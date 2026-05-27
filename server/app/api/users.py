@@ -5,6 +5,9 @@ from app.models.user import User
 from app.core.db_connection import engine
 from app.schemas.user import UserResponse
 from passlib.context import CryptContext
+from app.services.verifyPassword import verify_password
+from app.services.verifyPassword import verify_password_format
+from app.services.verifyPassword import verify_email_format
 router = APIRouter(prefix="/users", tags=["users"])
 
 
@@ -19,7 +22,8 @@ def create_user(user: UserCreate):
         existing_user = session.query(User).filter_by(email=user.email).first()
         if existing_user:
             raise HTTPException(status_code=400, detail="Email already registered")
-        
+        verify_email_format(user.email)
+        verify_password_format(user.password)
         hashed_password = pwd_context.hash(user.password)
         password_hash=hashed_password
         
