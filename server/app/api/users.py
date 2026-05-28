@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.orm import Session
-from app.schemas.user import UserCreate, UserResponse
+from app.schemas.user import LoginResponse, UserCreate, UserResponse
 from app.core.db_connection import engine
 from app.utils.verifyPassword import verify_password_format, verify_email_format
 from app.repositories.user import UserRepository
@@ -18,7 +18,7 @@ def create_user(user: UserCreate):
                               )
         return service.create_user(user)
     
-@router.post("/login")
+@router.post("/login", response_model=LoginResponse)
 def login_user(email: str, password: str):
     with Session(bind=engine) as session:
         repo = UserRepository(session)
