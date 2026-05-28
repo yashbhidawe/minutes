@@ -17,3 +17,10 @@ def create_user(user: UserCreate):
         service = UserService(repo
                               )
         return service.create_user(user)
+    
+@router.post("/login")
+def login_user(email: str, password: str):
+    with Session(bind=engine) as session:
+        repo = UserRepository(session)
+        service = UserService(repo)
+        return service.login_user(email, password)

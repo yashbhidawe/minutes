@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from app.schemas.user import UserCreate
 from app.utils.verifyPassword import verify_email_format, verify_password_format
 from passlib.context import CryptContext
+from app.utils.auth import create_access_token
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -32,6 +33,6 @@ class UserService:
         if not pwd_context.verify(password, user.password_hash):
             raise HTTPException(status_code=400, detail="Invalid email or password")
         
-        access_token = self.create_access_token({"user_id": user.id})
+        access_token = create_access_token(data={"sub": user.email})
         
         return {"user": user, "access_token": access_token}
