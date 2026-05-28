@@ -1,38 +1,24 @@
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.orm import Session
 from app.schemas.user import UserCreate, UserResponse
-from app.models.user import User
 from app.core.db_connection import engine
-from app.schemas.user import UserResponse
 from passlib.context import CryptContext
-from app.services.verifyPassword import verify_password
-from app.services.verifyPassword import verify_password_format
-from app.services.verifyPassword import verify_email_format
+from app.services.verifyPassword import verify_password_format, verify_email_format
+from app.repositories.user import UserRepository
+
 router = APIRouter(prefix="/users", tags=["users"])
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto"
-)
 @router.post("/", response_model=UserResponse)
 def create_user(user: UserCreate):
     with Session(bind=engine) as session:
-        existing_user = session.query(User).filter_by(email=user.email).first()
+        repo = UserRepository(session)
+        existing_user = repo.get_by_email(user.email)
         if existing_user:
             raise HTTPException(status_code=400, detail="Email already registered")
         verify_email_format(user.email)
         verify_password_format(user.password)
-        hashed_password = pwd_context.hash(user.password)
-        password_hash=hashed_password
-        
-        db_user = User(
-    email=user.email,
-    password_hash=password_hash
-)
-        
-        session.add(db_user)
-        session.commit()
-        session.refresh(db_user)
+        password_hash = pwd_context.hash(user.password)
+        db_user = repo.create(user, password_hash)
         return db_user
