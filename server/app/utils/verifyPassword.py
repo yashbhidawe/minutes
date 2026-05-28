@@ -20,6 +20,8 @@ def verify_email_format(email):
 def verify_password_format(plain_password):
     if len(plain_password) < 8:
         raise HTTPException(status_code=400, detail="Password must be at least 8 characters long")
+    if len(plain_password.encode()) > 72:
+        raise HTTPException(status_code=400, detail="Password must be at most 72 characters long")
     if not any(char.isupper() for char in plain_password):
         raise HTTPException(status_code=400, detail="Password must contain at least one uppercase letter")
     if not any(char.islower() for char in plain_password):

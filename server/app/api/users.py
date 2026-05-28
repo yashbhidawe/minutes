@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from sqlalchemy.orm import Session
 from app.schemas.user import UserCreate, UserResponse
 from app.core.db_connection import engine
-from app.services.verifyPassword import verify_password_format, verify_email_format
+from app.utils.verifyPassword import verify_password_format, verify_email_format
 from app.repositories.user import UserRepository
 from app.services.user import UserService
 

@@ -17,5 +17,8 @@ class UserRepository:
         )
         self.session.add(db_user)
         self.session.commit()
+       
+
+
         self.session.refresh(db_user)
         return db_user
