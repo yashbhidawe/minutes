@@ -15,3 +15,7 @@ class UserCreate(BaseModel):
 class LoginResponse(BaseModel):
     user: UserResponse
     access_token: str
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str

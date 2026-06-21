@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 
 from app.schemas.user import UserCreate
+from app.schemas.user import LoginRequest
 from app.utils.verifyPassword import verify_email_format, verify_password_format
 from passlib.context import CryptContext
 from app.utils.auth import create_access_token
@@ -25,12 +26,14 @@ class UserService:
         return self.user_repository.create(user_data, password_hash)
     
     
-    def login_user(self, email:str, password: str):
+    def login_user(self, login_data: LoginRequest):
+        email = login_data.email.lower()
+        verify_email_format(email)
         user = self.user_repository.get_by_email(email)
         if not user:
             raise HTTPException(status_code=400, detail="Invalid email or password")
         
-        if not pwd_context.verify(password, user.password_hash):
+        if not pwd_context.verify(login_data.password, user.password_hash):
             raise HTTPException(status_code=400, detail="Invalid email or password")
         
         access_token = create_access_token(data={"sub": user.email})
