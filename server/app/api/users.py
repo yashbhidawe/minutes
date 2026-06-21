@@ -21,6 +21,8 @@ def create_user(user: UserCreate):
 @router.post("/login", response_model=LoginResponse)
 def login_user(email: str, password: str):
     with Session(bind=engine) as session:
+        email = email.lower()
+        verify_email_format(email)        
         repo = UserRepository(session)
         service = UserService(repo)
         return service.login_user(email, password)
