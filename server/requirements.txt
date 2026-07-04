@@ -22,5 +22,4 @@ python-dotenv==1.0.1
 # http client
 httpx==0.27.2
 
-pyjwt==2.8.0
 
