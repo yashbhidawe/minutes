@@ -1,12 +1,12 @@
-from datetime import datetime
-from pytz import timezone
-from sqlalchemy import Boolean, Column, Integer, String
+from datetime import datetime, timezone
+from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
+from app.core.db_connection import Base
 
-def ActionItem(Base):
+class ActionItem(Base):
     __tablename__ = 'action_items'
 
     id = Column(Integer, primary_key=True)
-    meeting_id = Column(Integer, foreign_key='meetings.id', nullable=False)  
+    meeting_id = Column(Integer, ForeignKey('meetings.id'), nullable=False)  
     description = Column(String, nullable=False)
     assigned_to = Column(String(100), nullable=True)  
     due_date = Column(String(50), nullable=True) 
