@@ -14,12 +14,12 @@ Built for small teams and individuals who want meeting context without manual no
 
 ## Stack
 
-**Backend** — FastAPI, PostgreSQL, SQLAlchemy, Alembic  
-**Frontend** — Next.js, Tailwind CSS, Zustand  
+**Backend** — FastAPI, SQLite, SQLAlchemy  
+**Frontend** — Next.js, Tailwind CSS  
 **Extension** — Vanilla JS, Chrome Extensions Manifest V3  
 **AI** — OpenAI Whisper (transcription), Google Gemini (summarization)  
-**Storage** — Cloudflare R2 (audio), PostgreSQL (notes and metadata)  
-**Infra** — Docker, Railway (backend), Vercel (frontend)
+**Storage** — Cloudflare R2 (audio files)  
+**Auth** — JWT (python-jose), bcrypt (passlib)
 
 ---
 
@@ -27,32 +27,19 @@ Built for small teams and individuals who want meeting context without manual no
 
 ```
 minuteai/
-├── backend/
+├── server/
 │   ├── app/
-│   │   ├── api/            # route handlers
-│   │   ├── services/       # whisper, gemini, auth logic
-│   │   ├── repositories/   # database queries
-│   │   ├── models/         # SQLAlchemy models
-│   │   ├── schemas/        # Pydantic schemas
-│   │   └── core/           # config, db, constants
-│   ├── alembic/
+│   │   ├── api/              # route handlers (users, meetings)
+│   │   ├── services/         # business logic (user, audio, storage)
+│   │   ├── repositories/     # database queries (user, meeting)
+│   │   ├── models/           # SQLAlchemy models
+│   │   ├── schemas/          # Pydantic request/response schemas
+│   │   ├── core/             # config, db connection, R2 client
+│   │   └── utils/            # auth, password validation
 │   ├── main.py
 │   └── requirements.txt
-├── frontend/
-│   ├── src/
-│   │   ├── pages/
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   ├── services/
-│   │   └── store/
-│   └── package.json
-├── extension/
-│   ├── manifest.json
-│   ├── background.js
-│   ├── content.js
-│   ├── popup/
-│   └── utils/
-└── docker-compose.yml
+├── client/                   # Next.js dashboard (in progress)
+└── README.md
 ```
 
 ---
@@ -69,9 +56,27 @@ minuteai/
 
 ---
 
+## API Endpoints
+
+### Auth
+
+| Method | Endpoint           | Description              |
+|:-------|:-------------------|:-------------------------|
+| POST   | `/users/`          | Register a new user      |
+| POST   | `/users/login`     | Login and get JWT token  |
+
+### Meetings
+
+| Method | Endpoint                        | Description                    |
+|:-------|:--------------------------------|:-------------------------------|
+| POST   | `/meetings/`                    | Create a new meeting           |
+| POST   | `/meetings/{id}/upload-audio`   | Upload audio file for a meeting|
+
+---
+
 ## Local Development
 
-**Prerequisites:** Python 3.11+, Node 18+, PostgreSQL, Docker (optional)
+**Prerequisites:** Python 3.11+, Node 18+
 
 ```bash
 # clone the repo
@@ -79,42 +84,58 @@ git clone https://github.com/yashbhidawe/minuteai
 cd minuteai
 
 # backend
-cd backend
+cd server
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-alembic upgrade head
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 
 # frontend
-cd ../frontend
+cd ../client
 npm install
 npm run dev   # starts on localhost:3000
 ```
-
-**Extension:** Go to `chrome://extensions`, enable Developer Mode, click Load Unpacked, and select the `extension/` folder.
 
 ---
 
 ## Environment Variables
 
 ```
+# Database
 DATABASE_URL=
+
+# Auth
+JWT_SECRET_KEY=
+
+# AI
 OPENAI_API_KEY=
 GEMINI_API_KEY=
+
+# Cloudflare R2 (audio storage)
 R2_ACCOUNT_ID=
 R2_ACCESS_KEY_ID=
 R2_SECRET_ACCESS_KEY=
 R2_BUCKET_NAME=
-JWT_SECRET=
 ```
 
 ---
 
 ## Status
 
-Active development. Not production-ready.
+**Completed:**
+- User registration and login with JWT
+- Meeting model with status tracking
+- Audio upload endpoint with R2 storage
+
+**In Progress:**
+- Whisper transcription service
+- Gemini summarization and action item extraction
+
+**Planned:**
+- Web dashboard (Next.js)
+- Chrome extension
+- Background job queue
 
 ---
 
