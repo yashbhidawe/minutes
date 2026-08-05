@@ -2,12 +2,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.db_connection import Base, engine
 from app.api.users import router as users_router
-from app.models import User
+from app.api.meetings import router as meetings_router
+from app.models import User, Meeting
 
 
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
 app.include_router(users_router)
+app.include_router(meetings_router)
 
 app.add_middleware(
     CORSMiddleware,
