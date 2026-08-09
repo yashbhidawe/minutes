@@ -24,3 +24,14 @@ class MeetingUploadResponse(BaseModel):
     meeting_id: int
     status: str
     audio_key: str
+
+
+class TranscriptResponse(BaseModel):
+    id: int
+    meeting_id: int
+    raw_text: str
+    language: str
+    created_at: str
+
+    class Config:
+        from_attributes = True

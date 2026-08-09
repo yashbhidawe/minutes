@@ -3,7 +3,9 @@ from sqlalchemy.orm import Session
 from app.core.db_connection import engine
 from app.repositories.meeting import MeetingRepository
 from app.services.audio import upload_audio
-from app.schemas.meeting import MeetingResponse, MeetingUploadResponse
+from app.services.transcription import transcribe_audio
+from app.services.storage import download_file
+from app.schemas.meeting import MeetingResponse, MeetingUploadResponse, TranscriptResponse
 
 router = APIRouter(prefix="/meetings", tags=["meetings"])
 
@@ -29,3 +31,30 @@ async def upload_meeting_audio(meeting_id: int, file: UploadFile, session: Sessi
         status=meeting.status,
         audio_key=meeting.audio_key,
     )
+
+
+@router.post("/{meeting_id}/transcribe", response_model=TranscriptResponse)
+def transcribe_meeting(meeting_id: int, session: Session = Depends(get_session)):
+    repo = MeetingRepository(session)
+
+    meeting = repo.get_by_id(meeting_id)
+    if not meeting:
+        raise HTTPException(status_code=404, detail="Meeting not found")
+
+    if not meeting.audio_key:
+        raise HTTPException(status_code=400, detail="No audio uploaded for this meeting")
+
+    existing = repo.get_transcript(meeting_id)
+    if existing:
+        return existing
+
+    audio_bytes = download_file(meeting.audio_key)
+
+    filename = meeting.audio_key.split("/")[-1]
+    result = transcribe_audio(audio_bytes, filename)
+
+    transcript = repo.save_transcript(meeting_id, result["text"], result["language"])
+
+    repo.update_status(meeting_id, "transcribed")
+
+    return transcript

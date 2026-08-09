@@ -17,7 +17,7 @@ async def upload_audio(meeting_id: int, file: UploadFile, meeting_repo: MeetingR
             detail=f"Invalid file type. Allowed: {', '.join(ALLOWED_TYPES)}",
         )
 
-    file_bytes = await file.read()
+    file_bytes = await file.read() 
 
     if len(file_bytes) > MAX_FILE_SIZE:
         raise HTTPException(status_code=400, detail="File too large. Max 100MB.")

@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models.meeting import Meeting
+from app.models.transcript import Transcript
 
 
 class MeetingRepository:
@@ -30,3 +31,17 @@ class MeetingRepository:
         self.session.commit()
         self.session.refresh(meeting)
         return meeting
+
+    def get_transcript(self, meeting_id: int) -> Transcript | None:
+        return self.session.query(Transcript).filter_by(meeting_id=meeting_id).first()
+
+    def save_transcript(self, meeting_id: int, raw_text: str, language: str) -> Transcript:
+        transcript = Transcript(
+            meeting_id=meeting_id,
+            raw_text=raw_text,
+            language=language,
+        )
+        self.session.add(transcript)
+        self.session.commit()
+        self.session.refresh(transcript)
+        return transcript

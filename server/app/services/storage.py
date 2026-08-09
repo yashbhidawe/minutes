@@ -9,3 +9,9 @@ def upload_file(file_bytes: bytes, key: str) -> str:
         Body=file_bytes,
     )
     return key
+
+
+def download_file(key: str) -> bytes:
+    client = get_r2_client()
+    response = client.get_object(Bucket=R2_BUCKET_NAME, Key=key)
+    return response["Body"].read()
