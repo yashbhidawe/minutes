@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.core.db_connection import engine
+from app.models.user import User
+from app.utils.auth import get_current_user
 from app.repositories.meeting import MeetingRepository
 from app.repositories.note import NoteRepository
 from app.repositories.action_item import ActionItemRepository
@@ -21,16 +23,82 @@ def get_session():
         yield session
 
 
-@router.post("/", response_model=MeetingResponse)
-def create_meeting(title: str, duration_sec: int, session: Session = Depends(get_session)):
+@router.get("/", response_model=list[MeetingResponse])
+def list_meetings(
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
     repo = MeetingRepository(session)
-    meeting = repo.create(user_id=1, title=title, duration_sec=duration_sec)
+    return repo.get_by_user(user.id)
+
+
+@router.get("/{meeting_id}", response_model=MeetingResponse)
+def get_meeting(
+    meeting_id: int,
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    repo = MeetingRepository(session)
+    meeting = repo.get_by_id(meeting_id)
+    if not meeting or meeting.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Meeting not found")
+    return meeting
+
+
+@router.get("/{meeting_id}/notes", response_model=list[NoteResponse])
+def get_meeting_notes(
+    meeting_id: int,
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    meeting_repo = MeetingRepository(session)
+    meeting = meeting_repo.get_by_id(meeting_id)
+    if not meeting or meeting.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Meeting not found")
+
+    note_repo = NoteRepository(session)
+    return note_repo.get_by_meeting(meeting_id)
+
+
+@router.get("/{meeting_id}/action-items", response_model=list[ActionItemResponse])
+def get_meeting_action_items(
+    meeting_id: int,
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    meeting_repo = MeetingRepository(session)
+    meeting = meeting_repo.get_by_id(meeting_id)
+    if not meeting or meeting.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Meeting not found")
+
+    action_item_repo = ActionItemRepository(session)
+    return action_item_repo.get_by_meeting(meeting_id)
+
+
+@router.post("/", response_model=MeetingResponse)
+def create_meeting(
+    title: str,
+    duration_sec: int,
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    repo = MeetingRepository(session)
+    meeting = repo.create(user_id=user.id, title=title, duration_sec=duration_sec)
     return meeting
 
 
 @router.post("/{meeting_id}/upload-audio", response_model=MeetingUploadResponse)
-async def upload_meeting_audio(meeting_id: int, file: UploadFile, session: Session = Depends(get_session)):
+async def upload_meeting_audio(
+    meeting_id: int,
+    file: UploadFile,
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
     repo = MeetingRepository(session)
+    meeting = repo.get_by_id(meeting_id)
+    if not meeting or meeting.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Meeting not found")
+
     meeting = await upload_audio(meeting_id, file, repo)
     return MeetingUploadResponse(
         meeting_id=meeting.id,
@@ -40,11 +108,15 @@ async def upload_meeting_audio(meeting_id: int, file: UploadFile, session: Sessi
 
 
 @router.post("/{meeting_id}/transcribe", response_model=TranscriptResponse)
-def transcribe_meeting(meeting_id: int, session: Session = Depends(get_session)):
+def transcribe_meeting(
+    meeting_id: int,
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
     repo = MeetingRepository(session)
 
     meeting = repo.get_by_id(meeting_id)
-    if not meeting:
+    if not meeting or meeting.user_id != user.id:
         raise HTTPException(status_code=404, detail="Meeting not found")
 
     if not meeting.audio_key:
@@ -82,13 +154,17 @@ class SummarizeResponse(BaseModel):
 
 
 @router.post("/{meeting_id}/summarize", response_model=SummarizeResponse)
-def summarize_meeting(meeting_id: int, session: Session = Depends(get_session)):
+def summarize_meeting(
+    meeting_id: int,
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
     meeting_repo = MeetingRepository(session)
     note_repo = NoteRepository(session)
     action_item_repo = ActionItemRepository(session)
 
     meeting = meeting_repo.get_by_id(meeting_id)
-    if not meeting:
+    if not meeting or meeting.user_id != user.id:
         raise HTTPException(status_code=404, detail="Meeting not found")
 
     transcript = meeting_repo.get_transcript(meeting_id)
