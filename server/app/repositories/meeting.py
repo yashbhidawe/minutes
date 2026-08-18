@@ -10,6 +10,14 @@ class MeetingRepository:
     def get_by_id(self, meeting_id: int) -> Meeting | None:
         return self.session.query(Meeting).filter_by(id=meeting_id).first()
 
+    def get_by_user(self, user_id: int) -> list[Meeting]:
+        return (
+            self.session.query(Meeting)
+            .filter_by(user_id=user_id)
+            .order_by(Meeting.created_at.desc())
+            .all()
+        )
+
     def create(self, user_id: int, title: str, duration_sec: int) -> Meeting:
         meeting = Meeting(
             user_id=user_id,
