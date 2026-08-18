@@ -9,7 +9,7 @@ from app.services.audio import upload_audio
 from app.services.transcription import transcribe_audio
 from app.services.summarization import summarize_transcript
 from app.services.storage import download_file
-from app.schemas.meeting import MeetingResponse, MeetingUploadResponse, TranscriptResponse
+from app.schemas.meeting import MeetingResponse, MeetingUploadResponse, TranscriptResponse, TranscriptSegment
 from app.schemas.note import NoteResponse
 from app.schemas.action_item import ActionItemResponse
 
@@ -59,7 +59,12 @@ def transcribe_meeting(meeting_id: int, session: Session = Depends(get_session))
     filename = meeting.audio_key.split("/")[-1]
     result = transcribe_audio(audio_bytes, filename)
 
-    transcript = repo.save_transcript(meeting_id, result["text"], result["language"])
+    transcript = repo.save_transcript(
+        meeting_id,
+        result["text"],
+        result["language"],
+        segments=result["segments"],
+    )
 
     repo.update_status(meeting_id, "transcribed")
 
@@ -68,7 +73,10 @@ def transcribe_meeting(meeting_id: int, session: Session = Depends(get_session))
 
 class SummarizeResponse(BaseModel):
     meeting_id: int
-    summary: str
+    key_decisions: str
+    discussion_points: str
+    blockers: str
+    next_steps: str
     notes: list[NoteResponse]
     action_items: list[ActionItemResponse]
 
@@ -90,26 +98,38 @@ def summarize_meeting(meeting_id: int, session: Session = Depends(get_session)):
     existing_notes = note_repo.get_by_meeting(meeting_id)
     if existing_notes:
         existing_items = action_item_repo.get_by_meeting(meeting_id)
+        notes_by_section = {n.section: n.content for n in existing_notes}
         return SummarizeResponse(
             meeting_id=meeting_id,
-            summary=existing_notes[0].content,
+            key_decisions=notes_by_section.get("key_decisions", ""),
+            discussion_points=notes_by_section.get("discussion_points", ""),
+            blockers=notes_by_section.get("blockers", ""),
+            next_steps=notes_by_section.get("next_steps", ""),
             notes=[NoteResponse.model_validate(n) for n in existing_notes],
             action_items=[ActionItemResponse.model_validate(i) for i in existing_items],
         )
 
     result = summarize_transcript(transcript.raw_text)
 
-    summary_text = result.get("summary", "")
+    sections = {
+        "key_decisions": result.get("key_decisions", ""),
+        "discussion_points": result.get("discussion_points", ""),
+        "blockers": result.get("blockers", ""),
+        "next_steps": result.get("next_steps", ""),
+    }
     action_items_data = result.get("action_items", [])
 
-    note = note_repo.create(meeting_id=meeting_id, content=summary_text)
+    notes = note_repo.create_many(meeting_id=meeting_id, sections=sections)
     items = action_item_repo.create_many(meeting_id=meeting_id, items=action_items_data)
 
     meeting_repo.update_status(meeting_id, "summarized")
 
     return SummarizeResponse(
         meeting_id=meeting_id,
-        summary=summary_text,
-        notes=[NoteResponse.model_validate(note)],
+        key_decisions=sections["key_decisions"],
+        discussion_points=sections["discussion_points"],
+        blockers=sections["blockers"],
+        next_steps=sections["next_steps"],
+        notes=[NoteResponse.model_validate(n) for n in notes],
         action_items=[ActionItemResponse.model_validate(i) for i in items],
     )

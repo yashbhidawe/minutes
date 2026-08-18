@@ -7,7 +7,8 @@ class ActionItemResponse(BaseModel):
     description: str
     assigned_to: str | None = None
     due_date: str | None = None
-    isDone: bool
+    priority: str
+    status: str
     created_at: str
     updated_at: str
 

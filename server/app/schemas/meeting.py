@@ -26,11 +26,18 @@ class MeetingUploadResponse(BaseModel):
     audio_key: str
 
 
+class TranscriptSegment(BaseModel):
+    start: float
+    end: float
+    text: str
+
+
 class TranscriptResponse(BaseModel):
     id: int
     meeting_id: int
     raw_text: str
     language: str
+    segments: list[TranscriptSegment] | None = None
     created_at: str
 
     class Config:

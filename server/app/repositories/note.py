@@ -9,9 +9,10 @@ class NoteRepository:
     def get_by_meeting(self, meeting_id: int) -> list[Note]:
         return self.session.query(Note).filter_by(meeting_id=meeting_id).all()
 
-    def create(self, meeting_id: int, content: str) -> Note:
+    def create(self, meeting_id: int, section: str, content: str) -> Note:
         note = Note(
             meeting_id=meeting_id,
+            section=section,
             content=content,
         )
         self.session.add(note)
@@ -19,12 +20,13 @@ class NoteRepository:
         self.session.refresh(note)
         return note
 
-    def create_many(self, meeting_id: int, contents: list[str]) -> list[Note]:
+    def create_many(self, meeting_id: int, sections: dict[str, str]) -> list[Note]:
         notes = []
-        for content in contents:
-            note = Note(meeting_id=meeting_id, content=content)
-            self.session.add(note)
-            notes.append(note)
+        for section, content in sections.items():
+            if content:
+                note = Note(meeting_id=meeting_id, section=section, content=content)
+                self.session.add(note)
+                notes.append(note)
         self.session.commit()
         for note in notes:
             self.session.refresh(note)

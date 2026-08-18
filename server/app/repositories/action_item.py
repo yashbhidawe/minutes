@@ -15,12 +15,14 @@ class ActionItemRepository:
         description: str,
         assigned_to: str | None = None,
         due_date: str | None = None,
+        priority: str = "medium",
     ) -> ActionItem:
         item = ActionItem(
             meeting_id=meeting_id,
             description=description,
             assigned_to=assigned_to,
             due_date=due_date,
+            priority=priority,
         )
         self.session.add(item)
         self.session.commit()
@@ -39,6 +41,7 @@ class ActionItemRepository:
                 description=item["description"],
                 assigned_to=item.get("assigned_to"),
                 due_date=item.get("due_date"),
+                priority=item.get("priority", "medium"),
             )
             self.session.add(ai)
             action_items.append(ai)
