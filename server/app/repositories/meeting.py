@@ -35,11 +35,12 @@ class MeetingRepository:
     def get_transcript(self, meeting_id: int) -> Transcript | None:
         return self.session.query(Transcript).filter_by(meeting_id=meeting_id).first()
 
-    def save_transcript(self, meeting_id: int, raw_text: str, language: str) -> Transcript:
+    def save_transcript(self, meeting_id: int, raw_text: str, language: str, segments: str = None) -> Transcript:
         transcript = Transcript(
             meeting_id=meeting_id,
             raw_text=raw_text,
             language=language,
+            segments=segments,
         )
         self.session.add(transcript)
         self.session.commit()

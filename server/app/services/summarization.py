@@ -18,19 +18,27 @@ Transcript:
 
 Return a JSON object with exactly this structure (no markdown, no code fences, just raw JSON):
 {{
-  "summary": "A concise 2-4 sentence summary of the meeting covering the main topics discussed and any decisions made.",
+  "key_decisions": "Bullet-point list of all decisions made during the meeting. Each decision on its own line starting with '- '. Leave empty string if none.",
+  "discussion_points": "Summary of the main topics discussed and key arguments or ideas shared. Use bullet points starting with '- '. Leave empty string if none.",
+  "blockers": "Any blockers, risks, or concerns raised. Each on its own line starting with '- '. Leave empty string if none.",
+  "next_steps": "Concrete next steps, follow-ups, or tasks mentioned. Each on its own line starting with '- '. Leave empty string if none.",
   "action_items": [
     {{
       "description": "Clear description of the action item",
       "assigned_to": "Name of person assigned, or null if unassigned",
-      "due_date": "Due date as ISO string, or null if not mentioned"
+      "due_date": "Due date as ISO string, or null if not mentioned",
+      "priority": "high, medium, or low based on urgency and importance"
     }}
   ]
 }}
 
 Rules:
-- The summary should be clear and useful for someone who missed the meeting.
-- Extract all concrete action items with owners and deadlines when mentioned.
+- Key decisions should capture any conclusions, agreements, or choices made.
+- Discussion points should cover the substance of what was talked about.
+- Blockers should capture anything that's preventing progress.
+- Next steps should be forward-looking actions or follow-ups.
+- Extract all concrete action items with owners, deadlines, and priority.
+- If a section has nothing relevant, use an empty string "".
 - If no action items are found, return an empty array for action_items.
 - Return ONLY the JSON object, no other text."""
 
