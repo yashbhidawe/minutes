@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+import json
+from pydantic import BaseModel, field_validator
 
 
 class MeetingCreate(BaseModel):
@@ -42,3 +43,13 @@ class TranscriptResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+    @field_validator("segments", mode="before")
+    @classmethod
+    def parse_segments(cls, v):
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except (json.JSONDecodeError, TypeError):
+                return None
+        return v

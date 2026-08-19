@@ -2,14 +2,13 @@ import json
 from fastapi import HTTPException
 from os import getenv
 from dotenv import load_dotenv
-import google.generativeai as genai
+from google import genai
 
 load_dotenv()
 
 GEMINI_API_KEY = getenv("GEMINI_API_KEY")
 
-genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel("gemini-3.6-flash")
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 SUMMARY_PROMPT = """You are an expert meeting assistant. Analyze the following meeting transcript and produce a structured output.
 
@@ -45,8 +44,9 @@ Rules:
 
 def summarize_transcript(transcript_text: str) -> dict:
     try:
-        response = model.generate_content(
-            SUMMARY_PROMPT.format(transcript=transcript_text)
+        response = client.models.generate_content(
+            model="gemini-3.6-flash",
+            contents=SUMMARY_PROMPT.format(transcript=transcript_text),
         )
         raw = response.text.strip()
 
