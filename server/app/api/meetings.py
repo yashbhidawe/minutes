@@ -75,15 +75,19 @@ def get_meeting_action_items(
     return action_item_repo.get_by_meeting(meeting_id)
 
 
+class CreateMeetingRequest(BaseModel):
+    title: str
+    duration_sec: int
+
+
 @router.post("/", response_model=MeetingResponse)
 def create_meeting(
-    title: str,
-    duration_sec: int,
+    body: CreateMeetingRequest,
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     repo = MeetingRepository(session)
-    meeting = repo.create(user_id=user.id, title=title, duration_sec=duration_sec)
+    meeting = repo.create(user_id=user.id, title=body.title, duration_sec=body.duration_sec)
     return meeting
 
 
