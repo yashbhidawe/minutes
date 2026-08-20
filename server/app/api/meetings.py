@@ -75,6 +75,44 @@ def get_meeting_action_items(
     return action_item_repo.get_by_meeting(meeting_id)
 
 
+@router.delete("/{meeting_id}")
+def delete_meeting(
+    meeting_id: int,
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    repo = MeetingRepository(session)
+    meeting = repo.get_by_id(meeting_id)
+    if not meeting or meeting.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Meeting not found")
+    repo.delete(meeting_id)
+    return {"detail": "Meeting deleted"}
+
+
+class UpdateActionItemStatusRequest(BaseModel):
+    status: str
+
+
+@router.patch("/{meeting_id}/action-items/{item_id}", response_model=ActionItemResponse)
+def update_action_item_status(
+    meeting_id: int,
+    item_id: int,
+    body: UpdateActionItemStatusRequest,
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    meeting_repo = MeetingRepository(session)
+    meeting = meeting_repo.get_by_id(meeting_id)
+    if not meeting or meeting.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Meeting not found")
+
+    action_item_repo = ActionItemRepository(session)
+    item = action_item_repo.update_status(item_id, body.status)
+    if not item:
+        raise HTTPException(status_code=404, detail="Action item not found")
+    return item
+
+
 class CreateMeetingRequest(BaseModel):
     title: str
     duration_sec: int

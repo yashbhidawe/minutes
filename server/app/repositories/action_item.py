@@ -9,6 +9,18 @@ class ActionItemRepository:
     def get_by_meeting(self, meeting_id: int) -> list[ActionItem]:
         return self.session.query(ActionItem).filter_by(meeting_id=meeting_id).all()
 
+    def get_by_id(self, item_id: int) -> ActionItem | None:
+        return self.session.query(ActionItem).filter_by(id=item_id).first()
+
+    def update_status(self, item_id: int, status: str) -> ActionItem | None:
+        item = self.get_by_id(item_id)
+        if not item:
+            return None
+        item.status = status
+        self.session.commit()
+        self.session.refresh(item)
+        return item
+
     def create(
         self,
         meeting_id: int,
