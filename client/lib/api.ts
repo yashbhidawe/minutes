@@ -126,5 +126,13 @@ export const api = {
         `/meetings/${id}/summarize`,
         { method: "POST", token }
       ),
+    delete: (id: number, token: string) =>
+      request<{ detail: string }>(`/meetings/${id}`, { method: "DELETE", token }),
+    updateActionItemStatus: (meetingId: number, itemId: number, status: string, token: string) =>
+      request<ActionItem>(`/meetings/${meetingId}/action-items/${itemId}`, {
+        method: "PATCH",
+        body: { status },
+        token,
+      }),
   },
 };

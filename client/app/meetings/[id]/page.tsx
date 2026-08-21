@@ -84,6 +84,7 @@ export default function MeetingDetailPage() {
   const [uploading, setUploading] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const [summarizing, setSummarizing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -147,6 +148,29 @@ export default function MeetingDetailPage() {
       setError(err instanceof Error ? err.message : "Summarization failed");
     } finally {
       setSummarizing(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!token || !confirm("Delete this meeting?")) return;
+    setDeleting(true);
+    setError("");
+    try {
+      await api.meetings.delete(meetingId, token);
+      router.push("/dashboard");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Delete failed");
+      setDeleting(false);
+    }
+  };
+
+  const handleStatusChange = async (itemId: number, newStatus: string) => {
+    if (!token) return;
+    try {
+      const updated = await api.meetings.updateActionItemStatus(meetingId, itemId, newStatus, token);
+      setActionItems((prev) => prev.map((i) => (i.id === itemId ? updated : i)));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Status update failed");
     }
   };
 
@@ -230,6 +254,14 @@ export default function MeetingDetailPage() {
               {summarizing ? "Summarizing..." : "Summarize"}
             </button>
           )}
+
+          <button
+            onClick={handleDelete}
+            disabled={deleting}
+            className="px-4 py-2 text-sm text-stone-400 hover:text-red-600 transition-colors"
+          >
+            {deleting ? "Deleting..." : "Delete"}
+          </button>
         </div>
       </div>
 
@@ -293,7 +325,7 @@ export default function MeetingDetailPage() {
                         {new Date(item.due_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                       </span>
                     )}
-                    <StatusSelect status={item.status} onChange={() => {}} />
+                    <StatusSelect status={item.status} onChange={(s) => handleStatusChange(item.id, s)} />
                   </div>
                 </div>
               ))}

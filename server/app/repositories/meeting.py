@@ -40,6 +40,14 @@ class MeetingRepository:
         self.session.refresh(meeting)
         return meeting
 
+    def delete(self, meeting_id: int) -> bool:
+        meeting = self.get_by_id(meeting_id)
+        if not meeting:
+            return False
+        self.session.delete(meeting)
+        self.session.commit()
+        return True
+
     def get_transcript(self, meeting_id: int) -> Transcript | None:
         return self.session.query(Transcript).filter_by(meeting_id=meeting_id).first()
 
