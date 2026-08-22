@@ -265,7 +265,11 @@ export default function MeetingDetailPage() {
 
         <div className="flex items-center gap-3">
           {meeting.status === "pending" && (
-            <>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-mono uppercase tracking-wider text-amber-700 bg-amber-50 px-3 py-1.5 border border-amber-200 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                Awaiting Extension Audio Upload...
+              </span>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -276,11 +280,11 @@ export default function MeetingDetailPage() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="px-4 py-2 bg-stone-900 text-white text-sm hover:bg-stone-800 disabled:opacity-50 transition-colors"
+                className="text-xs text-stone-400 hover:text-stone-900 underline underline-offset-4 transition-colors"
               >
-                {uploading ? "Uploading..." : "Upload audio"}
+                {uploading ? "Uploading..." : "Upload manually"}
               </button>
-            </>
+            </div>
           )}
 
           {meeting.status === "uploaded" && (
@@ -368,7 +372,7 @@ export default function MeetingDetailPage() {
             <div className="py-16 text-center">
               <p className="text-stone-300 text-sm">No summary yet</p>
               <p className="text-stone-400 text-xs mt-1">
-                {meeting.status === "pending" && "Upload audio to get started."}
+                {meeting.status === "pending" && "Extension capturing audio. Notes will appear as soon as the recording finishes."}
                 {meeting.status === "uploaded" && "Transcribe the audio to generate notes."}
                 {meeting.status === "transcribed" && "Summarize the transcript to generate notes."}
               </p>
