@@ -19,14 +19,23 @@
     .header {
       padding: 16px 20px;
       border-bottom: 1px solid #e7e5e4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .header h1 {
       font-size: 11px;
-      font-weight: 500;
+      font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: #78716c;
+    }
+
+    .header .app-brand {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1c1917;
     }
 
     .content {
@@ -41,8 +50,8 @@
     }
 
     .status-dot {
-      width: 6px;
-      height: 6px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: #d6d3d1;
     }
@@ -53,12 +62,12 @@
 
     .status-dot.recording {
       background: #dc2626;
-      animation: pulse 1.5s infinite;
+      animation: pulse 1.2s infinite;
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.15); }
     }
 
     .status-text {
@@ -68,7 +77,40 @@
 
     .status-text strong {
       color: #1c1917;
-      font-weight: 500;
+      font-weight: 600;
+    }
+
+    .recording-card {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      padding: 14px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+
+    .recording-badge {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .recording-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #dc2626;
+    }
+
+    .recording-timer {
+      font-family: monospace;
+      font-size: 14px;
+      font-weight: 700;
+      color: #991b1b;
     }
 
     .login-form {
@@ -96,32 +138,39 @@
     }
 
     .btn {
-      padding: 8px 16px;
+      padding: 10px 16px;
       border: none;
       font-size: 12px;
+      font-weight: 500;
       cursor: pointer;
-      transition: background 0.15s;
+      width: 100%;
+      border-radius: 4px;
+      transition: all 0.15s;
     }
 
     .btn-primary {
       background: #1c1917;
       color: white;
-      margin-top: 4px;
     }
 
     .btn-primary:hover {
       background: #44403c;
     }
 
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #b91c1c;
     }
 
     .btn-ghost {
       background: transparent;
       color: #78716c;
       padding: 0;
+      width: auto;
     }
 
     .btn-ghost:hover {
@@ -131,7 +180,11 @@
     .error {
       font-size: 12px;
       color: #dc2626;
-      margin-top: 4px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      padding: 8px 10px;
+      margin-top: 8px;
+      border-radius: 4px;
     }
 
     .user-info {
@@ -144,6 +197,7 @@
     .user-email {
       font-size: 12px;
       color: #78716c;
+      font-weight: 500;
     }
 
     .divider {
@@ -156,6 +210,7 @@
       font-size: 12px;
       color: #78716c;
       line-height: 1.5;
+      margin-bottom: 14px;
     }
 
     .meeting-info strong {
@@ -166,18 +221,19 @@
       padding: 12px 20px;
       border-top: 1px solid #e7e5e4;
       font-size: 10px;
-      color: #d6d3d1;
+      color: #a8a29e;
       text-align: center;
     }
 
     .hidden {
-      display: none;
+      display: none !important;
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>Minute AI</h1>
+    <span class="app-brand">Minute AI</span>
+    <h1>Extension</h1>
   </div>
 
   <div class="content">
@@ -202,21 +258,39 @@
         <button class="btn btn-ghost" id="logout-btn">Sign out</button>
       </div>
 
-      <div class="status" id="status-area">
-        <div class="status-dot" id="status-dot"></div>
-        <span class="status-text" id="status-text">Ready</span>
+      <!-- Active Recording Card -->
+      <div id="recording-card" class="recording-card hidden">
+        <div class="recording-badge">
+          <div class="recording-label">
+            <div class="status-dot recording"></div>
+            Recording Call...
+          </div>
+          <span class="recording-timer" id="recording-timer">00:00</span>
+        </div>
+        <p class="meeting-info" style="margin-bottom: 10px; font-size: 11px;">
+          Audio is being captured. When you finish, click below or leave call to process AI notes.
+        </p>
+        <button id="stop-rec-btn" class="btn btn-danger">Stop & Process Notes</button>
       </div>
 
-      <div class="divider"></div>
-
-      <div class="meeting-info" id="meeting-info">
-        Open Google Meet to start recording.
+      <!-- Idle Ready View -->
+      <div id="idle-card">
+        <div class="status">
+          <div class="status-dot active"></div>
+          <span class="status-text"><strong>Connected</strong> &amp; Ready</span>
+        </div>
+        <p class="meeting-info" id="meeting-info">
+          Join a Google Meet call to auto-record, or click below to manually start recording this tab.
+        </p>
+        <button id="start-rec-btn" class="btn btn-primary">Record Current Tab</button>
       </div>
+
+      <div class="error hidden" id="main-error"></div>
     </div>
   </div>
 
   <div class="footer">
-    Auto-captures audio on call end
+    Auto-captures Google Meet audio &amp; generates AI summaries
   </div>
 
   <script src="popup.js"></script>

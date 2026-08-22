@@ -48,6 +48,7 @@ export interface Meeting {
   duration_sec: number;
   status: string;
   audio_key: string | null;
+  error_message: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -126,6 +127,11 @@ export const api = {
     summarize: (id: number, token: string) =>
       request<{ meeting_id: number; key_decisions: string; discussion_points: string; blockers: string; next_steps: string; notes: Note[]; action_items: ActionItem[] }>(
         `/meetings/${id}/summarize`,
+        { method: "POST", token }
+      ),
+    reprocess: (id: number, token: string) =>
+      request<{ meeting_id: number; status: string; audio_key: string }>(
+        `/meetings/${id}/reprocess`,
         { method: "POST", token }
       ),
     delete: (id: number, token: string) =>

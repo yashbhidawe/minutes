@@ -40,6 +40,33 @@ class MeetingRepository:
         self.session.refresh(meeting)
         return meeting
 
+    def update_title(self, meeting_id: int, title: str) -> Meeting | None:
+        meeting = self.get_by_id(meeting_id)
+        if not meeting:
+            return None
+        meeting.title = title
+        self.session.commit()
+        self.session.refresh(meeting)
+        return meeting
+
+    def update_duration(self, meeting_id: int, duration_sec: int) -> Meeting | None:
+        meeting = self.get_by_id(meeting_id)
+        if not meeting:
+            return None
+        meeting.duration_sec = duration_sec
+        self.session.commit()
+        self.session.refresh(meeting)
+        return meeting
+
+    def update_error(self, meeting_id: int, error_message: str) -> Meeting | None:
+        meeting = self.get_by_id(meeting_id)
+        if not meeting:
+            return None
+        meeting.error_message = error_message
+        self.session.commit()
+        self.session.refresh(meeting)
+        return meeting
+
     def delete(self, meeting_id: int) -> bool:
         meeting = self.get_by_id(meeting_id)
         if not meeting:

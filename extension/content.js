@@ -1,82 +1,57 @@
 (function () {
   let isInMeeting = false;
-  let recordingStartTime = null;
+  let pendingMeetingTimer = null;
 
-  function detectMeetingState() {
-    const callEnded = document.querySelector('[data-is-muted]');
-    const meetingActive = document.querySelector(
-      'div[role="main"], div[jsname="r4nke"], video'
-    );
-    const leaveButton = document.querySelector(
-      '[aria-label*="Leave call"], [data-tooltip*="Leave"], button[aria-label*="end"], [aria-label*="End call"]'
-    );
+  function checkIsGoogleMeetCall() {
+    if (window.location.host !== "meet.google.com") return false;
 
-    const participants = document.querySelectorAll(
-      '[data-participant-id], [data-initial-participant-id]'
-    );
-
-    const hasVideo = document.querySelectorAll("video").length > 0;
-    const hasMainContent = !!document.querySelector('div[role="main"]');
-
-    const meetingDetected = hasVideo && hasMainContent && participants.length > 0;
-
-    if (meetingDetected && !isInMeeting) {
-      isInMeeting = true;
-      recordingStartTime = Date.now();
-
-      const title = document.title.replace(" - Google Meet", "").trim();
-
-      chrome.runtime.sendMessage({
-        type: "MEETING_STARTED",
-        tabId: null,
-        title: title,
-        duration: 1800,
-      });
+    const path = window.location.pathname;
+    if (!path || path === "/" || path.startsWith("/landing") || path.startsWith("/about")) {
+      return false;
     }
 
-    if (!meetingDetected && isInMeeting) {
-      isInMeeting = false;
+    // Require a leave/end button to confirm an active call (not lobby/pre-join)
+    const leaveButton = document.querySelector(
+      '[aria-label*="Leave"], [aria-label*="End call"], [jsname="CQylEf"]'
+    );
 
-      chrome.runtime.sendMessage({
-        type: "MEETING_ENDED",
-        audioBlob: null,
-      });
+    return !!leaveButton;
+  }
+
+  function monitorMeetingState() {
+    const currentlyInMeeting = checkIsGoogleMeetCall();
+
+    if (currentlyInMeeting && !isInMeeting && !pendingMeetingTimer) {
+      // Wait 5 seconds to confirm this isn't the lobby/pre-join transitioning
+      pendingMeetingTimer = setTimeout(() => {
+        pendingMeetingTimer = null;
+        if (checkIsGoogleMeetCall() && !isInMeeting) {
+          isInMeeting = true;
+          const title = document.title.replace(" - Google Meet", "").trim() || "Google Meet";
+          chrome.runtime.sendMessage({
+            type: "MEETING_STARTED",
+            title: title,
+            duration: 0,
+          });
+        }
+      }, 5000);
+    }
+
+    // Cancel pending timer if we left before 5s
+    if (!currentlyInMeeting && pendingMeetingTimer) {
+      clearTimeout(pendingMeetingTimer);
+      pendingMeetingTimer = null;
+    }
+
+    if (!currentlyInMeeting && isInMeeting) {
+      isInMeeting = false;
+      chrome.runtime.sendMessage({ type: "MEETING_ENDED" });
     }
   }
 
-  let lastState = false;
-  setInterval(() => {
-    const hasVideo = document.querySelectorAll("video").length > 0;
-    const hasMainContent = !!document.querySelector('div[role="main"]');
+  setInterval(monitorMeetingState, 2000);
 
-    const currentlyInMeeting = hasVideo && hasMainContent;
-
-    if (currentlyInMeeting !== lastState) {
-      lastState = currentlyInMeeting;
-
-      if (currentlyInMeeting && !isInMeeting) {
-        isInMeeting = true;
-        recordingStartTime = Date.now();
-
-        const title = document.title.replace(" - Google Meet", "").trim();
-
-        chrome.runtime.sendMessage({
-          type: "MEETING_STARTED",
-          title: title,
-          duration: 1800,
-        });
-      }
-
-      if (!currentlyInMeeting && isInMeeting) {
-        isInMeeting = false;
-
-        chrome.runtime.sendMessage({
-          type: "MEETING_ENDED",
-        });
-      }
-    }
-  }, 3000);
-
+  // Sync on load
   chrome.runtime.sendMessage({ type: "GET_STATUS" }, (response) => {
     if (response && response.isRecording) {
       isInMeeting = true;

@@ -18,6 +18,7 @@ Transcript:
 
 Return a JSON object with exactly this structure (no markdown, no code fences, just raw JSON):
 {{
+  "title": "A concise, descriptive meeting title (3 to 7 words) summarizing the core topic discussed",
   "key_decisions": "Bullet-point list of all decisions made during the meeting. Each decision on its own line starting with '- '. Leave empty string if none.",
   "discussion_points": "Summary of the main topics discussed and key arguments or ideas shared. Use bullet points starting with '- '. Leave empty string if none.",
   "blockers": "Any blockers, risks, or concerns raised. Each on its own line starting with '- '. Leave empty string if none.",

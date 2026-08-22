@@ -113,6 +113,50 @@ export default function MeetingDetailPage() {
     }).finally(() => setLoading(false));
   }, [token, meetingId]);
 
+  useEffect(() => {
+    if (!token || !meeting) return;
+    const isProcessing = ["uploaded", "processing", "transcribing", "summarizing"].includes(meeting.status);
+    if (!isProcessing) return;
+
+    let lastStatus = meeting.status;
+    let stalePollCount = 0;
+    const MAX_STALE_POLLS = 20; // ~60 seconds with no status change
+
+    const interval = setInterval(async () => {
+      try {
+        const updated = await api.meetings.get(meetingId, token);
+        setMeeting(updated);
+
+        if (updated.status === lastStatus) {
+          stalePollCount++;
+          if (stalePollCount >= MAX_STALE_POLLS) {
+            clearInterval(interval);
+            setError("Processing is taking longer than expected. The server may have restarted. Try the Retry button.");
+          }
+        } else {
+          stalePollCount = 0;
+          lastStatus = updated.status;
+        }
+
+        if (updated.status === "completed" || updated.status === "failed") {
+          clearInterval(interval);
+          const [n, a, t] = await Promise.all([
+            api.meetings.getNotes(meetingId, token).catch(() => []),
+            api.meetings.getActionItems(meetingId, token).catch(() => []),
+            api.meetings.getTranscript(meetingId, token).catch(() => null),
+          ]);
+          setNotes(n);
+          setActionItems(a);
+          setTranscript(t);
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [token, meetingId, meeting?.status]);
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !token) return;
@@ -126,6 +170,17 @@ export default function MeetingDetailPage() {
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleRetry = async () => {
+    if (!token) return;
+    setError("");
+    try {
+      const res = await api.meetings.reprocess(meetingId, token);
+      setMeeting((prev) => prev ? { ...prev, status: res.status } : prev);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Retry failed");
     }
   };
 
@@ -226,7 +281,11 @@ export default function MeetingDetailPage() {
 
         <div className="flex items-center gap-3">
           {meeting.status === "pending" && (
-            <>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-mono uppercase tracking-wider text-amber-700 bg-amber-50 px-3 py-1.5 border border-amber-200 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                Awaiting Extension Audio Upload...
+              </span>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -237,11 +296,11 @@ export default function MeetingDetailPage() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="px-4 py-2 bg-stone-900 text-white text-sm hover:bg-stone-800 disabled:opacity-50 transition-colors"
+                className="text-xs text-stone-400 hover:text-stone-900 underline underline-offset-4 transition-colors"
               >
-                {uploading ? "Uploading..." : "Upload audio"}
+                {uploading ? "Uploading..." : "Upload manually"}
               </button>
-            </>
+            </div>
           )}
 
           {meeting.status === "uploaded" && (
@@ -264,6 +323,15 @@ export default function MeetingDetailPage() {
             </button>
           )}
 
+          {meeting.status === "failed" && (
+            <button
+              onClick={handleRetry}
+              className="px-4 py-2 bg-stone-900 text-white text-sm hover:bg-stone-800 transition-colors"
+            >
+              Retry AI Processing
+            </button>
+          )}
+
           <button
             onClick={handleDelete}
             disabled={deleting}
@@ -277,6 +345,37 @@ export default function MeetingDetailPage() {
       {error && (
         <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-700 text-sm">
           {error}
+        </div>
+      )}
+
+      {meeting.status === "failed" && meeting.error_message && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 flex items-start gap-3">
+          <span className="text-red-500 mt-0.5 shrink-0">✕</span>
+          <div>
+            <p className="text-sm font-medium text-red-800">Processing failed</p>
+            <p className="text-xs text-red-600 mt-1">{meeting.error_message}</p>
+          </div>
+        </div>
+      )}
+
+      {["uploaded", "processing", "transcribing", "summarizing"].includes(meeting.status) && (
+        <div className="mb-8 p-4 bg-stone-50 border border-stone-200 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            <div>
+              <p className="text-sm font-medium text-stone-900">
+                {meeting.status === "transcribing" && "Transcribing meeting audio via Groq Whisper..."}
+                {meeting.status === "summarizing" && "Extracting AI notes & key decisions via Gemini..."}
+                {(meeting.status === "processing" || meeting.status === "uploaded") && "Processing audio & preparing AI pipeline..."}
+              </p>
+              <p className="text-xs text-stone-500 mt-0.5">
+                The meeting title and structured notes will auto-update as soon as processing completes.
+              </p>
+            </div>
+          </div>
+          <span className="text-xs uppercase tracking-wider text-amber-700 font-mono bg-amber-50 px-2 py-1 border border-amber-200">
+            {meeting.status}
+          </span>
         </div>
       )}
 
@@ -299,7 +398,7 @@ export default function MeetingDetailPage() {
             <div className="py-16 text-center">
               <p className="text-stone-300 text-sm">No summary yet</p>
               <p className="text-stone-400 text-xs mt-1">
-                {meeting.status === "pending" && "Upload audio to get started."}
+                {meeting.status === "pending" && "Extension capturing audio. Notes will appear as soon as the recording finishes."}
                 {meeting.status === "uploaded" && "Transcribe the audio to generate notes."}
                 {meeting.status === "transcribed" && "Summarize the transcript to generate notes."}
               </p>
