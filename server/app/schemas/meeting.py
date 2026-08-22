@@ -4,7 +4,7 @@ from pydantic import BaseModel, field_validator
 
 class MeetingCreate(BaseModel):
     title: str
-    duration_sec: int
+    duration_sec: int = 0
 
 
 class MeetingResponse(BaseModel):
@@ -14,6 +14,7 @@ class MeetingResponse(BaseModel):
     duration_sec: int
     status: str
     audio_key: str | None = None
+    error_message: str | None = None
     created_at: str
     updated_at: str
 

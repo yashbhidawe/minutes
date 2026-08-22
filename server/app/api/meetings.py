@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, BackgroundTasks, Header
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.core.db_connection import engine, SessionLocal
@@ -20,18 +20,31 @@ router = APIRouter(prefix="/meetings", tags=["meetings"])
 
 def run_automated_pipeline(meeting_id: int):
     with SessionLocal() as session:
+        repo = MeetingRepository(session)
         try:
-            repo = MeetingRepository(session)
             meeting = repo.get_by_id(meeting_id)
             if not meeting or not meeting.audio_key:
                 return
 
+            # Step 1: Download and validate audio
             repo.update_status(meeting_id, "transcribing")
             audio_bytes = download_file(meeting.audio_key)
+
+            if len(audio_bytes) < 5000:  # < 5KB = empty/silent recording
+                repo.update_error(meeting_id, "Recording too short or empty — no audio was captured.")
+                repo.update_status(meeting_id, "failed")
+                return
+
+            # Step 2: Transcribe via Groq Whisper
             filename = meeting.audio_key.split("/")[-1]
             transcribe_result = transcribe_audio(audio_bytes, filename)
 
-            transcript = repo.save_transcript(
+            if not transcribe_result["text"].strip():
+                repo.update_error(meeting_id, "Transcription produced no speech — the recording may contain only background noise.")
+                repo.update_status(meeting_id, "failed")
+                return
+
+            repo.save_transcript(
                 meeting_id,
                 transcribe_result["text"],
                 transcribe_result["language"],
@@ -39,6 +52,7 @@ def run_automated_pipeline(meeting_id: int):
             )
             repo.update_status(meeting_id, "transcribed")
 
+            # Step 3: Summarize via Gemini
             repo.update_status(meeting_id, "summarizing")
             summary = summarize_transcript(transcribe_result["text"])
 
@@ -60,10 +74,15 @@ def run_automated_pipeline(meeting_id: int):
             if summary.get("action_items"):
                 action_item_repo.create_many(meeting_id, summary["action_items"])
 
+            # Clear any previous error and mark done
+            repo.update_error(meeting_id, None)
             repo.update_status(meeting_id, "completed")
+
         except Exception as e:
-            print(f"Error in automated pipeline for meeting {meeting_id}: {e}")
+            error_msg = str(e)
+            print(f"[pipeline] Error for meeting {meeting_id}: {error_msg}")
             try:
+                repo.update_error(meeting_id, error_msg)
                 repo.update_status(meeting_id, "failed")
             except Exception:
                 pass
@@ -187,6 +206,7 @@ async def upload_meeting_audio(
     background_tasks: BackgroundTasks,
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
+    x_recording_duration: int | None = Header(default=None, alias="X-Recording-Duration"),
 ):
     repo = MeetingRepository(session)
     meeting = repo.get_by_id(meeting_id)
@@ -194,6 +214,11 @@ async def upload_meeting_audio(
         raise HTTPException(status_code=404, detail="Meeting not found")
 
     meeting = await upload_audio(meeting_id, file, repo)
+
+    # Update actual recorded duration if sent from extension
+    if x_recording_duration and x_recording_duration > 0:
+        repo.update_duration(meeting_id, x_recording_duration)
+
     repo.update_status(meeting_id, "processing")
     background_tasks.add_task(run_automated_pipeline, meeting_id)
 
