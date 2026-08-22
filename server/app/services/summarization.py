@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from os import getenv
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
 
 load_dotenv()
 
@@ -47,6 +48,9 @@ def summarize_transcript(transcript_text: str) -> dict:
         response = client.models.generate_content(
             model="gemini-3.6-flash",
             contents=SUMMARY_PROMPT.format(transcript=transcript_text),
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+            ),
         )
         raw = response.text.strip()
 
