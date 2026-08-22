@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, BackgroundTasks
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from app.core.db_connection import engine
+from app.core.db_connection import engine, SessionLocal
 from app.models.user import User
 from app.utils.auth import get_current_user
 from app.repositories.meeting import MeetingRepository
@@ -16,6 +16,57 @@ from app.schemas.note import NoteResponse
 from app.schemas.action_item import ActionItemResponse
 
 router = APIRouter(prefix="/meetings", tags=["meetings"])
+
+
+def run_automated_pipeline(meeting_id: int):
+    with SessionLocal() as session:
+        try:
+            repo = MeetingRepository(session)
+            meeting = repo.get_by_id(meeting_id)
+            if not meeting or not meeting.audio_key:
+                return
+
+            repo.update_status(meeting_id, "transcribing")
+            audio_bytes = download_file(meeting.audio_key)
+            filename = meeting.audio_key.split("/")[-1]
+            transcribe_result = transcribe_audio(audio_bytes, filename)
+
+            transcript = repo.save_transcript(
+                meeting_id,
+                transcribe_result["text"],
+                transcribe_result["language"],
+                segments=transcribe_result["segments"],
+            )
+            repo.update_status(meeting_id, "transcribed")
+
+            repo.update_status(meeting_id, "summarizing")
+            summary = summarize_transcript(transcribe_result["text"])
+
+            if summary.get("title"):
+                repo.update_title(meeting_id, summary["title"])
+
+            note_repo = NoteRepository(session)
+            note_repo.save_notes_batch(
+                meeting_id,
+                {
+                    "key_decisions": summary.get("key_decisions", ""),
+                    "discussion_points": summary.get("discussion_points", ""),
+                    "blockers": summary.get("blockers", ""),
+                    "next_steps": summary.get("next_steps", ""),
+                },
+            )
+
+            action_item_repo = ActionItemRepository(session)
+            if summary.get("action_items"):
+                action_item_repo.create_batch(meeting_id, summary["action_items"])
+
+            repo.update_status(meeting_id, "completed")
+        except Exception as e:
+            print(f"Error in automated pipeline for meeting {meeting_id}: {e}")
+            try:
+                repo.update_status(meeting_id, "failed")
+            except Exception:
+                pass
 
 
 def get_session():
@@ -133,6 +184,7 @@ def create_meeting(
 async def upload_meeting_audio(
     meeting_id: int,
     file: UploadFile,
+    background_tasks: BackgroundTasks,
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
@@ -142,9 +194,12 @@ async def upload_meeting_audio(
         raise HTTPException(status_code=404, detail="Meeting not found")
 
     meeting = await upload_audio(meeting_id, file, repo)
+    repo.update_status(meeting_id, "processing")
+    background_tasks.add_task(run_automated_pipeline, meeting_id)
+
     return MeetingUploadResponse(
         meeting_id=meeting.id,
-        status=meeting.status,
+        status="processing",
         audio_key=meeting.audio_key,
     )
 

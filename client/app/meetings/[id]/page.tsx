@@ -113,6 +113,34 @@ export default function MeetingDetailPage() {
     }).finally(() => setLoading(false));
   }, [token, meetingId]);
 
+  useEffect(() => {
+    if (!token || !meeting) return;
+    const isProcessing = ["uploaded", "processing", "transcribing", "summarizing"].includes(meeting.status);
+    if (!isProcessing) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const updated = await api.meetings.get(meetingId, token);
+        setMeeting(updated);
+        if (updated.status === "completed" || updated.status === "failed") {
+          clearInterval(interval);
+          const [n, a, t] = await Promise.all([
+            api.meetings.getNotes(meetingId, token).catch(() => []),
+            api.meetings.getActionItems(meetingId, token).catch(() => []),
+            api.meetings.getTranscript(meetingId, token).catch(() => null),
+          ]);
+          setNotes(n);
+          setActionItems(a);
+          setTranscript(t);
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [token, meetingId, meeting?.status]);
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !token) return;
@@ -277,6 +305,27 @@ export default function MeetingDetailPage() {
       {error && (
         <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-700 text-sm">
           {error}
+        </div>
+      )}
+
+      {["uploaded", "processing", "transcribing", "summarizing"].includes(meeting.status) && (
+        <div className="mb-8 p-4 bg-stone-50 border border-stone-200 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            <div>
+              <p className="text-sm font-medium text-stone-900">
+                {meeting.status === "transcribing" && "Transcribing meeting audio via Groq Whisper..."}
+                {meeting.status === "summarizing" && "Extracting AI notes & key decisions via Gemini..."}
+                {(meeting.status === "processing" || meeting.status === "uploaded") && "Processing audio & preparing AI pipeline..."}
+              </p>
+              <p className="text-xs text-stone-500 mt-0.5">
+                The meeting title and structured notes will auto-update as soon as processing completes.
+              </p>
+            </div>
+          </div>
+          <span className="text-xs uppercase tracking-wider text-amber-700 font-mono bg-amber-50 px-2 py-1 border border-amber-200">
+            {meeting.status}
+          </span>
         </div>
       )}
 
