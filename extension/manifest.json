@@ -10,7 +10,8 @@
     "offscreen"
   ],
   "host_permissions": [
-    "http://localhost:8000/*"
+    "http://localhost:8000/*",
+    "https://meet.google.com/*"
   ],
   "background": {
     "service_worker": "background.js"

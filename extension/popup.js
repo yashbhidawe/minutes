@@ -5,11 +5,17 @@ const mainView = document.getElementById("main-view");
 const loginForm = document.getElementById("login-form");
 const loginBtn = document.getElementById("login-btn");
 const loginError = document.getElementById("login-error");
+const mainError = document.getElementById("main-error");
 const userEmail = document.getElementById("user-email");
 const logoutBtn = document.getElementById("logout-btn");
-const statusDot = document.getElementById("status-dot");
-const statusText = document.getElementById("status-text");
-const meetingInfo = document.getElementById("meeting-info");
+
+const recordingCard = document.getElementById("recording-card");
+const idleCard = document.getElementById("idle-card");
+const recordingTimer = document.getElementById("recording-timer");
+const startRecBtn = document.getElementById("start-rec-btn");
+const stopRecBtn = document.getElementById("stop-rec-btn");
+
+let timerInterval = null;
 
 function showView(view) {
   loginView.classList.toggle("hidden", view !== "login");
@@ -17,6 +23,7 @@ function showView(view) {
 }
 
 function showError(el, msg) {
+  if (!msg) return;
   el.textContent = msg;
   el.classList.remove("hidden");
 }
@@ -25,17 +32,40 @@ function hideError(el) {
   el.classList.add("hidden");
 }
 
-function updateStatus(isRecording, meetingId) {
-  statusDot.className = "status-dot";
+function formatTimer(ms) {
+  const totalSec = Math.floor(ms / 1000);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${m < 10 ? "0" : ""}${m}:${s < 10 ? "0" : ""}${s}`;
+}
 
-  if (isRecording) {
-    statusDot.classList.add("recording");
-    statusText.innerHTML = "<strong>Recording</strong> meeting in progress";
-    meetingInfo.textContent = `Meeting #${meetingId} is being recorded. Audio will upload automatically when the call ends.`;
+function updateUI(status) {
+  hideError(mainError);
+
+  if (status && status.error) {
+    showError(mainError, status.error);
+  }
+
+  if (status && status.isRecording) {
+    recordingCard.classList.remove("hidden");
+    idleCard.classList.add("hidden");
+
+    const startTime = status.startTime || Date.now();
+    if (timerInterval) clearInterval(timerInterval);
+
+    const updateClock = () => {
+      const elapsed = Date.now() - startTime;
+      recordingTimer.textContent = formatTimer(elapsed);
+    };
+    updateClock();
+    timerInterval = setInterval(updateClock, 1000);
   } else {
-    statusDot.classList.add("active");
-    statusText.innerHTML = "<strong>Connected</strong>";
-    meetingInfo.textContent = "Open Google Meet to start recording. Audio is captured automatically when the call ends.";
+    recordingCard.classList.add("hidden");
+    idleCard.classList.remove("hidden");
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
   }
 }
 
@@ -45,9 +75,7 @@ chrome.runtime.sendMessage({ type: "GET_TOKEN" }, (response) => {
     userEmail.textContent = response.email || "Logged in";
 
     chrome.runtime.sendMessage({ type: "GET_STATUS" }, (statusResponse) => {
-      if (statusResponse) {
-        updateStatus(statusResponse.isRecording, statusResponse.meetingId);
-      }
+      updateUI(statusResponse);
     });
   } else {
     showView("login");
@@ -78,20 +106,21 @@ loginForm.addEventListener("submit", async (e) => {
 
     const data = await res.json();
 
-    chrome.runtime.sendMessage({
-      type: "SET_TOKEN",
-      token: data.access_token,
-      email: email,
-    }, () => {
-      showView("main");
-      userEmail.textContent = email;
+    chrome.runtime.sendMessage(
+      {
+        type: "SET_TOKEN",
+        token: data.access_token,
+        email: email,
+      },
+      () => {
+        showView("main");
+        userEmail.textContent = email;
 
-      chrome.runtime.sendMessage({ type: "GET_STATUS" }, (statusResponse) => {
-        if (statusResponse) {
-          updateStatus(statusResponse.isRecording, statusResponse.meetingId);
-        }
-      });
-    });
+        chrome.runtime.sendMessage({ type: "GET_STATUS" }, (statusResponse) => {
+          updateUI(statusResponse);
+        });
+      }
+    );
   } catch (err) {
     showError(loginError, err.message);
   } finally {
@@ -108,12 +137,48 @@ logoutBtn.addEventListener("click", () => {
   });
 });
 
+startRecBtn.addEventListener("click", () => {
+  startRecBtn.disabled = true;
+  startRecBtn.textContent = "Starting Recording...";
+  hideError(mainError);
+
+  chrome.runtime.sendMessage({ type: "MANUAL_START_RECORDING" }, (res) => {
+    startRecBtn.disabled = false;
+    startRecBtn.textContent = "Record Current Tab";
+
+    if (res && res.error) {
+      showError(mainError, res.error);
+    } else {
+      chrome.runtime.sendMessage({ type: "GET_STATUS" }, (statusResponse) => {
+        updateUI(statusResponse);
+      });
+    }
+  });
+});
+
+stopRecBtn.addEventListener("click", () => {
+  stopRecBtn.disabled = true;
+  stopRecBtn.textContent = "Stopping & Processing...";
+  hideError(mainError);
+
+  chrome.runtime.sendMessage({ type: "MANUAL_STOP_RECORDING" }, (res) => {
+    stopRecBtn.disabled = false;
+    stopRecBtn.textContent = "Stop & Process Notes";
+
+    if (res && res.error) {
+      showError(mainError, res.error);
+    } else {
+      chrome.runtime.sendMessage({ type: "GET_STATUS" }, (statusResponse) => {
+        updateUI(statusResponse);
+      });
+    }
+  });
+});
+
 setInterval(() => {
   if (!mainView.classList.contains("hidden")) {
     chrome.runtime.sendMessage({ type: "GET_STATUS" }, (response) => {
-      if (response) {
-        updateStatus(response.isRecording, response.meetingId);
-      }
+      updateUI(response);
     });
   }
 }, 2000);
