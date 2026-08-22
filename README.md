@@ -1,25 +1,25 @@
-# minuteai
+# Minute AI
 
-Automatic meeting notes for Google Meet. Records tab audio after the call, transcribes via Whisper, and generates structured summaries and action items using Gemini. Notes are stored and accessible via a web dashboard.
+Automatic meeting notes for Google Meet. Records tab audio upon call completion, transcribes via Groq Whisper (`whisper-large-v3`), and generates structured summaries and action items using Google Gemini (`gemini-3.6-flash`). Notes and timestamped transcripts are stored and accessible via a Next.js web dashboard.
 
 ---
 
 ## Overview
 
-minuteai is a Chrome extension paired with a web dashboard. It captures Google Meet audio without requiring host permissions, processes it through an AI pipeline, and returns clean notes within minutes of the call ending.
+**Minute AI** is an intelligent meeting assistant pairing a Manifest V3 Chrome Extension with a FastAPI backend and a Next.js web dashboard. It captures Google Meet tab audio automatically without requiring host permissions, processes it through an AI pipeline, and surfaces clean meeting notes, key decisions, action items, and timestamped transcripts within minutes of the call ending.
 
-Built for small teams and individuals who want meeting context without manual note-taking.
+Built for small teams, managers, and individuals who want full meeting context without manual note-taking.
 
 ---
 
 ## Stack
 
-**Backend** — FastAPI, SQLite, SQLAlchemy  
-**Frontend** — Next.js, Tailwind CSS  
-**Extension** — Vanilla JS, Chrome Extensions Manifest V3  
-**AI** — OpenAI Whisper (transcription), Google Gemini (summarization)  
-**Storage** — Cloudflare R2 (audio files)  
-**Auth** — JWT (python-jose), bcrypt (passlib)
+- **Backend** — FastAPI, SQLite, SQLAlchemy, Pydantic v2
+- **Frontend** — Next.js 16 (App Router), Tailwind CSS, TypeScript
+- **Extension** — Vanilla JS, Chrome Extensions Manifest V3 (`chrome.offscreen` + `chrome.tabCapture`)
+- **AI Pipeline** — Groq Whisper (`whisper-large-v3` for transcription), Google Gemini (`gemini-3.6-flash` for structured JSON summarization)
+- **Storage** — Cloudflare R2 (audio files via boto3 S3 interface)
+- **Auth** — JWT (`python-jose`), bcrypt password hashing (`passlib`)
 
 ---
 
@@ -27,18 +27,30 @@ Built for small teams and individuals who want meeting context without manual no
 
 ```
 minuteai/
-├── server/
+├── server/                   # FastAPI backend
 │   ├── app/
-│   │   ├── api/              # route handlers (users, meetings)
-│   │   ├── services/         # business logic (user, audio, storage)
-│   │   ├── repositories/     # database queries (user, meeting)
-│   │   ├── models/           # SQLAlchemy models
+│   │   ├── api/              # Route handlers (users, meetings)
+│   │   ├── services/         # Business logic (user, audio, storage, transcription, summarization)
+│   │   ├── repositories/     # Database queries (user, meeting, note, action_item)
+│   │   ├── models/           # SQLAlchemy models (User, Meeting, Transcript, Note, ActionItem)
 │   │   ├── schemas/          # Pydantic request/response schemas
-│   │   ├── core/             # config, db connection, R2 client
-│   │   └── utils/            # auth, password validation
-│   ├── main.py
+│   │   ├── core/             # Database connection & Cloudflare R2 client
+│   │   └── utils/            # JWT authentication & password validation
+│   ├── main.py               # FastAPI app entry point & CORS configuration
 │   └── requirements.txt
-├── client/                   # Next.js dashboard (in progress)
+├── client/                   # Next.js web dashboard
+│   ├── app/                  # App Router pages (login, register, dashboard, meetings/[id])
+│   ├── components/           # UI components
+│   └── lib/                  # Auth context & API client
+├── extension/                # Chrome Extension Manifest V3
+│   ├── manifest.json         # Extension permissions & background scripts
+│   ├── background.js         # Service worker for meeting state & upload coordination
+│   ├── offscreen.html        # Offscreen document host
+│   ├── offscreen.js          # Tab audio capture via MediaRecorder & AudioContext pass-through
+│   ├── content.js            # Google Meet session detection script
+│   ├── popup.html            # Extension popup UI
+│   └── popup.js              # Authentication & extension status controller
+├── AGENTS.md                 # Developer & AI assistant guidelines
 └── README.md
 ```
 
@@ -46,13 +58,13 @@ minuteai/
 
 ## How It Works
 
-1. Extension detects an active Google Meet session
-2. On call end, tab audio is captured via `chrome.tabCapture`
-3. Audio file is uploaded to the backend
-4. Backend stores the file in R2 and queues a processing job
-5. Whisper transcribes the audio
-6. Gemini generates a summary and extracts action items
-7. Notes are saved to the database and surfaced on the dashboard
+1. **Detection**: `content.js` monitors DOM elements to detect when a Google Meet call begins.
+2. **Audio Capture**: On call completion, `background.js` obtains a tab stream ID and spawns `offscreen.html`. `offscreen.js` uses `MediaRecorder` to capture tab audio into a `.webm` file while piping audio to speakers so call audio is unaffected.
+3. **Upload**: `background.js` automatically uploads the WebM audio blob to the backend API (`/meetings/{id}/upload-audio`).
+4. **Storage**: Backend streams the audio file to Cloudflare R2.
+5. **Transcription**: Groq Whisper (`whisper-large-v3`) transcribes the meeting audio into raw text and timestamped segments.
+6. **AI Summarization**: Gemini 3.6 Flash analyzes the transcript and outputs structured JSON containing key decisions, discussion points, blockers, next steps, and action items.
+7. **Dashboard**: Notes, action items, and timestamped transcripts are accessible on the Next.js web dashboard.
 
 ---
 
@@ -60,82 +72,100 @@ minuteai/
 
 ### Auth
 
-| Method | Endpoint           | Description              |
-|:-------|:-------------------|:-------------------------|
-| POST   | `/users/`          | Register a new user      |
-| POST   | `/users/login`     | Login and get JWT token  |
+| Method | Endpoint        | Description             |
+|:-------|:----------------|:------------------------|
+| POST   | `/users/`       | Register a new user     |
+| POST   | `/users/login`  | Login and receive JWT   |
 
 ### Meetings
 
-| Method | Endpoint                        | Description                    |
-|:-------|:--------------------------------|:-------------------------------|
-| POST   | `/meetings/`                    | Create a new meeting           |
-| POST   | `/meetings/{id}/upload-audio`   | Upload audio file for a meeting|
+| Method | Endpoint                                    | Description                                |
+|:-------|:--------------------------------------------|:-------------------------------------------|
+| GET    | `/meetings/`                                | List user meetings                         |
+| POST   | `/meetings/`                                | Create a new meeting instance              |
+| GET    | `/meetings/{id}`                            | Get meeting metadata by ID                 |
+| DELETE | `/meetings/{id}`                            | Delete meeting and related data            |
+| POST   | `/meetings/{id}/upload-audio`               | Upload audio blob (.webm / .wav)           |
+| GET    | `/meetings/{id}/transcript`                 | Retrieve meeting transcript & segments     |
+| POST   | `/meetings/{id}/transcribe`                 | Run Whisper transcription on uploaded audio|
+| POST   | `/meetings/{id}/summarize`                  | Run Gemini AI summarization on transcript  |
+| GET    | `/meetings/{id}/notes`                      | Get generated meeting notes                |
+| GET    | `/meetings/{id}/action-items`               | Get extracted action items                 |
+| PATCH  | `/meetings/{id}/action-items/{item_id}`     | Update action item status                  |
 
 ---
 
-## Local Development
+## Local Development Setup
 
-**Prerequisites:** Python 3.11+, Node 18+
+### Prerequisites
+
+- **Python**: 3.11+
+- **Node.js**: 18+
+
+### 1. Backend Setup
 
 ```bash
-# clone the repo
-git clone https://github.com/yashbhidawe/minuteai
-cd minuteai
-
-# backend
 cd server
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate   # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env
-uvicorn app.main:app --reload
-
-# frontend
-cd ../client
-npm install
-npm run dev   # starts on localhost:3000
+cp .env.example .env       # Configure your environment variables
+uvicorn app.main:app --reload --port 8000
 ```
+
+### 2. Frontend Setup
+
+```bash
+cd client
+npm install
+npm run dev                # Starts Next.js dashboard on http://localhost:3000
+```
+
+### 3. Extension Setup
+
+1. Open Chrome and navigate to `chrome://extensions`.
+2. Enable **Developer mode** in the top right corner.
+3. Click **Load unpacked** and select the `extension/` directory.
+4. Click the Minute AI extension icon and log in with your credentials.
 
 ---
 
 ## Environment Variables
 
-```
-# Database
-DATABASE_URL=
+Create a `.env` file in `server/` with the following variables:
 
+```env
 # Auth
-JWT_SECRET_KEY=
+JWT_SECRET_KEY=your_random_jwt_secret_key
 
-# AI
-OPENAI_API_KEY=
-GEMINI_API_KEY=
+# AI Services
+GROQ_API_KEY=gsk_your_groq_api_key
+GEMINI_API_KEY=AIzaSy_your_gemini_api_key
 
-# Cloudflare R2 (audio storage)
-R2_ACCOUNT_ID=
-R2_ACCESS_KEY_ID=
-R2_SECRET_ACCESS_KEY=
-R2_BUCKET_NAME=
+# Cloudflare R2 Storage
+R2_ACCOUNT_ID=your_cloudflare_account_id
+R2_ACCESS_KEY_ID=your_r2_access_key_id
+R2_SECRET_ACCESS_KEY=your_r2_secret_access_key
+R2_BUCKET_NAME=minuteai
+```
+
+Create a `.env.local` file in `client/` if needed:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
 ---
 
-## Status
+## Project Status
 
-**Completed:**
-- User registration and login with JWT
-- Meeting model with status tracking
-- Audio upload endpoint with R2 storage
-
-**In Progress:**
-- Whisper transcription service
-- Gemini summarization and action item extraction
-
-**Planned:**
-- Web dashboard (Next.js)
-- Chrome extension
-- Background job queue
+- ✅ User authentication with JWT & bcrypt password validation
+- ✅ Chrome Extension tab capture via `chrome.offscreen` & `MediaRecorder`
+- ✅ Cloudflare R2 audio file storage
+- ✅ Groq Whisper speech-to-text transcription with timestamped segments
+- ✅ Google Gemini 3.6 Flash structured JSON summarization
+- ✅ Next.js dashboard with meeting list, detail view, action item status toggles, and full transcript viewer
+- ✅ CORS security & dynamic ORM timestamping
 
 ---
 
