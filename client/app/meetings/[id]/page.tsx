@@ -157,6 +157,17 @@ export default function MeetingDetailPage() {
     }
   };
 
+  const handleRetry = async () => {
+    if (!token) return;
+    setError("");
+    try {
+      const res = await api.meetings.reprocess(meetingId, token);
+      setMeeting((prev) => prev ? { ...prev, status: res.status } : prev);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Retry failed");
+    }
+  };
+
   const handleTranscribe = async () => {
     if (!token) return;
     setTranscribing(true);
@@ -289,6 +300,15 @@ export default function MeetingDetailPage() {
               className="px-4 py-2 bg-stone-900 text-white text-sm hover:bg-stone-800 disabled:opacity-50 transition-colors"
             >
               {summarizing ? "Summarizing..." : "Summarize"}
+            </button>
+          )}
+
+          {meeting.status === "failed" && (
+            <button
+              onClick={handleRetry}
+              className="px-4 py-2 bg-stone-900 text-white text-sm hover:bg-stone-800 transition-colors"
+            >
+              Retry AI Processing
             </button>
           )}
 

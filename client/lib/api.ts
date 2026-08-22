@@ -128,6 +128,11 @@ export const api = {
         `/meetings/${id}/summarize`,
         { method: "POST", token }
       ),
+    reprocess: (id: number, token: string) =>
+      request<{ meeting_id: number; status: string; audio_key: string }>(
+        `/meetings/${id}/reprocess`,
+        { method: "POST", token }
+      ),
     delete: (id: number, token: string) =>
       request<{ detail: string }>(`/meetings/${id}`, { method: "DELETE", token }),
     updateActionItemStatus: (meetingId: number, itemId: number, status: string, token: string) =>

@@ -46,7 +46,7 @@ def run_automated_pipeline(meeting_id: int):
                 repo.update_title(meeting_id, summary["title"])
 
             note_repo = NoteRepository(session)
-            note_repo.save_notes_batch(
+            note_repo.create_many(
                 meeting_id,
                 {
                     "key_decisions": summary.get("key_decisions", ""),
@@ -58,7 +58,7 @@ def run_automated_pipeline(meeting_id: int):
 
             action_item_repo = ActionItemRepository(session)
             if summary.get("action_items"):
-                action_item_repo.create_batch(meeting_id, summary["action_items"])
+                action_item_repo.create_many(meeting_id, summary["action_items"])
 
             repo.update_status(meeting_id, "completed")
         except Exception as e:
@@ -194,6 +194,30 @@ async def upload_meeting_audio(
         raise HTTPException(status_code=404, detail="Meeting not found")
 
     meeting = await upload_audio(meeting_id, file, repo)
+    repo.update_status(meeting_id, "processing")
+    background_tasks.add_task(run_automated_pipeline, meeting_id)
+
+    return MeetingUploadResponse(
+        meeting_id=meeting.id,
+        status="processing",
+        audio_key=meeting.audio_key,
+    )
+
+
+@router.post("/{meeting_id}/reprocess", response_model=MeetingUploadResponse)
+def reprocess_meeting(
+    meeting_id: int,
+    background_tasks: BackgroundTasks,
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    repo = MeetingRepository(session)
+    meeting = repo.get_by_id(meeting_id)
+    if not meeting or meeting.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Meeting not found")
+    if not meeting.audio_key:
+        raise HTTPException(status_code=400, detail="No audio file found for this meeting")
+
     repo.update_status(meeting_id, "processing")
     background_tasks.add_task(run_automated_pipeline, meeting_id)
 
