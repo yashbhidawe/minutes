@@ -111,6 +111,8 @@ export const api = {
       request<Note[]>(`/meetings/${id}/notes`, { token }),
     getActionItems: (id: number, token: string) =>
       request<ActionItem[]>(`/meetings/${id}/action-items`, { token }),
+    getTranscript: (id: number, token: string) =>
+      request<Transcript>(`/meetings/${id}/transcript`, { token }),
     uploadAudio: (id: number, file: File, token: string) => {
       const formData = new FormData();
       formData.append("file", file);

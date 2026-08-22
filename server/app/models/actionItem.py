@@ -13,5 +13,5 @@ class ActionItem(Base):
     due_date = Column(String(50), nullable=True)
     priority = Column(String(10), nullable=False, default="medium")
     status = Column(String(20), nullable=False, default="pending")
-    created_at = Column(String(50), nullable=False, default=datetime.now(timezone.utc).isoformat())
-    updated_at = Column(String(50), nullable=False, default=datetime.now(timezone.utc).isoformat())
+    created_at = Column(String(50), nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at = Column(String(50), nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())

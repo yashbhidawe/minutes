@@ -149,6 +149,23 @@ async def upload_meeting_audio(
     )
 
 
+@router.get("/{meeting_id}/transcript", response_model=TranscriptResponse)
+def get_meeting_transcript(
+    meeting_id: int,
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    repo = MeetingRepository(session)
+    meeting = repo.get_by_id(meeting_id)
+    if not meeting or meeting.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Meeting not found")
+
+    transcript = repo.get_transcript(meeting_id)
+    if not transcript:
+        raise HTTPException(status_code=404, detail="Transcript not found")
+    return transcript
+
+
 @router.post("/{meeting_id}/transcribe", response_model=TranscriptResponse)
 def transcribe_meeting(
     meeting_id: int,

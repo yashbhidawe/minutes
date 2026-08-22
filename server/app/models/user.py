@@ -11,8 +11,8 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(128), nullable=False)
-    created_at: Mapped[str] = mapped_column(String(50), nullable=False, default=datetime.now(timezone.utc).isoformat())
-    updated_at: Mapped[str] = mapped_column(String(50), nullable=False, default=datetime.now(timezone.utc).isoformat())
+    created_at: Mapped[str] = mapped_column(String(50), nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: Mapped[str] = mapped_column(String(50), nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
     meetings: Mapped[list["Meeting"]] = relationship("Meeting", back_populates="user", cascade="all, delete-orphan")
 
 
