@@ -48,6 +48,7 @@ export interface Meeting {
   duration_sec: number;
   status: string;
   audio_key: string | null;
+  error_message: string | null;
   created_at: string;
   updated_at: string;
 }

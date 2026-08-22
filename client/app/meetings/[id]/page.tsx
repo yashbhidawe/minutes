@@ -118,10 +118,26 @@ export default function MeetingDetailPage() {
     const isProcessing = ["uploaded", "processing", "transcribing", "summarizing"].includes(meeting.status);
     if (!isProcessing) return;
 
+    let lastStatus = meeting.status;
+    let stalePollCount = 0;
+    const MAX_STALE_POLLS = 20; // ~60 seconds with no status change
+
     const interval = setInterval(async () => {
       try {
         const updated = await api.meetings.get(meetingId, token);
         setMeeting(updated);
+
+        if (updated.status === lastStatus) {
+          stalePollCount++;
+          if (stalePollCount >= MAX_STALE_POLLS) {
+            clearInterval(interval);
+            setError("Processing is taking longer than expected. The server may have restarted. Try the Retry button.");
+          }
+        } else {
+          stalePollCount = 0;
+          lastStatus = updated.status;
+        }
+
         if (updated.status === "completed" || updated.status === "failed") {
           clearInterval(interval);
           const [n, a, t] = await Promise.all([
@@ -329,6 +345,16 @@ export default function MeetingDetailPage() {
       {error && (
         <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-700 text-sm">
           {error}
+        </div>
+      )}
+
+      {meeting.status === "failed" && meeting.error_message && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 flex items-start gap-3">
+          <span className="text-red-500 mt-0.5 shrink-0">✕</span>
+          <div>
+            <p className="text-sm font-medium text-red-800">Processing failed</p>
+            <p className="text-xs text-red-600 mt-1">{meeting.error_message}</p>
+          </div>
         </div>
       )}
 
