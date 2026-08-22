@@ -23,6 +23,12 @@ function formatDuration(sec: number) {
   return rem > 0 ? `${hr}h ${rem}m` : `${hr}h`;
 }
 
+function formatTimestamp(sec: number) {
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s < 10 ? "0" : ""}${s}`;
+}
+
 function PriorityDot({ priority }: { priority: string }) {
   const colors: Record<string, string> = {
     high: "bg-red-500",
@@ -85,6 +91,7 @@ export default function MeetingDetailPage() {
   const [transcribing, setTranscribing] = useState(false);
   const [summarizing, setSummarizing] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showTranscript, setShowTranscript] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -97,10 +104,12 @@ export default function MeetingDetailPage() {
       api.meetings.get(meetingId, token),
       api.meetings.getNotes(meetingId, token).catch(() => []),
       api.meetings.getActionItems(meetingId, token).catch(() => []),
-    ]).then(([m, n, a]) => {
+      api.meetings.getTranscript(meetingId, token).catch(() => null),
+    ]).then(([m, n, a, t]) => {
       setMeeting(m);
       setNotes(n);
       setActionItems(a);
+      setTranscript(t);
     }).finally(() => setLoading(false));
   }, [token, meetingId]);
 
@@ -333,6 +342,41 @@ export default function MeetingDetailPage() {
           )}
         </div>
       </div>
+
+      {transcript && (
+        <div className="mt-16 pt-8 border-t border-stone-200">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xs uppercase tracking-wider text-stone-400">
+              Full Transcript ({transcript.language || "en"})
+            </h3>
+            <button
+              onClick={() => setShowTranscript(!showTranscript)}
+              className="text-xs uppercase tracking-wider text-stone-600 hover:text-stone-900 transition-colors cursor-pointer"
+            >
+              {showTranscript ? "Hide Transcript ▲" : "Show Transcript ▼"}
+            </button>
+          </div>
+
+          {showTranscript && (
+            <div className="bg-stone-50 border border-stone-200 p-6 rounded-none space-y-3 max-h-[500px] overflow-y-auto">
+              {transcript.segments && transcript.segments.length > 0 ? (
+                transcript.segments.map((seg, idx) => (
+                  <div key={idx} className="flex items-start gap-4 text-xs">
+                    <span className="font-mono text-stone-400 select-none whitespace-nowrap pt-0.5">
+                      [{formatTimestamp(seg.start)} - {formatTimestamp(seg.end)}]
+                    </span>
+                    <p className="text-stone-800 leading-relaxed font-sans">{seg.text}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-stone-700 whitespace-pre-wrap leading-relaxed">
+                  {transcript.raw_text}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

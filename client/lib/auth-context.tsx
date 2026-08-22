@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { api, User } from "@/lib/api";
 
 interface AuthContextType {
@@ -14,20 +14,53 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const logout = useCallback(() => {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  }, []);
+
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
     const savedUser = localStorage.getItem("user");
     if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
+      if (isTokenExpired(savedToken)) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      } else {
+        setToken(savedToken);
+        setUser(JSON.parse(savedUser));
+      }
     }
     setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (!token) return;
+
+    const interval = setInterval(() => {
+      if (isTokenExpired(token)) {
+        logout();
+      }
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [token, logout]);
 
   const login = async (email: string, password: string) => {
     const res = await api.auth.login(email, password);
@@ -40,13 +73,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = async (email: string, password: string) => {
     await api.auth.register(email, password);
     await login(email, password);
-  };
-
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
   };
 
   return (
