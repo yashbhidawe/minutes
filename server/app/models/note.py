@@ -10,5 +10,5 @@ class Note(Base):
     meeting_id = Column(Integer, ForeignKey('meetings.id'), nullable=False)
     section = Column(String(50), nullable=False)
     content = Column(String, nullable=False)
-    created_at = Column(String(50), nullable=False, default=datetime.now(timezone.utc).isoformat())
-    updated_at = Column(String(50), nullable=False, default=datetime.now(timezone.utc).isoformat())
+    created_at = Column(String(50), nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at = Column(String(50), nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())

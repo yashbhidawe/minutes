@@ -11,4 +11,4 @@ class Transcript(Base):
     raw_text = Column(Text, nullable=False)
     language = Column(String(20), nullable=False)
     segments = Column(Text, nullable=True)
-    created_at = Column(String(50), nullable=False, default=datetime.now(timezone.utc).isoformat())
+    created_at = Column(String(50), nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())

@@ -14,8 +14,8 @@ class Meeting(Base):
     duration_sec: Mapped[int] = mapped_column(Integer, nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
     audio_key: Mapped[str] = mapped_column(String(255), nullable=True)
-    created_at: Mapped[str] = mapped_column(String(50), nullable=False, default=datetime.now(timezone.utc).isoformat())
-    updated_at: Mapped[str] = mapped_column(String(50), nullable=False, default=datetime.now(timezone.utc).isoformat())
+    created_at: Mapped[str] = mapped_column(String(50), nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: Mapped[str] = mapped_column(String(50), nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
     user: Mapped["User"] = relationship("User", back_populates="meetings")
 
 
