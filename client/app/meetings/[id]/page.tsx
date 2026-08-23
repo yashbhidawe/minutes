@@ -110,6 +110,9 @@ export default function MeetingDetailPage() {
       setNotes(n);
       setActionItems(a);
       setTranscript(t);
+      if (n.length === 0 && t) {
+        setShowTranscript(true);
+      }
     }).finally(() => setLoading(false));
   }, [token, meetingId]);
 
@@ -148,6 +151,9 @@ export default function MeetingDetailPage() {
           setNotes(n);
           setActionItems(a);
           setTranscript(t);
+          if (n.length === 0 && t) {
+            setShowTranscript(true);
+          }
         }
       } catch (err) {
         console.error("Polling error:", err);
@@ -396,11 +402,14 @@ export default function MeetingDetailPage() {
 
           {notes.length === 0 && (
             <div className="py-16 text-center">
-              <p className="text-stone-300 text-sm">No summary yet</p>
+              <p className="text-stone-300 text-sm">
+                {meeting.status === "completed" ? "No structured notes generated" : "No summary yet"}
+              </p>
               <p className="text-stone-400 text-xs mt-1">
                 {meeting.status === "pending" && "Extension capturing audio. Notes will appear as soon as the recording finishes."}
                 {meeting.status === "uploaded" && "Transcribe the audio to generate notes."}
                 {meeting.status === "transcribed" && "Summarize the transcript to generate notes."}
+                {meeting.status === "completed" && "The audio contained insufficient speech to produce bullet points. Check the full transcript below."}
               </p>
             </div>
           )}
