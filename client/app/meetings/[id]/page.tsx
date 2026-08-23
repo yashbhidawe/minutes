@@ -93,6 +93,14 @@ export default function MeetingDetailPage() {
   const [deleting, setDeleting] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
   const [error, setError] = useState("");
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!token || !meeting?.audio_key) return;
+    api.meetings.getAudioUrl(meetingId, token)
+      .then(setAudioUrl)
+      .catch(() => setAudioUrl(null));
+  }, [token, meetingId, meeting?.audio_key]);
 
   useEffect(() => {
     if (!authLoading && !token) router.push("/login");
@@ -382,6 +390,16 @@ export default function MeetingDetailPage() {
           <span className="text-xs uppercase tracking-wider text-amber-700 font-mono bg-amber-50 px-2 py-1 border border-amber-200">
             {meeting.status}
           </span>
+        </div>
+      )}
+
+      {audioUrl && (
+        <div className="mb-8 p-4 bg-stone-50 border border-stone-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-wider text-stone-500 font-medium">Recorded Call Audio</p>
+            <p className="text-xs text-stone-400 mt-0.5">Listen to captured tab audio</p>
+          </div>
+          <audio controls src={audioUrl} className="h-9 w-full sm:max-w-md" />
         </div>
       )}
 

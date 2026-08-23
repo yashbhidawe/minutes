@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, BackgroundTasks, Header
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, BackgroundTasks, Header, Response
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.core.db_connection import engine, SessionLocal
@@ -197,6 +197,22 @@ def create_meeting(
     repo = MeetingRepository(session)
     meeting = repo.create(user_id=user.id, title=body.title, duration_sec=body.duration_sec)
     return meeting
+
+
+@router.get("/{meeting_id}/audio")
+def get_meeting_audio(
+    meeting_id: int,
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    repo = MeetingRepository(session)
+    meeting = repo.get_by_id(meeting_id)
+    if not meeting or meeting.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Meeting not found")
+    if not meeting.audio_key:
+        raise HTTPException(status_code=404, detail="No audio file found for this meeting")
+    audio_bytes = download_file(meeting.audio_key)
+    return Response(content=audio_bytes, media_type="audio/webm")
 
 
 @router.post("/{meeting_id}/upload-audio", response_model=MeetingUploadResponse)
