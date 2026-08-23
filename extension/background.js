@@ -9,15 +9,18 @@ let recordingState = {
 };
 
 // Restore state across service worker restarts
-chrome.storage.local.get(["recordingState"], (result) => {
-  if (result.recordingState) {
-    recordingState = result.recordingState;
-    if (recordingState.isRecording) {
-      chrome.action.setBadgeText({ text: "REC" });
-      chrome.action.setBadgeBackgroundColor({ color: "#dc2626" });
+// Guard in case storage API isn't fully bound yet (MV3 cold start race)
+if (chrome.storage && chrome.storage.local) {
+  chrome.storage.local.get(["recordingState"], (result) => {
+    if (result.recordingState) {
+      recordingState = result.recordingState;
+      if (recordingState.isRecording) {
+        chrome.action.setBadgeText({ text: "REC" });
+        chrome.action.setBadgeBackgroundColor({ color: "#dc2626" });
+      }
     }
-  }
-});
+  });
+}
 
 // ─── Offscreen document helpers ─────────────────────────────────────────────
 
