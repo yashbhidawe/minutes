@@ -6,10 +6,11 @@ let mediaStream = null;
 let audioContext = null;
 let currentMeetingId = null;
 let recordingStartTime = null;
+let authToken = null; // Passed in from background.js — we do NOT call chrome.storage here
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "START_RECORDING") {
-    startRecording(message.streamId, message.meetingId)
+    startRecording(message.streamId, message.meetingId, message.token)
       .then(() => sendResponse({ ok: true }))
       .catch((err) => sendResponse({ error: err.message }));
     return true;
@@ -23,9 +24,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-async function startRecording(streamId, meetingId) {
+async function startRecording(streamId, meetingId, token) {
   currentMeetingId = meetingId;
   recordingStartTime = Date.now();
+  authToken = token;
   audioChunks = [];
 
   const stream = await navigator.mediaDevices.getUserMedia({
@@ -40,7 +42,7 @@ async function startRecording(streamId, meetingId) {
 
   mediaStream = stream;
 
-  // Pass-through audio context so the user can still hear call participants
+  // Pass-through so user can still hear meeting audio while recording
   audioContext = new AudioContext();
   const source = audioContext.createMediaStreamSource(stream);
   source.connect(audioContext.destination);
@@ -72,13 +74,11 @@ async function stopRecording() {
         const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
         cleanup();
 
-        // Upload directly from offscreen document — bypasses service worker lifecycle
-        // The offscreen doc is persistent; the service worker may be dead by now.
+        // Upload directly from offscreen document
         await uploadAudioToBackend(audioBlob, currentMeetingId, durationSec);
         resolve();
       } catch (err) {
         cleanup();
-        // Notify background of failure so it can update badge/state
         chrome.runtime.sendMessage({
           type: "UPLOAD_FAILED",
           meetingId: currentMeetingId,
@@ -93,16 +93,12 @@ async function stopRecording() {
 }
 
 async function uploadAudioToBackend(audioBlob, meetingId, durationSec) {
-  // Read token directly from storage — no service worker needed
-  const storageData = await new Promise((resolve) =>
-    chrome.storage.local.get(["token"], resolve)
-  );
-
-  if (!storageData.token) {
+  // Token was passed in from background.js at recording start — no storage access needed
+  if (!authToken) {
     chrome.runtime.sendMessage({
       type: "UPLOAD_FAILED",
       meetingId,
-      error: "Not logged in — token missing at upload time.",
+      error: "Not logged in — auth token was not passed to recorder.",
     });
     return;
   }
@@ -119,8 +115,8 @@ async function uploadAudioToBackend(audioBlob, meetingId, durationSec) {
   const formData = new FormData();
   formData.append("file", audioBlob, `meeting_${meetingId}.webm`);
 
-  const headers = { Authorization: `Bearer ${storageData.token}` };
-  if (durationSec) {
+  const headers = { Authorization: `Bearer ${authToken}` };
+  if (durationSec && durationSec > 0) {
     headers["X-Recording-Duration"] = String(durationSec);
   }
 
@@ -141,7 +137,7 @@ async function uploadAudioToBackend(audioBlob, meetingId, durationSec) {
     throw new Error(errMsg);
   }
 
-  // Notify background of success so it can clear badge/state
+  // Notify background to clear badge and state
   chrome.runtime.sendMessage({
     type: "UPLOAD_COMPLETE",
     meetingId,

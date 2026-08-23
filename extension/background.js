@@ -174,11 +174,13 @@ async function handleMeetingStarted(message, sender, sendResponse) {
       // 3. Create offscreen recording document
       await ensureOffscreenDocument();
 
-      // 4. Start recording inside offscreen doc
+      // 4. Start recording inside offscreen doc — pass token directly so
+      //    offscreen.js never needs to call chrome.storage (not available there)
       await chrome.runtime.sendMessage({
         type: "START_RECORDING",
         streamId,
         meetingId: meeting.id,
+        token: data.token,
       });
 
       recordingState = {
