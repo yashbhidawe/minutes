@@ -14,6 +14,7 @@ const idleCard = document.getElementById("idle-card");
 const recordingTimer = document.getElementById("recording-timer");
 const startRecBtn = document.getElementById("start-rec-btn");
 const stopRecBtn = document.getElementById("stop-rec-btn");
+const openDashboardBtn = document.getElementById("open-dashboard-btn");
 
 let timerInterval = null;
 
@@ -125,7 +126,7 @@ loginForm.addEventListener("submit", async (e) => {
     showError(loginError, err.message);
   } finally {
     loginBtn.disabled = false;
-    loginBtn.textContent = "Sign in";
+    loginBtn.textContent = "Sign In";
   }
 });
 
@@ -186,10 +187,23 @@ stopRecBtn.addEventListener("click", () => {
   });
 });
 
+if (openDashboardBtn) {
+  openDashboardBtn.addEventListener("click", () => {
+    chrome.tabs.create({ url: "http://localhost:3000/dashboard" });
+  });
+}
+
+const setupMicBtn = document.getElementById("setup-mic-btn");
+if (setupMicBtn) {
+  setupMicBtn.addEventListener("click", () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL("permissions.html") });
+  });
+}
+
 setInterval(() => {
   if (!mainView.classList.contains("hidden")) {
     chrome.runtime.sendMessage({ type: "GET_STATUS" }, (response) => {
       updateUI(response);
     });
   }
-}, 2000);
+}, 1500);

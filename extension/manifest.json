@@ -4,15 +4,17 @@
   "version": "1.0.0",
   "description": "Automatic meeting notes for Google Meet",
   "permissions": [
+    "activeTab",
     "tabCapture",
-    "audioCapture",
     "tabs",
     "storage",
-    "offscreen"
+    "offscreen",
+    "notifications"
   ],
   "host_permissions": [
     "http://localhost:8000/*",
-    "https://meet.google.com/*"
+    "*://meet.google.com/*",
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"
