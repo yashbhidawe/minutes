@@ -58,6 +58,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     recordingState = { isRecording: false, meetingId: null, tabId: null, startTime: null, error: null };
     chrome.storage.local.set({ recordingState });
     closeOffscreenDocument().catch(() => {});
+
+    if (chrome.notifications && message.meetingId) {
+      chrome.notifications.create(`meeting_${message.meetingId}`, {
+        type: "basic",
+        iconUrl: "icons/icon128.png",
+        title: "Minute AI — Meeting Notes Ready",
+        message: "Audio processing started. Click to view notes and action items.",
+        priority: 2,
+      });
+    }
     return true;
   }
 
@@ -251,3 +261,14 @@ chrome.tabs.onRemoved.addListener(async (tabId) => {
     }
   }
 });
+
+// ─── Notification Click Listener ──────────────────────────────────────────────
+
+if (chrome.notifications && chrome.notifications.onClicked) {
+  chrome.notifications.onClicked.addListener((notificationId) => {
+    if (notificationId.startsWith("meeting_")) {
+      const meetingId = notificationId.replace("meeting_", "");
+      chrome.tabs.create({ url: `http://localhost:3000/meetings/${meetingId}` });
+    }
+  });
+}
