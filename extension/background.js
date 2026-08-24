@@ -9,15 +9,18 @@ let recordingState = {
 };
 
 // Restore state across service worker restarts
-chrome.storage.local.get(["recordingState"], (result) => {
-  if (result.recordingState) {
-    recordingState = result.recordingState;
-    if (recordingState.isRecording) {
-      chrome.action.setBadgeText({ text: "REC" });
-      chrome.action.setBadgeBackgroundColor({ color: "#dc2626" });
+// Guard in case storage API isn't fully bound yet (MV3 cold start race)
+if (chrome.storage && chrome.storage.local) {
+  chrome.storage.local.get(["recordingState"], (result) => {
+    if (result.recordingState) {
+      recordingState = result.recordingState;
+      if (recordingState.isRecording) {
+        chrome.action.setBadgeText({ text: "REC" });
+        chrome.action.setBadgeBackgroundColor({ color: "#dc2626" });
+      }
     }
-  }
-});
+  });
+}
 
 // ─── Offscreen document helpers ─────────────────────────────────────────────
 
@@ -171,11 +174,13 @@ async function handleMeetingStarted(message, sender, sendResponse) {
       // 3. Create offscreen recording document
       await ensureOffscreenDocument();
 
-      // 4. Start recording inside offscreen doc
+      // 4. Start recording inside offscreen doc — pass token directly so
+      //    offscreen.js never needs to call chrome.storage (not available there)
       await chrome.runtime.sendMessage({
         type: "START_RECORDING",
         streamId,
         meetingId: meeting.id,
+        token: data.token,
       });
 
       recordingState = {

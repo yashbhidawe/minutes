@@ -93,6 +93,14 @@ export default function MeetingDetailPage() {
   const [deleting, setDeleting] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
   const [error, setError] = useState("");
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!token || !meeting?.audio_key) return;
+    api.meetings.getAudioUrl(meetingId, token)
+      .then(setAudioUrl)
+      .catch(() => setAudioUrl(null));
+  }, [token, meetingId, meeting?.audio_key]);
 
   useEffect(() => {
     if (!authLoading && !token) router.push("/login");
@@ -110,6 +118,9 @@ export default function MeetingDetailPage() {
       setNotes(n);
       setActionItems(a);
       setTranscript(t);
+      if (n.length === 0 && t) {
+        setShowTranscript(true);
+      }
     }).finally(() => setLoading(false));
   }, [token, meetingId]);
 
@@ -148,6 +159,9 @@ export default function MeetingDetailPage() {
           setNotes(n);
           setActionItems(a);
           setTranscript(t);
+          if (n.length === 0 && t) {
+            setShowTranscript(true);
+          }
         }
       } catch (err) {
         console.error("Polling error:", err);
@@ -379,6 +393,16 @@ export default function MeetingDetailPage() {
         </div>
       )}
 
+      {audioUrl && (
+        <div className="mb-8 p-4 bg-stone-50 border border-stone-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-wider text-stone-500 font-medium">Recorded Call Audio</p>
+            <p className="text-xs text-stone-400 mt-0.5">Listen to captured tab audio</p>
+          </div>
+          <audio controls src={audioUrl} className="h-9 w-full sm:max-w-md" />
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2 space-y-2">
           {notesBySection["key_decisions"] && (
@@ -396,11 +420,14 @@ export default function MeetingDetailPage() {
 
           {notes.length === 0 && (
             <div className="py-16 text-center">
-              <p className="text-stone-300 text-sm">No summary yet</p>
+              <p className="text-stone-300 text-sm">
+                {meeting.status === "completed" ? "No structured notes generated" : "No summary yet"}
+              </p>
               <p className="text-stone-400 text-xs mt-1">
                 {meeting.status === "pending" && "Extension capturing audio. Notes will appear as soon as the recording finishes."}
                 {meeting.status === "uploaded" && "Transcribe the audio to generate notes."}
                 {meeting.status === "transcribed" && "Summarize the transcript to generate notes."}
+                {meeting.status === "completed" && "The audio contained insufficient speech to produce bullet points. Check the full transcript below."}
               </p>
             </div>
           )}

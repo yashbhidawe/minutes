@@ -62,9 +62,14 @@ export default function DashboardPage() {
   }, [token, authLoading, router]);
 
   useEffect(() => {
-    if (token) {
-      api.meetings.list(token).then(setMeetings).finally(() => setLoading(false));
-    }
+    if (!token) return;
+    api.meetings.list(token).then(setMeetings).finally(() => setLoading(false));
+
+    const interval = setInterval(() => {
+      api.meetings.list(token).then(setMeetings).catch(() => {});
+    }, 4000);
+
+    return () => clearInterval(interval);
   }, [token]);
 
   const handleCreate = async (e: React.FormEvent) => {

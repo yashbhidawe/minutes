@@ -10,12 +10,19 @@
       return false;
     }
 
-    // Require a leave/end button to confirm an active call (not lobby/pre-join)
-    const leaveButton = document.querySelector(
-      '[aria-label*="Leave"], [aria-label*="End call"], [jsname="CQylEf"]'
-    );
+    const isMeetingUrl = /^\/[a-z]{3}-[a-z]{4}-[a-z]{3}/i.test(path);
+    if (!isMeetingUrl) return false;
 
-    return !!leaveButton;
+    // Require active in-call DOM elements (Leave call button, mic/cam controls, or toolbar)
+    const leaveButton = document.querySelector(
+      '[aria-label*="Leave"], [aria-label*="End call"], [jsname="CQylEf"], [data-tooltip*="Leave"]'
+    );
+    const micCamControls = document.querySelector(
+      '[aria-label*="microphone"], [aria-label*="camera"], [aria-label*="Microphone"], [aria-label*="Camera"]'
+    );
+    const toolbar = document.querySelector('[jsname="A137Wd"], [jscontroller="kAP0id"]');
+
+    return !!(leaveButton || (micCamControls && toolbar));
   }
 
   function monitorMeetingState() {

@@ -5,6 +5,7 @@
   "description": "Automatic meeting notes for Google Meet",
   "permissions": [
     "tabCapture",
+    "audioCapture",
     "tabs",
     "storage",
     "offscreen"
