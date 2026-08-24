@@ -137,10 +137,21 @@ logoutBtn.addEventListener("click", () => {
   });
 });
 
-startRecBtn.addEventListener("click", () => {
+async function requestMicPermissionIfNeeded() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach((track) => track.stop());
+  } catch (err) {
+    console.warn("Microphone permission check in popup skipped/failed:", err);
+  }
+}
+
+startRecBtn.addEventListener("click", async () => {
   startRecBtn.disabled = true;
   startRecBtn.textContent = "Starting Recording...";
   hideError(mainError);
+
+  await requestMicPermissionIfNeeded();
 
   chrome.runtime.sendMessage({ type: "MANUAL_START_RECORDING" }, (res) => {
     startRecBtn.disabled = false;

@@ -2,7 +2,8 @@ const API_BASE = "http://localhost:8000";
 
 let mediaRecorder = null;
 let audioChunks = [];
-let mediaStream = null;
+let mediaStream = null;  // Tab stream
+let micStream = null;    // Microphone stream
 let audioContext = null;
 let currentMeetingId = null;
 let recordingStartTime = null;
@@ -25,37 +26,92 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 async function startRecording(streamId, meetingId, token) {
+  console.log(`[Offscreen] Starting recording for meeting ${meetingId}...`);
   currentMeetingId = meetingId;
   recordingStartTime = Date.now();
   authToken = token;
   audioChunks = [];
 
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: {
-      mandatory: {
-        chromeMediaSource: "tab",
-        chromeMediaSourceId: streamId,
+  // 1. Capture Tab Audio (Other call participants)
+  let tabStream = null;
+  try {
+    tabStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        mandatory: {
+          chromeMediaSource: "tab",
+          chromeMediaSourceId: streamId,
+        },
       },
-    },
-    video: false,
-  });
+      video: false,
+    });
+    console.log("[Offscreen] Tab audio stream acquired!");
+  } catch (err) {
+    console.warn("[Offscreen] Tab audio stream capture failed:", err);
+  }
 
-  mediaStream = stream;
+  mediaStream = tabStream;
 
-  // Pass-through so user can still hear meeting audio while recording
+  // 2. Capture Microphone Audio (User's own voice)
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    console.log("[Offscreen] Microphone audio stream acquired!");
+  } catch (err) {
+    console.warn("[Offscreen] Microphone access unavailable or denied:", err);
+    micStream = null;
+  }
+
+  if (!tabStream && !micStream) {
+    throw new Error("Unable to capture tab audio or microphone stream.");
+  }
+
+  // 3. Create AudioContext and FORCE RESUME (CRITICAL for Chrome MV3 offscreen)
   audioContext = new AudioContext();
-  const source = audioContext.createMediaStreamSource(stream);
-  source.connect(audioContext.destination);
+  if (audioContext.state === "suspended") {
+    await audioContext.resume();
+  }
 
-  mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+  let streamToRecord = null;
+
+  if (tabStream && micStream) {
+    // Both Tab + Mic available -> Mix them
+    const tabSource = audioContext.createMediaStreamSource(tabStream);
+    tabSource.connect(audioContext.destination); // Pass-through so user hears call out loud
+
+    const mixerDestination = audioContext.createMediaStreamDestination();
+    tabSource.connect(mixerDestination);
+
+    const micSource = audioContext.createMediaStreamSource(micStream);
+    micSource.connect(mixerDestination);
+
+    streamToRecord = mixerDestination.stream;
+    console.log("[Offscreen] Recording mixed audio stream (Tab Audio + Local Mic).");
+  } else if (micStream) {
+    // Only Mic available
+    streamToRecord = micStream;
+    console.log("[Offscreen] Recording microphone stream only.");
+  } else if (tabStream) {
+    // Only Tab available
+    const tabSource = audioContext.createMediaStreamSource(tabStream);
+    tabSource.connect(audioContext.destination); // Pass-through to speakers
+    streamToRecord = tabStream;
+    console.log("[Offscreen] Recording direct tab audio stream.");
+  }
+
+  mediaRecorder = new MediaRecorder(streamToRecord, { mimeType: "audio/webm" });
 
   mediaRecorder.ondataavailable = (event) => {
     if (event.data && event.data.size > 0) {
+      console.log(`[Offscreen] Audio chunk captured: ${event.data.size} bytes`);
       audioChunks.push(event.data);
     }
   };
 
+  mediaRecorder.onerror = (err) => {
+    console.error("[Offscreen] MediaRecorder error:", err);
+  };
+
   mediaRecorder.start(1000);
+  console.log("[Offscreen] MediaRecorder started successfully.");
 }
 
 async function stopRecording() {
@@ -72,6 +128,7 @@ async function stopRecording() {
           : null;
 
         const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+        console.log(`[Offscreen] Final audio blob created: ${audioBlob.size} bytes`);
         cleanup();
 
         // Upload directly from offscreen document
@@ -93,7 +150,6 @@ async function stopRecording() {
 }
 
 async function uploadAudioToBackend(audioBlob, meetingId, durationSec) {
-  // Token was passed in from background.js at recording start — no storage access needed
   if (!authToken) {
     chrome.runtime.sendMessage({
       type: "UPLOAD_FAILED",
@@ -148,6 +204,10 @@ function cleanup() {
   if (mediaStream) {
     mediaStream.getTracks().forEach((track) => track.stop());
     mediaStream = null;
+  }
+  if (micStream) {
+    micStream.getTracks().forEach((track) => track.stop());
+    micStream = null;
   }
   if (audioContext) {
     audioContext.close();
