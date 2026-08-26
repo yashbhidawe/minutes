@@ -23,6 +23,19 @@ function isTokenExpired(token: string): boolean {
   }
 }
 
+function broadcastAuthChange(token: string | null, user: User | null) {
+  if (typeof window !== "undefined") {
+    window.postMessage(
+      {
+        type: "MINUTE_AI_AUTH_CHANGE",
+        token,
+        user,
+      },
+      "*"
+    );
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -33,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    broadcastAuthChange(null, null);
   }, []);
 
   useEffect(() => {
@@ -42,10 +56,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (isTokenExpired(savedToken)) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+        broadcastAuthChange(null, null);
       } else {
+        const parsedUser = JSON.parse(savedUser);
         setToken(savedToken);
-        setUser(JSON.parse(savedUser));
+        setUser(parsedUser);
+        broadcastAuthChange(savedToken, parsedUser);
       }
+    } else {
+      broadcastAuthChange(null, null);
     }
     setIsLoading(false);
   }, []);
@@ -68,6 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(res.user);
     localStorage.setItem("token", res.access_token);
     localStorage.setItem("user", JSON.stringify(res.user));
+    broadcastAuthChange(res.access_token, res.user);
   };
 
   const register = async (email: string, password: string) => {
