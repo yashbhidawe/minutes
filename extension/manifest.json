@@ -23,6 +23,13 @@
     {
       "matches": ["https://meet.google.com/*"],
       "js": ["content.js"]
+    },
+    {
+      "matches": [
+        "http://localhost:3000/*",
+        "http://127.0.0.1:3000/*"
+      ],
+      "js": ["dashboard-sync.js"]
     }
   ],
   "action": {

@@ -1,4 +1,5 @@
 const API_BASE = "http://localhost:8000";
+const DASHBOARD_URL = "http://localhost:3000";
 
 const loginView = document.getElementById("login-view");
 const mainView = document.getElementById("main-view");
@@ -8,6 +9,9 @@ const loginError = document.getElementById("login-error");
 const mainError = document.getElementById("main-error");
 const userEmail = document.getElementById("user-email");
 const logoutBtn = document.getElementById("logout-btn");
+
+const gotoDashboardBtn = document.getElementById("goto-dashboard-btn");
+const toggleManualLoginBtn = document.getElementById("toggle-manual-login");
 
 const recordingCard = document.getElementById("recording-card");
 const idleCard = document.getElementById("idle-card");
@@ -70,71 +74,133 @@ function updateUI(status) {
   }
 }
 
-chrome.runtime.sendMessage({ type: "GET_TOKEN" }, (response) => {
-  if (response && response.token) {
-    showView("main");
-    userEmail.textContent = response.email || "Logged in";
+function checkAuthState() {
+  chrome.runtime.sendMessage({ type: "GET_TOKEN" }, (response) => {
+    if (response && response.token) {
+      showView("main");
+      userEmail.textContent = response.email || "Logged in";
 
-    chrome.runtime.sendMessage({ type: "GET_STATUS" }, (statusResponse) => {
-      updateUI(statusResponse);
-    });
-  } else {
-    showView("login");
-  }
-});
-
-loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  hideError(loginError);
-
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  loginBtn.disabled = true;
-  loginBtn.textContent = "Signing in...";
-
-  try {
-    const res = await fetch(`${API_BASE}/users/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!res.ok) {
-      const data = await res.json();
-      throw new Error(data.detail || "Login failed");
-    }
-
-    const data = await res.json();
-
-    chrome.runtime.sendMessage(
-      {
-        type: "SET_TOKEN",
-        token: data.access_token,
-        email: email,
-      },
-      () => {
-        showView("main");
-        userEmail.textContent = email;
-
-        chrome.runtime.sendMessage({ type: "GET_STATUS" }, (statusResponse) => {
-          updateUI(statusResponse);
-        });
+      chrome.runtime.sendMessage({ type: "GET_STATUS" }, (statusResponse) => {
+        updateUI(statusResponse);
+      });
+    } else {
+      // Try requesting active dashboard sync from open tabs
+      if (chrome.tabs && chrome.tabs.query) {
+        chrome.tabs.query(
+          { url: ["http://localhost:3000/*", "http://127.0.0.1:3000/*"] },
+          (tabs) => {
+            if (tabs && tabs.length > 0) {
+              tabs.forEach((tab) => {
+                chrome.tabs.sendMessage(tab.id, { type: "REQUEST_DASHBOARD_TOKEN" }, () => {
+                  if (chrome.runtime.lastError) {
+                    // Suppress tab error if tab script isn't ready
+                  }
+                });
+              });
+            }
+          }
+        );
       }
-    );
-  } catch (err) {
-    showError(loginError, err.message);
-  } finally {
-    loginBtn.disabled = false;
-    loginBtn.textContent = "Sign In";
-  }
-});
+      showView("login");
+    }
+  });
+}
+
+// Listen for storage changes so popup updates dynamically when user logs in via dashboard tab
+if (chrome.storage && chrome.storage.onChanged) {
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === "local" && (changes.token || changes.email)) {
+      chrome.runtime.sendMessage({ type: "GET_TOKEN" }, (response) => {
+        if (response && response.token) {
+          showView("main");
+          userEmail.textContent = response.email || "Logged in";
+          chrome.runtime.sendMessage({ type: "GET_STATUS" }, (statusResponse) => {
+            updateUI(statusResponse);
+          });
+        } else {
+          showView("login");
+        }
+      });
+    }
+  });
+}
+
+// Initial check on popup open
+checkAuthState();
+
+// Redirect to dashboard button
+if (gotoDashboardBtn) {
+  gotoDashboardBtn.addEventListener("click", () => {
+    chrome.tabs.create({ url: DASHBOARD_URL });
+  });
+}
+
+// Toggle manual email/password form
+if (toggleManualLoginBtn) {
+  toggleManualLoginBtn.addEventListener("click", () => {
+    if (loginForm) {
+      loginForm.classList.toggle("hidden");
+    }
+  });
+}
+
+// Manual login form submission fallback
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    hideError(loginError);
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    loginBtn.disabled = true;
+    loginBtn.textContent = "Signing in...";
+
+    try {
+      const res = await fetch(`${API_BASE}/users/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.detail || "Login failed");
+      }
+
+      const data = await res.json();
+
+      chrome.runtime.sendMessage(
+        {
+          type: "SET_TOKEN",
+          token: data.access_token,
+          email: email,
+        },
+        () => {
+          showView("main");
+          userEmail.textContent = email;
+
+          chrome.runtime.sendMessage({ type: "GET_STATUS" }, (statusResponse) => {
+            updateUI(statusResponse);
+          });
+        }
+      );
+    } catch (err) {
+      showError(loginError, err.message);
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = "Sign In Directly";
+    }
+  });
+}
 
 logoutBtn.addEventListener("click", () => {
   chrome.runtime.sendMessage({ type: "LOGOUT" }, () => {
     showView("login");
-    document.getElementById("email").value = "";
-    document.getElementById("password").value = "";
+    const emailInput = document.getElementById("email");
+    const passInput = document.getElementById("password");
+    if (emailInput) emailInput.value = "";
+    if (passInput) passInput.value = "";
   });
 });
 
@@ -189,7 +255,7 @@ stopRecBtn.addEventListener("click", () => {
 
 if (openDashboardBtn) {
   openDashboardBtn.addEventListener("click", () => {
-    chrome.tabs.create({ url: "http://localhost:3000/dashboard" });
+    chrome.tabs.create({ url: `${DASHBOARD_URL}/dashboard` });
   });
 }
 

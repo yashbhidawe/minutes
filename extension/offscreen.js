@@ -7,7 +7,7 @@ let micStream = null;    // Microphone stream
 let audioContext = null;
 let currentMeetingId = null;
 let recordingStartTime = null;
-let authToken = null; // Passed in from background.js — we do NOT call chrome.storage here
+let authToken = null; // Passed in from background.js
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "START_RECORDING") {
@@ -34,19 +34,23 @@ async function startRecording(streamId, meetingId, token) {
 
   // 1. Capture Tab Audio (Other call participants)
   let tabStream = null;
-  try {
-    tabStream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        mandatory: {
-          chromeMediaSource: "tab",
-          chromeMediaSourceId: streamId,
+  if (streamId) {
+    try {
+      tabStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          mandatory: {
+            chromeMediaSource: "tab",
+            chromeMediaSourceId: streamId,
+          },
         },
-      },
-      video: false,
-    });
-    console.log("[Offscreen] Tab audio stream acquired!");
-  } catch (err) {
-    console.warn("[Offscreen] Tab audio stream capture failed:", err);
+        video: false,
+      });
+      console.log("[Offscreen] Tab audio stream acquired!");
+    } catch (err) {
+      console.warn("[Offscreen] Tab audio stream capture failed:", err);
+    }
+  } else {
+    console.warn("[Offscreen] No streamId provided for tab capture.");
   }
 
   mediaStream = tabStream;
@@ -61,43 +65,52 @@ async function startRecording(streamId, meetingId, token) {
   }
 
   if (!tabStream && !micStream) {
-    throw new Error("Unable to capture tab audio or microphone stream.");
+    throw new Error("Unable to capture tab audio or microphone stream. Please ensure microphone permissions are enabled.");
   }
 
-  // 3. Create AudioContext and FORCE RESUME (CRITICAL for Chrome MV3 offscreen)
-  audioContext = new AudioContext();
+  // 3. Create AudioContext and FORCE RESUME
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
   if (audioContext.state === "suspended") {
     await audioContext.resume();
   }
 
+  const mixerDestination = audioContext.createMediaStreamDestination();
   let streamToRecord = null;
 
   if (tabStream && micStream) {
-    // Both Tab + Mic available -> Mix them
+    // Both Tab + Mic available -> Mix them cleanly
     const tabSource = audioContext.createMediaStreamSource(tabStream);
-    tabSource.connect(audioContext.destination); // Pass-through so user hears call out loud
-
-    const mixerDestination = audioContext.createMediaStreamDestination();
-    tabSource.connect(mixerDestination);
+    tabSource.connect(audioContext.destination); // Play to speakers out loud
+    tabSource.connect(mixerDestination);          // Route to recorder
 
     const micSource = audioContext.createMediaStreamSource(micStream);
-    micSource.connect(mixerDestination);
+    micSource.connect(mixerDestination);          // Route to recorder (no speaker connection to prevent echo)
 
     streamToRecord = mixerDestination.stream;
     console.log("[Offscreen] Recording mixed audio stream (Tab Audio + Local Mic).");
+  } else if (tabStream) {
+    // Only Tab available -> Pass to speakers AND destination
+    const tabSource = audioContext.createMediaStreamSource(tabStream);
+    tabSource.connect(audioContext.destination); // Play to speakers out loud
+    tabSource.connect(mixerDestination);          // Route to recorder
+
+    streamToRecord = mixerDestination.stream;
+    console.log("[Offscreen] Recording tab audio stream via AudioContext.");
   } else if (micStream) {
     // Only Mic available
     streamToRecord = micStream;
     console.log("[Offscreen] Recording microphone stream only.");
-  } else if (tabStream) {
-    // Only Tab available
-    const tabSource = audioContext.createMediaStreamSource(tabStream);
-    tabSource.connect(audioContext.destination); // Pass-through to speakers
-    streamToRecord = tabStream;
-    console.log("[Offscreen] Recording direct tab audio stream.");
   }
 
-  mediaRecorder = new MediaRecorder(streamToRecord, { mimeType: "audio/webm" });
+  let options = { mimeType: "audio/webm;codecs=opus" };
+  if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+    options = { mimeType: "audio/webm" };
+  }
+  if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+    options = {};
+  }
+
+  mediaRecorder = new MediaRecorder(streamToRecord, options);
 
   mediaRecorder.ondataavailable = (event) => {
     if (event.data && event.data.size > 0) {
@@ -210,7 +223,9 @@ function cleanup() {
     micStream = null;
   }
   if (audioContext) {
-    audioContext.close();
+    try {
+      audioContext.close();
+    } catch (e) {}
     audioContext = null;
   }
   mediaRecorder = null;

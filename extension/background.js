@@ -170,7 +170,10 @@ async function handleMeetingStarted(message, sender, sendResponse) {
       const meeting = await res.json();
       createdMeetingId = meeting.id;
 
-      // 2. Get media stream ID (must happen before offscreen doc is created)
+      // 2. Ensure offscreen document exists
+      await ensureOffscreenDocument();
+
+      // 3. Get media stream ID for tab audio capture
       const streamId = await new Promise((resolve, reject) => {
         chrome.tabCapture.getMediaStreamId({ targetTabId: tabId }, (id) => {
           if (chrome.runtime.lastError) {
@@ -180,9 +183,6 @@ async function handleMeetingStarted(message, sender, sendResponse) {
           }
         });
       });
-
-      // 3. Create offscreen recording document
-      await ensureOffscreenDocument();
 
       // 4. Start recording inside offscreen doc — pass token directly so
       //    offscreen.js never needs to call chrome.storage (not available there)
