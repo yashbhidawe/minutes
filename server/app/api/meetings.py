@@ -7,10 +7,13 @@ from app.utils.auth import get_current_user
 from app.repositories.meeting import MeetingRepository
 from app.repositories.note import NoteRepository
 from app.repositories.action_item import ActionItemRepository
+from os import getenv
 from app.services.audio import upload_audio
+from app.services.audio_chunker import process_and_transcribe_audio
 from app.services.transcription import transcribe_audio
 from app.services.summarization import summarize_transcript
 from app.services.storage import download_file
+from app.services.cloud_tasks import enqueue_meeting_processing_task
 from app.schemas.meeting import MeetingResponse, MeetingUploadResponse, TranscriptResponse, TranscriptSegment
 from app.schemas.note import NoteResponse
 from app.schemas.action_item import ActionItemResponse
@@ -35,9 +38,9 @@ def run_automated_pipeline(meeting_id: int):
                 repo.update_status(meeting_id, "failed")
                 return
 
-            # Step 2: Transcribe via Groq Whisper
+            # Step 2: Transcribe via Groq Whisper (with Chunking)
             filename = meeting.audio_key.split("/")[-1]
-            transcribe_result = transcribe_audio(audio_bytes, filename)
+            transcribe_result = process_and_transcribe_audio(audio_bytes, filename)
 
             if not transcribe_result["text"].strip():
                 repo.update_error(meeting_id, "Transcription produced no speech — the recording may contain only background noise.")
@@ -215,6 +218,25 @@ def get_meeting_audio(
     return Response(content=audio_bytes, media_type="audio/webm")
 
 
+class ProcessMeetingTaskPayload(BaseModel):
+    meeting_id: int
+
+
+@router.post("/tasks/process-meeting")
+def process_meeting_task_endpoint(
+    body: ProcessMeetingTaskPayload,
+    x_task_secret: str | None = Header(default=None, alias="X-Task-Secret"),
+    session: Session = Depends(get_session),
+):
+    expected_secret = getenv("INTERNAL_TASK_SECRET")
+    if expected_secret and expected_secret != "default-minute-ai-secret":
+        if x_task_secret != expected_secret:
+            raise HTTPException(status_code=403, detail="Unauthorized task trigger call")
+
+    run_automated_pipeline(body.meeting_id)
+    return {"status": "ok", "meeting_id": body.meeting_id}
+
+
 @router.post("/{meeting_id}/upload-audio", response_model=MeetingUploadResponse)
 async def upload_meeting_audio(
     meeting_id: int,
@@ -235,12 +257,12 @@ async def upload_meeting_audio(
     if x_recording_duration and x_recording_duration > 0:
         repo.update_duration(meeting_id, x_recording_duration)
 
-    repo.update_status(meeting_id, "processing")
-    background_tasks.add_task(run_automated_pipeline, meeting_id)
+    repo.update_status(meeting_id, "queued")
+    result = enqueue_meeting_processing_task(meeting_id, background_tasks, fallback_handler=run_automated_pipeline)
 
     return MeetingUploadResponse(
         meeting_id=meeting.id,
-        status="processing",
+        status=result.get("status", "queued"),
         audio_key=meeting.audio_key,
     )
 
@@ -259,14 +281,16 @@ def reprocess_meeting(
     if not meeting.audio_key:
         raise HTTPException(status_code=400, detail="No audio file found for this meeting")
 
-    repo.update_status(meeting_id, "processing")
-    background_tasks.add_task(run_automated_pipeline, meeting_id)
+    repo.update_status(meeting_id, "queued")
+    result = enqueue_meeting_processing_task(meeting_id, background_tasks, fallback_handler=run_automated_pipeline)
 
     return MeetingUploadResponse(
         meeting_id=meeting.id,
-        status="processing",
+        status=result.get("status", "queued"),
         audio_key=meeting.audio_key,
     )
+
+
 
 
 @router.get("/{meeting_id}/transcript", response_model=TranscriptResponse)
