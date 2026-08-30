@@ -6,7 +6,7 @@ Automatic meeting notes for Google Meet. Records tab audio upon call completion,
 
 ## Overview
 
-**Minute AI** is an intelligent meeting assistant pairing a Manifest V3 Chrome Extension with a FastAPI backend and a Next.js web dashboard. It captures Google Meet tab audio automatically without requiring host permissions, processes it through an AI pipeline, and surfaces clean meeting notes, key decisions, action items, and timestamped transcripts within minutes of the call ending.
+**Minute AI** is an intelligent meeting assistant pairing a Manifest V3 Chrome Extension with a FastAPI backend and a Next.js web dashboard. It captures Google Meet tab audio automatically without requiring host permissions, processes it through a serverless AI pipeline (with audio chunking & GCP Cloud Tasks queueing), and surfaces clean meeting notes, key decisions, action items, and timestamped transcripts within minutes of the call ending.
 
 Built for small teams, managers, and individuals who want full meeting context without manual note-taking.
 
@@ -14,12 +14,15 @@ Built for small teams, managers, and individuals who want full meeting context w
 
 ## Stack
 
-- **Backend** — FastAPI, SQLite, SQLAlchemy, Pydantic v2
+- **Backend** — FastAPI, PostgreSQL / SQLite, SQLAlchemy, Pydantic v2
+- **Queue & Async Jobs** — GCP Cloud Tasks (Production Serverless Queue) / FastAPI BackgroundTasks (Local Dev)
+- **Audio Processing** — FFmpeg & Pydub (Automatic 10-min slicing to bypass 25MB Whisper limits)
 - **Frontend** — Next.js 16 (App Router), Tailwind CSS, TypeScript
 - **Extension** — Vanilla JS, Chrome Extensions Manifest V3 (`chrome.offscreen` + `chrome.tabCapture`)
-- **AI Pipeline** — Groq Whisper (`whisper-large-v3` for transcription), Google Gemini (`gemini-3.6-flash` for structured JSON summarization)
-- **Storage** — Cloudflare R2 (audio files via boto3 S3 interface)
+- **AI Pipeline** — Groq Whisper (`whisper-large-v3` for speech-to-text), Google Gemini (`gemini-3.6-flash` for JSON summarization)
+- **Storage** — Cloudflare R2 (audio persistence)
 - **Auth** — JWT (`python-jose`), bcrypt password hashing (`passlib`)
+
 
 ---
 
@@ -147,6 +150,14 @@ R2_ACCOUNT_ID=your_cloudflare_account_id
 R2_ACCESS_KEY_ID=your_r2_access_key_id
 R2_SECRET_ACCESS_KEY=your_r2_secret_access_key
 R2_BUCKET_NAME=minuteai
+
+# GCP Cloud Tasks (Optional for Production Serverless Queueing)
+ENABLE_GCP_CLOUD_TASKS=false
+GCP_PROJECT_ID=your-gcp-project-id
+GCP_LOCATION=us-central1
+GCP_QUEUE_NAME=meeting-processing-queue
+BACKEND_SERVICE_URL=https://your-cloud-run-backend-url.a.run.app
+INTERNAL_TASK_SECRET=your_secure_internal_secret
 ```
 
 Create a `.env.local` file in `client/` if needed:
@@ -162,10 +173,13 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 - ✅ User authentication with JWT & bcrypt password validation
 - ✅ Chrome Extension tab capture via `chrome.offscreen` & `MediaRecorder`
 - ✅ Cloudflare R2 audio file storage
+- ✅ FFmpeg Audio Slicing (10-min chunking to bypass Groq Whisper 25MB limits with offset re-stitching)
+- ✅ GCP Cloud Tasks serverless queue processing with local fallback
 - ✅ Groq Whisper speech-to-text transcription with timestamped segments
 - ✅ Google Gemini 3.6 Flash structured JSON summarization
 - ✅ Next.js dashboard with meeting list, detail view, action item status toggles, and full transcript viewer
-- ✅ CORS security & dynamic ORM timestamping
+- ✅ Dockerized deployment setup for GCP Cloud Run / GCP VM
+
 
 ---
 
