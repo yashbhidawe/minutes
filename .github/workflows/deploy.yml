@@ -1,20 +1,10 @@
-name: CI/CD Pipeline & GCP Cloud Run Deployment
+name: CI Pipeline (Run Pytest Suite)
 
 on:
   push:
     branches: [ "main", "dev" ]
   pull_request:
     branches: [ "main" ]
-
-permissions:
-  contents: read
-  id-token: write
-
-env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  REGION: ${{ secrets.GCP_REGION || 'us-central1' }}
-  SERVICE_NAME: minuteai-api
-  REPOSITORY_NAME: minute-ai-repo
 
 jobs:
   test:
@@ -45,55 +35,3 @@ jobs:
         run: |
           cd server
           pytest -v
-
-  deploy:
-    name: Build & Deploy to GCP Cloud Run
-    needs: test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Authenticate to GCP via Workload Identity Federation (OIDC)
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: github-deployer@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-
-      - name: Configure Docker for Artifact Registry
-        run: |
-          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
-
-      - name: Ensure Artifact Registry Repo Exists
-        run: |
-          gcloud artifacts repositories describe ${{ env.REPOSITORY_NAME }} --location=${{ env.REGION }} || \
-          gcloud artifacts repositories create ${{ env.REPOSITORY_NAME }} --repository-format=docker --location=${{ env.REGION }} --description="Minute AI Backend Docker repository"
-
-      - name: Build & Push Docker Image
-        run: |
-          IMAGE_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/backend:${{ github.sha }}"
-          
-          docker build -t "$IMAGE_TAG" ./server
-          docker push "$IMAGE_TAG"
-
-      - name: Deploy to GCP Cloud Run (Secret Manager Injection)
-        run: |
-          IMAGE_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/backend:${{ github.sha }}"
-          
-          gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image="$IMAGE_TAG" \
-            --region="${{ env.REGION }}" \
-            --platform=managed \
-            --allow-unauthenticated \
-            --port=8000 \
-            --service-account="minuteai-runtime@${{ env.PROJECT_ID }}.iam.gserviceaccount.com" \
-            --set-env-vars="ENABLE_GCP_CLOUD_TASKS=true,GCP_PROJECT_ID=${{ env.PROJECT_ID }},GCP_LOCATION=${{ env.REGION }},GCP_QUEUE_NAME=meeting-processing-queue" \
-            --set-secrets="DATABASE_URL=database-url:1,GROQ_API_KEY=groq-api-key:1,GEMINI_API_KEY=gemini-api-key:1,JWT_SECRET_KEY=jwt-secret-key:1,R2_ACCOUNT_ID=r2-account-id:1,R2_ACCESS_KEY_ID=r2-access-key-id:1,R2_SECRET_ACCESS_KEY=r2-secret-access-key:1,R2_BUCKET_NAME=r2-bucket-name:1,INTERNAL_TASK_SECRET=internal-task-secret:1"
-
-
-
