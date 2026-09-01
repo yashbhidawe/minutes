@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+  id-token: write
+
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: ${{ secrets.GCP_REGION || 'us-central1' }}
@@ -52,10 +56,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Authenticate to GCP
+      - name: Authenticate to GCP via Workload Identity Federation (OIDC)
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: github-deployer@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -72,20 +77,23 @@ jobs:
       - name: Build & Push Docker Image
         run: |
           IMAGE_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/backend:${{ github.sha }}"
-          LATEST_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/backend:latest"
           
-          docker build -t $IMAGE_TAG -t $LATEST_TAG ./server
-          docker push $IMAGE_TAG
-          docker push $LATEST_TAG
+          docker build -t "$IMAGE_TAG" ./server
+          docker push "$IMAGE_TAG"
 
-      - name: Deploy to GCP Cloud Run
+      - name: Deploy to GCP Cloud Run (Secret Manager Injection)
         run: |
           IMAGE_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/backend:${{ github.sha }}"
           
           gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image=$IMAGE_TAG \
-            --region=${{ env.REGION }} \
+            --image="$IMAGE_TAG" \
+            --region="${{ env.REGION }}" \
             --platform=managed \
             --allow-unauthenticated \
             --port=8000 \
-            --set-env-vars="ENABLE_GCP_CLOUD_TASKS=true,GCP_PROJECT_ID=${{ env.PROJECT_ID }},GCP_LOCATION=${{ env.REGION }},GCP_QUEUE_NAME=${{ secrets.GCP_QUEUE_NAME || 'meeting-processing-queue' }},INTERNAL_TASK_SECRET=${{ secrets.INTERNAL_TASK_SECRET }},GROQ_API_KEY=${{ secrets.GROQ_API_KEY }},GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }},JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }},R2_ACCOUNT_ID=${{ secrets.R2_ACCOUNT_ID }},R2_ACCESS_KEY_ID=${{ secrets.R2_ACCESS_KEY_ID }},R2_SECRET_ACCESS_KEY=${{ secrets.R2_SECRET_ACCESS_KEY }},R2_BUCKET_NAME=${{ secrets.R2_BUCKET_NAME }},BACKEND_SERVICE_URL=${{ secrets.BACKEND_SERVICE_URL }}"
+            --service-account="minuteai-runtime@${{ env.PROJECT_ID }}.iam.gserviceaccount.com" \
+            --set-env-vars="ENABLE_GCP_CLOUD_TASKS=true,GCP_PROJECT_ID=${{ env.PROJECT_ID }},GCP_LOCATION=${{ env.REGION }},GCP_QUEUE_NAME=meeting-processing-queue" \
+            --set-secrets="DATABASE_URL=database-url:1,GROQ_API_KEY=groq-api-key:1,GEMINI_API_KEY=gemini-api-key:1,JWT_SECRET_KEY=jwt-secret-key:1,R2_ACCOUNT_ID=r2-account-id:1,R2_ACCESS_KEY_ID=r2-access-key-id:1,R2_SECRET_ACCESS_KEY=r2-secret-access-key:1,R2_BUCKET_NAME=r2-bucket-name:1,INTERNAL_TASK_SECRET=internal-task-secret:1"
+
+
+

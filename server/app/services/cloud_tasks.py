@@ -13,7 +13,12 @@ BACKEND_SERVICE_URL = getenv("BACKEND_SERVICE_URL", "http://localhost:8000")
 INTERNAL_TASK_SECRET = getenv("INTERNAL_TASK_SECRET", "default-minute-ai-secret")
 
 
-def enqueue_meeting_processing_task(meeting_id: int, background_tasks: BackgroundTasks, fallback_handler=None):
+def enqueue_meeting_processing_task(
+    meeting_id: int,
+    background_tasks: BackgroundTasks,
+    fallback_handler=None,
+    request_base_url: str | None = None,
+):
     """
     Enqueues meeting background processing task.
     In GCP Production: Pushes HTTP task to GCP Cloud Tasks.
@@ -26,7 +31,8 @@ def enqueue_meeting_processing_task(meeting_id: int, background_tasks: Backgroun
             client = tasks_v2.CloudTasksClient()
             parent = client.queue_path(GCP_PROJECT_ID, GCP_LOCATION, GCP_QUEUE_NAME)
 
-            target_url = f"{BACKEND_SERVICE_URL.rstrip('/')}/meetings/tasks/process-meeting"
+            base_url = request_base_url or BACKEND_SERVICE_URL or "http://localhost:8000"
+            target_url = f"{base_url.rstrip('/')}/meetings/tasks/process-meeting"
             payload = json.dumps({"meeting_id": meeting_id}).encode("utf-8")
 
             task = {
