@@ -1,3 +1,4 @@
+import json
 import os
 from fastapi import BackgroundTasks
 from app.core.celery_app import celery_app, ENABLE_CELERY
@@ -27,38 +28,66 @@ def execute_meeting_pipeline(meeting_id: int):
                 print(f"[Pipeline Warning] Meeting ID {meeting_id} not found or missing audio.")
                 return False
 
-            repo.update_status(meeting_id, "processing")
+            repo.update_status(meeting_id, "transcribing")
             print(f"[Pipeline] Processing audio for meeting ID: {meeting_id}")
             audio_bytes = download_file(meeting.audio_key)
 
-            # Transcribe audio with automatic <=10 min chunking & timestamp stitching
-            filename = meeting.audio_key.rsplit("/", 1)[-1]
-            raw_transcript = process_and_transcribe_audio(audio_bytes, filename)
-
-            if not raw_transcript:
+            if len(audio_bytes) < 5000:
+                repo.update_error(meeting_id, "Recording too short or empty — no audio was captured.")
                 repo.update_status(meeting_id, "failed")
-                print(f"[Pipeline Error] Empty transcript returned for meeting ID: {meeting_id}")
                 return False
 
-            saved_transcript = repo.save_transcript(meeting_id, raw_transcript)
+            # Transcribe audio with automatic <=10 min chunking & timestamp stitching
+            filename = meeting.audio_key.rsplit("/", 1)[-1]
+            transcribe_result = process_and_transcribe_audio(audio_bytes, filename)
 
-            transcript_text = "\n".join(
-                f"[{seg.get('start', 0.0):.1f}s - {seg.get('end', 0.0):.1f}s] {seg.get('speaker', 'Speaker')}: {seg.get('text', '')}"
-                for seg in saved_transcript
+            if not transcribe_result or not transcribe_result.get("text", "").strip():
+                repo.update_error(meeting_id, "Transcription produced no speech — the recording may contain only background noise.")
+                repo.update_status(meeting_id, "failed")
+                return False
+
+            raw_text = transcribe_result["text"]
+            language = transcribe_result.get("language", "english")
+            segments = transcribe_result.get("segments", [])
+            segments_json = json.dumps(segments) if isinstance(segments, list) else segments
+
+            repo.save_transcript(
+                meeting_id=meeting_id,
+                raw_text=raw_text,
+                language=language,
+                segments=segments_json,
+            )
+            repo.update_status(meeting_id, "transcribed")
+
+            # Summarize via Gemini
+            repo.update_status(meeting_id, "summarizing")
+            summary = summarize_transcript(raw_text)
+
+            if summary.get("title"):
+                repo.update_title(meeting_id, summary["title"])
+
+            note_repo = NoteRepository(session)
+            note_repo.create_many(
+                meeting_id,
+                {
+                    "key_decisions": summary.get("key_decisions", ""),
+                    "discussion_points": summary.get("discussion_points", ""),
+                    "blockers": summary.get("blockers", ""),
+                    "next_steps": summary.get("next_steps", ""),
+                },
             )
 
-            summary_result = summarize_transcript(transcript_text)
-            note_repo = NoteRepository(session)
             action_item_repo = ActionItemRepository(session)
+            if summary.get("action_items"):
+                action_item_repo.create_many(meeting_id, summary["action_items"])
 
-            note_repo.save_notes(meeting_id, summary_result.get("summary", []))
-            action_item_repo.save_action_items(meeting_id, summary_result.get("action_items", []))
-
+            repo.update_error(meeting_id, None)
             repo.update_status(meeting_id, "completed")
             print(f"[Pipeline] Successfully completed meeting ID: {meeting_id}")
             return True
         except Exception as e:
             print(f"[Pipeline Error] Exception during processing for meeting ID {meeting_id}: {e}")
+            repo.update_error(meeting_id, str(e))
             repo.update_status(meeting_id, "failed")
             raise e
 
