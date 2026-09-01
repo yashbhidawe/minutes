@@ -13,6 +13,7 @@ from app.services.audio_chunker import process_and_transcribe_audio
 from app.services.transcription import transcribe_audio
 from app.services.summarization import summarize_transcript
 from app.services.storage import download_file
+from app.services.celery_tasks import dispatch_meeting_task, execute_meeting_pipeline
 from app.schemas.meeting import MeetingResponse, MeetingUploadResponse, TranscriptResponse, TranscriptSegment
 from app.schemas.note import NoteResponse
 from app.schemas.action_item import ActionItemResponse
@@ -21,73 +22,7 @@ router = APIRouter(prefix="/meetings", tags=["meetings"])
 
 
 def run_automated_pipeline(meeting_id: int):
-    with SessionLocal() as session:
-        repo = MeetingRepository(session)
-        try:
-            meeting = repo.get_by_id(meeting_id)
-            if not meeting or not meeting.audio_key:
-                return
-
-            # Step 1: Download and validate audio
-            repo.update_status(meeting_id, "transcribing")
-            audio_bytes = download_file(meeting.audio_key)
-
-            if len(audio_bytes) < 5000:  # < 5KB = empty/silent recording
-                repo.update_error(meeting_id, "Recording too short or empty — no audio was captured.")
-                repo.update_status(meeting_id, "failed")
-                return
-
-            # Step 2: Transcribe via Groq Whisper (with Chunking)
-            filename = meeting.audio_key.split("/")[-1]
-            transcribe_result = process_and_transcribe_audio(audio_bytes, filename)
-
-            if not transcribe_result["text"].strip():
-                repo.update_error(meeting_id, "Transcription produced no speech — the recording may contain only background noise.")
-                repo.update_status(meeting_id, "failed")
-                return
-
-            repo.save_transcript(
-                meeting_id,
-                transcribe_result["text"],
-                transcribe_result["language"],
-                segments=transcribe_result["segments"],
-            )
-            repo.update_status(meeting_id, "transcribed")
-
-            # Step 3: Summarize via Gemini
-            repo.update_status(meeting_id, "summarizing")
-            summary = summarize_transcript(transcribe_result["text"])
-
-            if summary.get("title"):
-                repo.update_title(meeting_id, summary["title"])
-
-            note_repo = NoteRepository(session)
-            note_repo.create_many(
-                meeting_id,
-                {
-                    "key_decisions": summary.get("key_decisions", ""),
-                    "discussion_points": summary.get("discussion_points", ""),
-                    "blockers": summary.get("blockers", ""),
-                    "next_steps": summary.get("next_steps", ""),
-                },
-            )
-
-            action_item_repo = ActionItemRepository(session)
-            if summary.get("action_items"):
-                action_item_repo.create_many(meeting_id, summary["action_items"])
-
-            # Clear any previous error and mark done
-            repo.update_error(meeting_id, None)
-            repo.update_status(meeting_id, "completed")
-
-        except Exception as e:
-            error_msg = str(e)
-            print(f"[pipeline] Error for meeting {meeting_id}: {error_msg}")
-            try:
-                repo.update_error(meeting_id, error_msg)
-                repo.update_status(meeting_id, "failed")
-            except Exception:
-                pass
+    return execute_meeting_pipeline(meeting_id)
 
 
 def get_session():
@@ -238,7 +173,7 @@ async def upload_meeting_audio(
         repo.update_duration(meeting_id, x_recording_duration)
 
     repo.update_status(meeting_id, "queued")
-    background_tasks.add_task(run_automated_pipeline, meeting_id)
+    dispatch_meeting_task(meeting_id, background_tasks)
 
     return MeetingUploadResponse(
         meeting_id=meeting.id,
@@ -262,7 +197,7 @@ def reprocess_meeting(
         raise HTTPException(status_code=400, detail="No audio file found for this meeting")
 
     repo.update_status(meeting_id, "queued")
-    background_tasks.add_task(run_automated_pipeline, meeting_id)
+    dispatch_meeting_task(meeting_id, background_tasks)
 
     return MeetingUploadResponse(
         meeting_id=meeting.id,
