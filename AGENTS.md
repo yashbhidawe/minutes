@@ -107,6 +107,6 @@ Ensure `.env` files are populated in `server/` before testing AI integrations:
 - `GROQ_API_KEY`
 - `GEMINI_API_KEY`
 - `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`
-- `ENABLE_GCP_CLOUD_TASKS`, `GCP_PROJECT_ID`, `GCP_LOCATION`, `GCP_QUEUE_NAME`, `BACKEND_SERVICE_URL`, `INTERNAL_TASK_SECRET`
+
 
 
