@@ -1,11 +1,15 @@
 from os import getenv
+from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 load_dotenv()
 
-DATABASE_URL = getenv("DATABASE_URL", "sqlite:///app.db")
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+DEFAULT_SQLITE_URL = f"sqlite:///{BASE_DIR / 'app.db'}"
+
+DATABASE_URL = getenv("DATABASE_URL", DEFAULT_SQLITE_URL)
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
