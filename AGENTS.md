@@ -46,9 +46,9 @@ Minute AI consists of three interconnected subsystems:
   ```python
   config = types.GenerateContentConfig(response_mime_type="application/json")
   ```
-- **CORS Configuration (`main.py`)**: Maintain origin regex matching both local development web servers and Chrome Extension origins:
+- **CORS Configuration (`main.py`)**: Maintain origin regex matching local dev, Vercel deployments (`https://*.vercel.app`), and Chrome Extension origins:
   ```python
-  allow_origin_regex = r"^(http://localhost:\d+|http://127\.0\.0\.1:\d+|chrome-extension://.*)$"
+  allow_origin_regex = r"^(http://localhost:\d+|http://127\.0\.0\.1:\d+|https://.*\.vercel\.app|chrome-extension://.*)$"
   ```
 - **Repository Pattern**: Database operations must go through repository classes (`app/repositories/`). Do not write inline SQL queries inside API router files.
 
