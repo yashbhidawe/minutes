@@ -15,14 +15,14 @@ Built for small teams, managers, and individuals who want full meeting context w
 ## Stack
 
 - **Backend** — FastAPI, PostgreSQL / SQLite, SQLAlchemy, Pydantic v2
-- **Queue & Async Jobs** — GCP Cloud Tasks (Production Serverless Queue) / FastAPI BackgroundTasks (Local Dev)
+- **Async Processing** — FastAPI `BackgroundTasks` (asynchronous pipeline execution)
 - **Audio Processing** — FFmpeg & Pydub (Automatic 10-min slicing to bypass 25MB Whisper limits)
 - **Frontend** — Next.js 16 (App Router), Tailwind CSS, TypeScript
 - **Extension** — Vanilla JS, Chrome Extensions Manifest V3 (`chrome.offscreen` + `chrome.tabCapture`)
 - **AI Pipeline** — Groq Whisper (`whisper-large-v3` for speech-to-text), Google Gemini (`gemini-3.6-flash` for JSON summarization)
 - **Storage** — Cloudflare R2 (audio persistence)
 - **Auth** — JWT (`python-jose`), bcrypt password hashing (`passlib`)
-
+- **Deployment** — Vercel (Frontend Dashboard) & Render (Backend Web Service)
 
 ---
 
@@ -151,13 +151,8 @@ R2_ACCESS_KEY_ID=your_r2_access_key_id
 R2_SECRET_ACCESS_KEY=your_r2_secret_access_key
 R2_BUCKET_NAME=minuteai
 
-# GCP Cloud Tasks (Optional for Production Serverless Queueing)
-ENABLE_GCP_CLOUD_TASKS=false
-GCP_PROJECT_ID=your-gcp-project-id
-GCP_LOCATION=us-central1
-GCP_QUEUE_NAME=meeting-processing-queue
-BACKEND_SERVICE_URL=https://your-cloud-run-backend-url.a.run.app
-INTERNAL_TASK_SECRET=your_secure_internal_secret
+# Production Database (Optional for local SQLite dev)
+DATABASE_URL=postgresql://user:password@host:5432/dbname
 ```
 
 Create a `.env.local` file in `client/` if needed:
@@ -168,17 +163,27 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 
 ---
 
+## Deployment Guide
+
+- **Frontend Dashboard**: Deployed on **Vercel** (`client/`).
+- **Backend API**: Deployed as a Web Service on **Render.com** (`server/`).
+  - **Root Directory**: `server`
+  - **Build Command**: `pip install -r requirements.txt`
+  - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+
+---
+
 ## Project Status
 
 - ✅ User authentication with JWT & bcrypt password validation
 - ✅ Chrome Extension tab capture via `chrome.offscreen` & `MediaRecorder`
 - ✅ Cloudflare R2 audio file storage
 - ✅ FFmpeg Audio Slicing (10-min chunking to bypass Groq Whisper 25MB limits with offset re-stitching)
-- ✅ GCP Cloud Tasks serverless queue processing with local fallback
+- ✅ Asynchronous pipeline execution via FastAPI BackgroundTasks
 - ✅ Groq Whisper speech-to-text transcription with timestamped segments
 - ✅ Google Gemini 3.6 Flash structured JSON summarization
-- ✅ Next.js dashboard with meeting list, detail view, action item status toggles, and full transcript viewer
-- ✅ Dockerized deployment setup for GCP Cloud Run / GCP VM
+- ✅ Next.js dashboard on Vercel with meeting list, detail view, action item status toggles, and transcript viewer
+- ✅ Production deployment architecture (Vercel + Render + Cloudflare R2)
 
 
 ---
