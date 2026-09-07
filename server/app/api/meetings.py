@@ -13,7 +13,7 @@ from app.services.audio_chunker import process_and_transcribe_audio
 from app.services.transcription import transcribe_audio
 from app.services.summarization import summarize_transcript
 from app.services.storage import download_file
-from app.services.celery_tasks import dispatch_meeting_task, execute_meeting_pipeline
+from app.services.celery_tasks import dispatch_meeting_task, execute_meeting_pipeline, BUSY_STATUSES
 from app.schemas.meeting import MeetingResponse, MeetingUploadResponse, TranscriptResponse, TranscriptSegment
 from app.schemas.note import NoteResponse
 from app.schemas.action_item import ActionItemResponse
@@ -195,6 +195,12 @@ def reprocess_meeting(
         raise HTTPException(status_code=404, detail="Meeting not found")
     if not meeting.audio_key:
         raise HTTPException(status_code=400, detail="No audio file found for this meeting")
+
+    if meeting.status in BUSY_STATUSES:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Meeting is already being processed (status: {meeting.status}). Please wait for it to finish.",
+        )
 
     repo.update_status(meeting_id, "queued")
     dispatch_meeting_task(meeting_id, background_tasks)

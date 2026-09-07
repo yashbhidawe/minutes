@@ -11,7 +11,12 @@ from app.services.audio_chunker import process_and_transcribe_audio
 from app.services.summarization import summarize_transcript
 
 
-def execute_meeting_pipeline(meeting_id: int):
+# Statuses that mean a background job is already running for a meeting.
+# The API layer uses this to reject duplicate reprocess requests with 409.
+BUSY_STATUSES = frozenset({"queued", "transcribing", "transcribed", "summarizing"})
+
+
+def execute_meeting_pipeline(meeting_id: int, is_final_attempt: bool = True):
     """
     Executes full audio pipeline:
     1. Downloads audio from Cloudflare R2
@@ -19,6 +24,15 @@ def execute_meeting_pipeline(meeting_id: int):
     3. Saves timestamped transcript segments
     4. Summarizes & extracts action items via Gemini 3.6 Flash
     5. Saves notes and updates meeting status to completed
+
+    Idempotent: existing transcript/notes/action items are deleted just
+    before the new ones are written, so retries and reprocesses never
+    create duplicates.
+
+    is_final_attempt: False when a Celery retry will follow. Transient
+    failures then leave the meeting "queued" instead of flashing "failed".
+    Direct/BackgroundTasks callers have no retries, so the default True
+    preserves their fail-fast behavior.
     """
     with SessionLocal() as session:
         repo = MeetingRepository(session)
@@ -51,6 +65,8 @@ def execute_meeting_pipeline(meeting_id: int):
             segments = transcribe_result.get("segments", [])
             segments_json = json.dumps(segments) if isinstance(segments, list) else segments
 
+            # Delete-before-insert: a retry/reprocess replaces results instead of duplicating them.
+            repo.delete_transcript(meeting_id)
             repo.save_transcript(
                 meeting_id=meeting_id,
                 raw_text=raw_text,
@@ -67,6 +83,11 @@ def execute_meeting_pipeline(meeting_id: int):
                 repo.update_title(meeting_id, summary["title"])
 
             note_repo = NoteRepository(session)
+            action_item_repo = ActionItemRepository(session)
+            # Delete-before-insert (only after summarization succeeded,
+            # so a summarize failure keeps the previous good notes/items).
+            note_repo.delete_by_meeting(meeting_id)
+            action_item_repo.delete_by_meeting(meeting_id)
             note_repo.create_many(
                 meeting_id,
                 {
@@ -77,7 +98,6 @@ def execute_meeting_pipeline(meeting_id: int):
                 },
             )
 
-            action_item_repo = ActionItemRepository(session)
             if summary.get("action_items"):
                 action_item_repo.create_many(meeting_id, summary["action_items"])
 
@@ -86,22 +106,33 @@ def execute_meeting_pipeline(meeting_id: int):
             print(f"[Pipeline] Successfully completed meeting ID: {meeting_id}")
             return True
         except Exception as e:
-            print(f"[Pipeline Error] Exception during processing for meeting ID {meeting_id}: {e}")
-            repo.update_error(meeting_id, str(e))
-            repo.update_status(meeting_id, "failed")
-            raise e
+            session.rollback()
+            if is_final_attempt:
+                print(f"[Pipeline Error] Exception during processing for meeting ID {meeting_id}: {e}")
+                repo.update_error(meeting_id, str(e))
+                repo.update_status(meeting_id, "failed")
+            else:
+                # A Celery retry is coming — stay queued instead of flashing "failed".
+                print(f"[Pipeline] Transient failure for meeting ID {meeting_id}, awaiting retry: {e}")
+                repo.update_status(meeting_id, "queued")
+            raise
 
 
 @celery_app.task(name="app.services.celery_tasks.process_meeting_celery_task", bind=True, max_retries=3)
 def process_meeting_celery_task(self, meeting_id: int):
     """
     Celery background worker task for asynchronous meeting processing.
-    Auto-retries up to 3 times on transient failures.
+    Auto-retries up to 3 times on transient failures. Only the final
+    attempt marks the meeting as failed; earlier attempts re-queue it.
     """
+    is_final_attempt = self.request.retries >= self.max_retries
     try:
-        return execute_meeting_pipeline(meeting_id)
+        return execute_meeting_pipeline(meeting_id, is_final_attempt=is_final_attempt)
     except Exception as exc:
-        print(f"[Celery Worker] Retrying meeting {meeting_id} due to error: {exc}")
+        if self.request.retries >= self.max_retries:
+            # Already marked failed inside execute_meeting_pipeline — stop retrying.
+            raise
+        print(f"[Celery Worker] Retrying meeting {meeting_id} (attempt {self.request.retries + 1}/3) due to error: {exc}")
         raise self.retry(exc=exc, countdown=10)
 
 

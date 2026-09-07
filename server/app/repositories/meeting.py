@@ -78,6 +78,16 @@ class MeetingRepository:
     def get_transcript(self, meeting_id: int) -> Transcript | None:
         return self.session.query(Transcript).filter_by(meeting_id=meeting_id).first()
 
+    def delete_transcript(self, meeting_id: int) -> int:
+        """Deletes existing transcript(s) for a meeting. Makes the pipeline idempotent on retry/reprocess."""
+        count = (
+            self.session.query(Transcript)
+            .filter_by(meeting_id=meeting_id)
+            .delete(synchronize_session=False)
+        )
+        self.session.commit()
+        return count
+
     def save_transcript(self, meeting_id: int, raw_text: str, language: str, segments: str = None) -> Transcript:
         transcript = Transcript(
             meeting_id=meeting_id,

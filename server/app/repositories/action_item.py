@@ -9,6 +9,16 @@ class ActionItemRepository:
     def get_by_meeting(self, meeting_id: int) -> list[ActionItem]:
         return self.session.query(ActionItem).filter_by(meeting_id=meeting_id).all()
 
+    def delete_by_meeting(self, meeting_id: int) -> int:
+        """Deletes existing action items for a meeting. Makes the pipeline idempotent on retry/reprocess."""
+        count = (
+            self.session.query(ActionItem)
+            .filter_by(meeting_id=meeting_id)
+            .delete(synchronize_session=False)
+        )
+        self.session.commit()
+        return count
+
     def get_by_id(self, item_id: int) -> ActionItem | None:
         return self.session.query(ActionItem).filter_by(id=item_id).first()
 
