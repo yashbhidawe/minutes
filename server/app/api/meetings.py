@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, BackgroundTasks, Header, Response
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from app.core.db_connection import engine, SessionLocal
+from app.core.db_connection import SessionLocal
 from app.models.user import User
 from app.utils.auth import get_current_user
 from app.repositories.meeting import MeetingRepository
@@ -26,8 +26,11 @@ def run_automated_pipeline(meeting_id: int):
 
 
 def get_session():
-    with Session(bind=engine) as session:
+    session = SessionLocal()
+    try:
         yield session
+    finally:
+        session.close()
 
 
 @router.get("/", response_model=list[MeetingResponse])
@@ -173,12 +176,14 @@ async def upload_meeting_audio(
         repo.update_duration(meeting_id, x_recording_duration)
 
     repo.update_status(meeting_id, "queued")
-    dispatch_meeting_task(meeting_id, background_tasks)
+    dispatch_result = dispatch_meeting_task(meeting_id, background_tasks)
 
     return MeetingUploadResponse(
         meeting_id=meeting.id,
-        status="queued",
+        status=dispatch_result.get("status", "queued"),
         audio_key=meeting.audio_key,
+        task_id=dispatch_result.get("task_id"),
+        mode=dispatch_result.get("mode"),
     )
 
 
@@ -203,12 +208,14 @@ def reprocess_meeting(
         )
 
     repo.update_status(meeting_id, "queued")
-    dispatch_meeting_task(meeting_id, background_tasks)
+    dispatch_result = dispatch_meeting_task(meeting_id, background_tasks)
 
     return MeetingUploadResponse(
         meeting_id=meeting.id,
-        status="queued",
+        status=dispatch_result.get("status", "queued"),
         audio_key=meeting.audio_key,
+        task_id=dispatch_result.get("task_id"),
+        mode=dispatch_result.get("mode"),
     )
 
 

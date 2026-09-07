@@ -26,7 +26,10 @@ services:
       context: ./server
       dockerfile: Dockerfile
     container_name: minuteai_worker
-    command: celery -A app.core.celery_app.celery_app worker --loglevel=info --concurrency=2
+    # Solo pool: the default DATABASE_URL is SQLite, which corrupts/locks
+    # under prefork concurrency. If you switch to Postgres, use prefork:
+    # celery -A app.core.celery_app.celery_app worker --loglevel=info --concurrency=2
+    command: celery -A app.core.celery_app.celery_app worker --pool=solo --loglevel=info
     env_file:
       - ./server/.env
     environment:
