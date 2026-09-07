@@ -9,6 +9,16 @@ class NoteRepository:
     def get_by_meeting(self, meeting_id: int) -> list[Note]:
         return self.session.query(Note).filter_by(meeting_id=meeting_id).all()
 
+    def delete_by_meeting(self, meeting_id: int) -> int:
+        """Deletes existing notes for a meeting. Makes the pipeline idempotent on retry/reprocess."""
+        count = (
+            self.session.query(Note)
+            .filter_by(meeting_id=meeting_id)
+            .delete(synchronize_session=False)
+        )
+        self.session.commit()
+        return count
+
     def create(self, meeting_id: int, section: str, content: str) -> Note:
         note = Note(
             meeting_id=meeting_id,

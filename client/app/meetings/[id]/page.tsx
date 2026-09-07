@@ -29,6 +29,11 @@ function formatTimestamp(sec: number) {
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
+// Statuses that mean the backend is still working on this meeting.
+// Must stay in sync with BUSY_STATUSES in server/app/services/celery_tasks.py
+// (+ "uploaded", the transient state set right before dispatch).
+const PROCESSING_STATUSES = ["uploaded", "queued", "transcribing", "transcribed", "summarizing"];
+
 function PriorityDot({ priority }: { priority: string }) {
   const colors: Record<string, string> = {
     high: "bg-red-500",
@@ -133,12 +138,14 @@ export default function MeetingDetailPage() {
 
   useEffect(() => {
     if (!token || !meeting) return;
-    const isProcessing = ["uploaded", "processing", "transcribing", "summarizing"].includes(meeting.status);
+    const isProcessing = PROCESSING_STATUSES.includes(meeting.status);
     if (!isProcessing) return;
 
     let lastStatus = meeting.status;
     let stalePollCount = 0;
-    const MAX_STALE_POLLS = 25;
+    // 200 polls x 3s = 10 min without a status change before giving up.
+    // Long transcriptions legitimately sit in one status for minutes.
+    const MAX_STALE_POLLS = 200;
 
     const interval = setInterval(async () => {
       try {
@@ -149,7 +156,7 @@ export default function MeetingDetailPage() {
           stalePollCount++;
           if (stalePollCount >= MAX_STALE_POLLS) {
             clearInterval(interval);
-            setError("Processing is taking longer than expected. Click 'Re-process AI' below to retry.");
+            setError("Processing is taking longer than expected. The background worker may be down — check its logs, then use 'Re-process AI' once the meeting reaches a terminal state.");
           }
         } else {
           stalePollCount = 0;
@@ -328,7 +335,7 @@ export default function MeetingDetailPage() {
     return acc;
   }, {});
 
-  const isProcessing = ["uploaded", "processing", "transcribing", "summarizing"].includes(meeting.status);
+  const isProcessing = PROCESSING_STATUSES.includes(meeting.status);
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
@@ -449,11 +456,11 @@ export default function MeetingDetailPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs border-t border-stone-800 pt-4">
-            <div className={`p-3 rounded border ${["uploaded", "processing", "transcribing", "summarizing", "completed"].includes(meeting.status) ? "bg-stone-800 border-emerald-500/50 text-emerald-400" : "bg-stone-950 border-stone-800 text-stone-500"}`}>
+            <div className={`p-3 rounded border ${["uploaded", "queued", "transcribing", "transcribed", "summarizing", "completed"].includes(meeting.status) ? "bg-stone-800 border-emerald-500/50 text-emerald-400" : "bg-stone-950 border-stone-800 text-stone-500"}`}>
               <p className="font-semibold mb-0.5">1. Audio Upload</p>
               <p className="text-[10px] text-stone-400">Captured & Persisted</p>
             </div>
-            <div className={`p-3 rounded border ${["transcribing", "summarizing", "completed"].includes(meeting.status) ? "bg-stone-800 border-emerald-500/50 text-emerald-400" : "bg-stone-950 border-stone-800 text-stone-500"}`}>
+            <div className={`p-3 rounded border ${["transcribing", "transcribed", "summarizing", "completed"].includes(meeting.status) ? "bg-stone-800 border-emerald-500/50 text-emerald-400" : "bg-stone-950 border-stone-800 text-stone-500"}`}>
               <p className="font-semibold mb-0.5">2. Speech-to-Text</p>
               <p className="text-[10px] text-stone-400">Groq Whisper API</p>
             </div>

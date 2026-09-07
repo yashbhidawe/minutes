@@ -26,6 +26,8 @@ class MeetingUploadResponse(BaseModel):
     meeting_id: int
     status: str
     audio_key: str
+    task_id: str | None = None
+    mode: str | None = None
 
 
 class TranscriptSegment(BaseModel):

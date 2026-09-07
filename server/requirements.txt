@@ -13,7 +13,7 @@ python-multipart==0.0.12
 
 # ai
 openai==1.51.0
-google-generativeai==0.8.2
+google-genai==2.18.1
 
 # config
 pydantic-settings==2.5.2

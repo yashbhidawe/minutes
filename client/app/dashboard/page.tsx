@@ -34,14 +34,16 @@ function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     pending: "bg-amber-50 text-amber-700 border-amber-200",
     uploaded: "bg-blue-50 text-blue-700 border-blue-200",
+    queued: "bg-blue-50 text-blue-700 border-blue-200",
     processing: "bg-amber-50 text-amber-700 border-amber-200",
     transcribing: "bg-purple-50 text-purple-700 border-purple-200",
+    transcribed: "bg-purple-50 text-purple-700 border-purple-200",
     summarizing: "bg-purple-50 text-purple-700 border-purple-200",
     completed: "bg-emerald-50 text-emerald-700 border-emerald-200",
     failed: "bg-red-50 text-red-700 border-red-200",
   };
 
-  const isLive = ["pending", "processing", "transcribing", "summarizing"].includes(status);
+  const isLive = ["uploaded", "queued", "transcribing", "transcribed", "summarizing"].includes(status);
 
   return (
     <span className={`text-[10px] uppercase font-mono tracking-wider px-2.5 py-0.5 rounded border font-semibold flex items-center gap-1.5 ${styles[status] || styles.pending}`}>
