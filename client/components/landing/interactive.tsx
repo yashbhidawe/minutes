@@ -86,7 +86,7 @@ export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) 
       <div className="mt-7 flex gap-3">
         <Link
           href={token ? "/dashboard" : "/register"}
-          className="btn-interactive btn-arrow px-5 py-2.5 bg-stone-900 text-white text-[13px] font-medium rounded-md hover:bg-stone-700 transition-colors inline-flex items-center gap-1.5"
+          className="btn-interactive btn-sheen btn-arrow px-5 py-2.5 bg-stone-900 text-white text-[13px] font-medium rounded-md hover:bg-stone-700 transition-colors inline-flex items-center gap-1.5"
         >
           {token ? (
             <>
@@ -115,7 +115,7 @@ export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) 
         <>
           <Link
             href="/dashboard"
-            className="btn-interactive btn-arrow px-6 py-3 bg-stone-900 text-white text-sm font-medium rounded-md hover:bg-stone-700 transition-colors text-center shadow-xs inline-flex items-center justify-center gap-1.5"
+            className="btn-interactive btn-sheen btn-arrow px-6 py-3 bg-stone-900 text-white text-sm font-medium rounded-md hover:bg-stone-700 transition-colors text-center shadow-xs inline-flex items-center justify-center gap-1.5"
           >
             Open dashboard <Arrow />
           </Link>
@@ -130,7 +130,7 @@ export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) 
         <>
           <Link
             href="/register"
-            className="btn-interactive px-6 py-3 bg-stone-900 text-white text-sm font-medium rounded-md hover:bg-stone-700 transition-colors text-center shadow-xs"
+            className="btn-interactive btn-sheen px-6 py-3 bg-stone-900 text-white text-sm font-medium rounded-md hover:bg-stone-700 transition-colors text-center shadow-xs"
           >
             Start capturing — it&apos;s free
           </Link>
@@ -161,6 +161,7 @@ export function LandingNav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [active, setActive] = useState<string>("");
 
   useEffect(() => {
     let raf = 0;
@@ -180,6 +181,25 @@ export function LandingNav() {
     };
   }, []);
 
+  /* Scrollspy — highlights the nav link for the section in view */
+  useEffect(() => {
+    const ids = NAV_LINKS.map(([, href]) => href.slice(1));
+    const sections = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => !!el);
+    if (!sections.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setActive(`#${e.target.id}`);
+        });
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+    );
+    sections.forEach((s) => io.observe(s));
+    return () => io.disconnect();
+  }, []);
+
   return (
     <header
       className={`sticky top-0 z-40 border-b bg-[#fafaf9]/85 backdrop-blur-md transition-shadow duration-300 ${
@@ -193,7 +213,12 @@ export function LandingNav() {
         <Logo />
         <div className="hidden md:flex items-center gap-7 text-[13px] font-medium text-stone-500">
           {NAV_LINKS.map(([label, href]) => (
-            <a key={href} href={href} className="nav-link hover:text-stone-950 transition-colors">
+            <a
+              key={href}
+              href={href}
+              aria-current={active === href ? "true" : undefined}
+              className={`nav-link hover:text-stone-950 transition-colors ${active === href ? "nav-link-active" : ""}`}
+            >
               {label}
             </a>
           ))}
@@ -202,7 +227,7 @@ export function LandingNav() {
           {token ? (
             <Link
               href="/dashboard"
-              className="btn-interactive btn-arrow px-4 py-2 bg-stone-900 text-white text-[13px] font-medium rounded-md hover:bg-stone-700 transition-colors inline-flex items-center gap-1.5"
+              className="btn-interactive btn-sheen btn-arrow px-4 py-2 bg-stone-900 text-white text-[13px] font-medium rounded-md hover:bg-stone-700 transition-colors inline-flex items-center gap-1.5"
             >
               Open dashboard <Arrow />
             </Link>
@@ -216,7 +241,7 @@ export function LandingNav() {
               </Link>
               <Link
                 href="/register"
-                className="btn-interactive px-4 py-2 bg-stone-900 text-white text-[13px] font-medium rounded-md hover:bg-stone-700 transition-colors shadow-xs"
+                className="btn-interactive btn-sheen px-4 py-2 bg-stone-900 text-white text-[13px] font-medium rounded-md hover:bg-stone-700 transition-colors shadow-xs"
               >
                 Get started
               </Link>
@@ -573,6 +598,8 @@ export function HeroDemo() {
       const py = (e.clientY - r.top) / r.height - 0.5;
       card.classList.add("tilting");
       card.style.transform = `perspective(1100px) rotateX(${(-py * 5).toFixed(2)}deg) rotateY(${(px * 6).toFixed(2)}deg)`;
+      card.style.setProperty("--mx", `${(((e.clientX - r.left) / r.width) * 100).toFixed(1)}%`);
+      card.style.setProperty("--my", `${(((e.clientY - r.top) / r.height) * 100).toFixed(1)}%`);
     });
   }, []);
 
@@ -616,6 +643,7 @@ export function HeroDemo() {
         ref={cardRef}
         className="tilt demo-card group relative bg-white border border-stone-200 rounded-xl shadow-[0_24px_60px_-24px_rgb(0_0_0/0.25)] overflow-hidden"
       >
+        <div className="demo-glare" aria-hidden />
         {/* window bar */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-stone-100 bg-stone-50/60">
           <div className="flex items-center gap-1.5" aria-hidden>
@@ -709,7 +737,7 @@ export function HeroDemo() {
             >
               {copied ? (
                 <>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="animate-pop-in">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                   Copied

@@ -267,9 +267,9 @@ export default function LandingPage() {
             {STEPS.map((s, i) => (
               <li key={s.n}>
                 <Reveal delay={i * 80} className="h-full">
-                  <div className="card-lift group bg-white border border-stone-200 rounded-lg p-6 hover:border-stone-900 hover:shadow-[0_16px_40px_-20px_rgb(0_0_0/0.3)] h-full">
+                  <div className="card-lift feature-card group bg-white border border-stone-200 rounded-lg p-6 hover:border-stone-900 hover:shadow-[0_16px_40px_-20px_rgb(0_0_0/0.3)] h-full">
                     <div className="flex items-center justify-between mb-8">
-                      <span className="text-xs font-mono font-bold text-stone-300 group-hover:text-stone-900 transition-colors">{s.n}</span>
+                      <span className="step-num text-xs font-mono font-bold text-stone-300 group-hover:text-stone-900 transition-colors">{s.n}</span>
                     </div>
                     <h3 className="text-[15px] font-semibold tracking-tight text-stone-950 mb-2">{s.title}</h3>
                     <p className="text-[13px] leading-relaxed text-stone-500">{s.body}</p>
@@ -299,8 +299,8 @@ export default function LandingPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {FEATURES.map((f, i) => (
                 <Reveal key={f.title} delay={(i % 3) * 80}>
-                  <div className="card-lift p-6 bg-[#fafaf9] border border-stone-200 rounded-lg hover:bg-white hover:border-stone-300 hover:shadow-xs h-full">
-                    <div className="w-9 h-9 rounded-md bg-stone-900 text-white flex items-center justify-center mb-5 transition-transform duration-200 group-hover:scale-105">
+                  <div className="card-lift feature-card group p-6 bg-[#fafaf9] border border-stone-200 rounded-lg hover:bg-white hover:border-stone-300 hover:shadow-xs h-full">
+                    <div className="feature-icon w-9 h-9 rounded-md bg-stone-900 text-white flex items-center justify-center mb-5">
                       {f.icon}
                     </div>
                     <h3 className="text-[15px] font-semibold tracking-tight text-stone-950 mb-2">{f.title}</h3>
@@ -543,8 +543,8 @@ export default function LandingPage() {
           <div>
             <p className="text-[11px] uppercase tracking-wider font-semibold text-stone-400 mb-4">Built by</p>
             <ul className="space-y-2.5 text-[13px] font-medium text-stone-600">
-              <li><a href="https://itsokyash.online" target="_blank" rel="noreferrer" className="hover:text-stone-950 transition-colors">itsokyash.online ↗</a></li>
-              <li><a href="https://github.com/yashbhidawe" target="_blank" rel="noreferrer" className="hover:text-stone-950 transition-colors">GitHub ↗</a></li>
+              <li><a href="https://itsokyash.online" target="_blank" rel="noreferrer" className="ext-link hover:text-stone-950 transition-colors">itsokyash.online <span className="ext-arrow" aria-hidden>↗</span></a></li>
+              <li><a href="https://github.com/yashbhidawe" target="_blank" rel="noreferrer" className="ext-link hover:text-stone-950 transition-colors">GitHub <span className="ext-arrow" aria-hidden>↗</span></a></li>
             </ul>
           </div>
         </div>

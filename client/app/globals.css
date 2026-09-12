@@ -158,8 +158,12 @@ textarea:focus {
   transform-origin: left;
   transition: transform 0.25s ease;
 }
-.nav-link:hover::after {
+.nav-link:hover::after,
+.nav-link-active::after {
   transform: scaleX(1);
+}
+.nav-link-active {
+  color: var(--foreground);
 }
 
 /* Buttons: lift on hover, press on active, arrow nudge */
@@ -197,6 +201,26 @@ textarea:focus {
   animation-play-state: paused;
 }
 
+/* Ticker edge fade — softens the loop cut, pure polish */
+.ticker-mask::before,
+.ticker-mask::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 72px;
+  z-index: 2;
+  pointer-events: none;
+}
+.ticker-mask::before {
+  left: 0;
+  background: linear-gradient(to right, #fafaf9, transparent);
+}
+.ticker-mask::after {
+  right: 0;
+  background: linear-gradient(to left, #fafaf9, transparent);
+}
+
 /* Floating chips */
 @keyframes floaty {
   0%,
@@ -227,6 +251,88 @@ textarea:focus {
 }
 .tilt.tilting {
   transition: transform 0.06s linear;
+}
+
+/* Hero demo glare — follows the pointer, CSS vars set in HeroDemo */
+.demo-glare {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    320px circle at var(--mx, 50%) var(--my, 20%),
+    rgb(255 255 255 / 0.35),
+    transparent 65%
+  );
+}
+.demo-card:hover .demo-glare {
+  opacity: 1;
+}
+
+/* Feature / step icon pop on card hover */
+.feature-icon {
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.25s ease;
+}
+.feature-card:hover .feature-icon {
+  transform: scale(1.08) rotate(-4deg);
+}
+.step-num {
+  transition: transform 0.25s ease, color 0.25s ease;
+  display: inline-block;
+}
+.feature-card:hover .step-num {
+  transform: translateY(-2px);
+}
+
+/* Primary button sheen sweep */
+.btn-sheen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgb(255 255 255 / 0.22) 50%,
+    transparent 65%
+  );
+  transform: translateX(-110%);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+.btn-sheen:hover::after {
+  transform: translateX(110%);
+}
+
+/* Copied check pop */
+@keyframes pop-in {
+  0% { transform: scale(0.6); }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.animate-pop-in {
+  animation: pop-in 0.25s ease both;
+}
+
+/* Footer / inline external link nudge */
+.ext-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.ext-link .ext-arrow {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+.ext-link:hover .ext-arrow {
+  transform: translate(1.5px, -1.5px);
 }
 
 /* FAQ accordion + mobile menu: smooth height, content stays in DOM */
