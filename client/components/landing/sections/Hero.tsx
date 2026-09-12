@@ -7,11 +7,11 @@ export function Hero() {
   return (
     <section className="relative" aria-labelledby="hero-heading">
       <div className="landing-grid absolute inset-0" aria-hidden />
-      <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-14 md:pt-24 md:pb-20 grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-10 items-center">
-        <div>
+      <div className="relative max-w-6xl mx-auto px-6 pt-12 pb-14 sm:pt-16 md:pt-24 md:pb-20 grid lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-10 items-center">
+        <div className="min-w-0">
           <h1
             id="hero-heading"
-            className="animate-fade-up-1 text-[42px] leading-[1.02] md:text-[64px] font-light tracking-[-0.03em] text-stone-950"
+            className="animate-fade-up-1 text-[38px] leading-[1.02] sm:text-[44px] md:text-[64px] font-light tracking-[-0.03em] text-balance text-stone-950"
           >
             Meeting notes,
             <br />

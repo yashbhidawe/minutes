@@ -6,7 +6,7 @@ export function ExtensionSection() {
     <section id="extension" className="max-w-6xl mx-auto px-6 pb-20 scroll-mt-24" aria-labelledby="extension-heading">
       <Reveal>
         <div className="bg-stone-950 rounded-xl overflow-hidden grid lg:grid-cols-2">
-          <div className="p-8 md:p-12">
+          <div className="p-6 sm:p-8 md:p-12">
             <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-500 mb-4">Chrome extension</p>
             <h2 id="extension-heading" className="text-3xl md:text-[34px] font-light tracking-tight text-stone-100 leading-tight">
               Installs in a minute. <span className="font-semibold">Works every call.</span>
@@ -36,7 +36,7 @@ export function ExtensionSection() {
               </a>
             </div>
           </div>
-          <div className="bg-stone-900 border-t lg:border-t-0 lg:border-l border-stone-800 p-8 md:p-12 flex flex-col justify-center gap-4">
+          <div className="bg-stone-900 border-t lg:border-t-0 lg:border-l border-stone-800 p-6 sm:p-8 md:p-12 flex flex-col justify-center gap-4">
             <div className="bg-stone-950 border border-stone-800 rounded-lg p-6">
               <p className="text-[10px] font-mono uppercase tracking-[0.16em] text-stone-500 mb-4">What you get</p>
               <ul className="space-y-3">

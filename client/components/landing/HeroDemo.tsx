@@ -117,22 +117,22 @@ export function HeroDemo() {
       >
         <div className="demo-glare" aria-hidden />
         {/* window bar */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-stone-100 bg-stone-50/60">
-          <div className="flex items-center gap-1.5" aria-hidden>
+        <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-stone-100 bg-stone-50/60">
+          <div className="flex items-center gap-1.5 shrink-0" aria-hidden>
             <span className="w-2.5 h-2.5 rounded-full bg-stone-300" />
             <span className="w-2.5 h-2.5 rounded-full bg-stone-300" />
             <span className="w-2.5 h-2.5 rounded-full bg-stone-800" />
           </div>
-          <p className="text-[11px] font-mono text-stone-400">Your meeting summary</p>
-          <span className="text-[10px] uppercase font-mono tracking-wider px-2 py-0.5 rounded border font-semibold bg-emerald-50 text-emerald-700 border-emerald-200 flex items-center gap-1.5">
+          <p className="hidden min-[400px]:block text-[11px] font-mono text-stone-400 truncate">Your meeting summary</p>
+          <span className="shrink-0 text-[10px] uppercase font-mono tracking-wider px-2 py-0.5 rounded border font-semibold bg-emerald-50 text-emerald-700 border-emerald-200 flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-current rec-dot" />
             ready
           </span>
         </div>
 
-        <div className="p-5">
+        <div className="p-4 sm:p-5">
           <div className="flex items-start justify-between gap-3 mb-4">
-            <div>
+            <div className="min-w-0">
               <p className="text-[15px] font-semibold tracking-tight text-stone-950">
                 Weekly Team Sync
               </p>
@@ -161,7 +161,7 @@ export function HeroDemo() {
             </ul>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-3">
             <button
               onClick={() => cycleStatus(0)}
               title="Try it — click to cycle the status"
@@ -197,7 +197,7 @@ export function HeroDemo() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between px-5 py-3 border-t border-stone-100 bg-white">
+        <div className="flex items-center justify-between gap-2 px-4 sm:px-5 py-3 border-t border-stone-100 bg-white">
           <div className="flex gap-2">
             <button
               onClick={handleCopy}

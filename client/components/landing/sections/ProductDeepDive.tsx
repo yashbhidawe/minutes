@@ -34,7 +34,7 @@ export function ProductDeepDive() {
 
         <div className="space-y-4">
           <Reveal>
-            <div className="bg-white border border-stone-200 rounded-lg p-6">
+            <div className="bg-white border border-stone-200 rounded-lg p-5 sm:p-6">
               <div className="flex items-center gap-2 mb-4 border-b border-stone-100 pb-3">
                 <h3 className="text-xs font-semibold tracking-wider uppercase text-stone-500">Next steps</h3>
               </div>
@@ -53,7 +53,7 @@ export function ProductDeepDive() {
             </div>
           </Reveal>
           <Reveal delay={80}>
-            <div className="bg-white border border-stone-200 rounded-lg p-6">
+            <div className="bg-white border border-stone-200 rounded-lg p-5 sm:p-6">
               <div className="flex items-center justify-between mb-4 border-b border-stone-100 pb-3">
                 <h3 className="text-xs font-semibold tracking-wider uppercase text-stone-500">Action items</h3>
                 <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-stone-100 text-stone-600">3</span>
@@ -69,7 +69,7 @@ export function ProductDeepDive() {
                       <span className={`inline-block w-2 h-2 rounded-full mt-1.5 shrink-0 ${dot}`} aria-hidden />
                       <p className="text-xs text-stone-900 font-medium leading-relaxed flex-1">{desc}</p>
                     </div>
-                    <div className="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-stone-200/60 text-[11px]">
+                    <div className="flex items-center justify-between flex-wrap gap-2 gap-y-1 mt-3 pt-2 border-t border-stone-200/60 text-[11px]">
                       <span className="font-medium text-stone-500">{owner}</span>
                       <span className="text-[10px] uppercase tracking-wider bg-stone-100 border border-stone-300 px-2 py-1 rounded text-stone-700 font-mono">{status}</span>
                     </div>
@@ -79,7 +79,7 @@ export function ProductDeepDive() {
             </div>
           </Reveal>
           <Reveal delay={120}>
-            <div className="bg-stone-950 text-stone-200 p-6 rounded-lg font-mono text-xs space-y-2.5">
+            <div className="bg-stone-950 text-stone-200 p-5 sm:p-6 rounded-lg font-mono text-xs space-y-2.5">
               <p className="text-[10px] uppercase tracking-[0.16em] text-stone-500 font-sans font-semibold mb-1">Full transcript</p>
               {[
                 ["00:00", "Alright, let's keep this tight — recap decisions, then blockers."],
