@@ -30,12 +30,17 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
@@ -47,4 +52,77 @@ input:focus,
 textarea:focus {
   outline: 1.5px solid var(--accent);
   outline-offset: -1px;
+}
+
+/* ---- Landing page motion ---- */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes wave-bar {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-fade-up-1 { animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both; }
+.animate-fade-up-2 { animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both; }
+.animate-fade-up-3 { animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both; }
+.animate-fade-up-4 { animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both; }
+
+.wave-bar {
+  transform-origin: center;
+  animation: wave-bar 1.4s ease-in-out infinite;
+}
+
+.rec-dot {
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
+
+.animate-ticker {
+  animation: ticker 28s linear infinite;
+}
+
+.landing-grid {
+  background-image:
+    linear-gradient(to right, rgb(0 0 0 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(0 0 0 / 0.045) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 55%, transparent 100%);
 }
