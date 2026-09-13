@@ -1,23 +1,45 @@
-"use client";
+import type { Metadata } from "next";
+import { SITE_DESCRIPTION } from "@/lib/site";
+import { LandingNav } from "@/components/landing";
+import {
+  AnnouncementBar,
+  Definition,
+  ExtensionSection,
+  FaqSection,
+  Features,
+  FinalCta,
+  Hero,
+  HowItWorks,
+  JsonLd,
+  ProductDeepDive,
+  SiteFooter,
+  StatsSection,
+} from "@/components/landing/sections";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+export const metadata: Metadata = {
+  title: "Automatic Meeting Notes for Google Meet",
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: "/" },
+};
 
-export default function Home() {
-  const router = useRouter();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      router.push("/dashboard");
-    } else {
-      router.push("/login");
-    }
-  }, [router]);
-
+export default function LandingPage() {
   return (
-    <div className="flex-1 flex items-center justify-center">
-      <p className="text-sm text-stone-400">Loading...</p>
+    <div className="min-h-screen bg-[#fafaf9] text-stone-900 antialiased overflow-x-clip">
+      <JsonLd />
+      <AnnouncementBar />
+      <LandingNav />
+      <main>
+        <Hero />
+        <Definition />
+        <StatsSection />
+        <HowItWorks />
+        <Features />
+        <ProductDeepDive />
+        <ExtensionSection />
+        <FaqSection />
+        <FinalCta />
+      </main>
+      <SiteFooter />
     </div>
   );
 }
