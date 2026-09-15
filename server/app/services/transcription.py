@@ -6,16 +6,27 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-GROQ_API_KEY = getenv("GROQ_API_KEY")
+_client = None
 
-client = OpenAI(
-    api_key=GROQ_API_KEY,
-    base_url="https://api.groq.com/openai/v1",
-)
+
+def get_client():
+    """Lazy-init Groq (OpenAI-compatible) client so import never crashes boot."""
+    global _client
+    if _client is not None:
+        return _client
+    api_key = getenv("GROQ_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="GROQ_API_KEY is not configured")
+    _client = OpenAI(
+        api_key=api_key,
+        base_url="https://api.groq.com/openai/v1",
+    )
+    return _client
 
 
 def transcribe_audio(audio_bytes: bytes, filename: str) -> dict:
     try:
+        client = get_client()
         response = client.audio.transcriptions.create(
             file=(filename, audio_bytes),
             model="whisper-large-v3",
@@ -37,5 +48,7 @@ def transcribe_audio(audio_bytes: bytes, filename: str) -> dict:
             "language": getattr(response, "language", "unknown"),
             "segments": json.dumps(segments) if segments else None,
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")

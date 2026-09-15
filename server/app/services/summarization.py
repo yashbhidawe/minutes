@@ -7,9 +7,19 @@ from google.genai import types
 
 load_dotenv()
 
-GEMINI_API_KEY = getenv("GEMINI_API_KEY")
+_client = None
 
-client = genai.Client(api_key=GEMINI_API_KEY)
+
+def get_client():
+    """Lazy-init Gemini client so import never crashes boot."""
+    global _client
+    if _client is not None:
+        return _client
+    api_key = getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="GEMINI_API_KEY is not configured")
+    _client = genai.Client(api_key=api_key)
+    return _client
 
 SUMMARY_PROMPT = """You are an expert meeting assistant. Analyze the following meeting transcript and produce a structured output.
 
@@ -46,6 +56,7 @@ Rules:
 
 def summarize_transcript(transcript_text: str) -> dict:
     try:
+        client = get_client()
         response = client.models.generate_content(
             model="gemini-3.6-flash",
             contents=SUMMARY_PROMPT.format(transcript=transcript_text),
@@ -62,6 +73,8 @@ def summarize_transcript(transcript_text: str) -> dict:
             raw = raw.strip()
 
         return json.loads(raw)
+    except HTTPException:
+        raise
     except json.JSONDecodeError:
         raise HTTPException(
             status_code=500, detail="Failed to parse Gemini response as JSON"
