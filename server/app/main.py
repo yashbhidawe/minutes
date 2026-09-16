@@ -1,13 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.core.db_connection import Base, engine
+from app.core.db_connection import ensure_schema
 from app.api.users import router as users_router
 from app.api.meetings import router as meetings_router
 from app.models import User, Meeting
 
 
 app = FastAPI()
-Base.metadata.create_all(bind=engine)
+ensure_schema()
 app.include_router(users_router)
 app.include_router(meetings_router)
 
@@ -22,12 +22,6 @@ app.add_middleware(
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
-
-def create_user(email: str, password_hash: str):
-    user = User(email=email, password_hash=password_hash)
-    with engine.begin() as connection:
-        connection.add(user)
-        connection.commit()
 
 
 
