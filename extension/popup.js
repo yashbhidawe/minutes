@@ -1,5 +1,15 @@
-const API_BASE = "http://localhost:8000";
-const DASHBOARD_URL = "http://localhost:3000";
+// Endpoints injected via config.js at package time (see extension/build.sh).
+const API_BASE =
+  (typeof MINUTE_AI_CONFIG !== "undefined" && MINUTE_AI_CONFIG.API_BASE) ||
+  "http://localhost:8000";
+const DASHBOARD_URL =
+  (typeof MINUTE_AI_CONFIG !== "undefined" && MINUTE_AI_CONFIG.DASHBOARD_URL) ||
+  "http://localhost:3000";
+const DASHBOARD_URL_PATTERNS =
+  (typeof MINUTE_AI_CONFIG !== "undefined" && MINUTE_AI_CONFIG.DASHBOARD_HOSTS) || [
+    "http://localhost:3000/*",
+    "http://127.0.0.1:3000/*",
+  ];
 
 const loginView = document.getElementById("login-view");
 const mainView = document.getElementById("main-view");
@@ -87,7 +97,7 @@ function checkAuthState() {
       // Try requesting active dashboard sync from open tabs
       if (chrome.tabs && chrome.tabs.query) {
         chrome.tabs.query(
-          { url: ["http://localhost:3000/*", "http://127.0.0.1:3000/*"] },
+          { url: DASHBOARD_URL_PATTERNS },
           (tabs) => {
             if (tabs && tabs.length > 0) {
               tabs.forEach((tab) => {

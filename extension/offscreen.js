@@ -1,4 +1,7 @@
-const API_BASE = "http://localhost:8000";
+// API base injected via config.js at package time (see extension/build.sh).
+const API_BASE =
+  (typeof MINUTE_AI_CONFIG !== "undefined" && MINUTE_AI_CONFIG.API_BASE) ||
+  "http://localhost:8000";
 
 let mediaRecorder = null;
 let audioChunks = [];

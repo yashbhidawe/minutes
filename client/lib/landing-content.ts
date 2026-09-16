@@ -47,6 +47,10 @@ export const FAQS: Faq[] = [
     q: "What does it cost?",
     a: "Free to start, no credit card required. Create an account, add the extension, and capture your next meeting.",
   },
+  {
+    q: "How do I install the extension without the Chrome Web Store?",
+    a: "Download the extension zip from our install page, unzip it, open chrome://extensions, enable Developer mode, and click Load unpacked. It takes about 2 minutes and updates are a re-download until our Web Store listing is live.",
+  },
 ];
 
 export const STEPS: Step[] = [
