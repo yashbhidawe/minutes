@@ -61,12 +61,12 @@ export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) 
             </>
           )}
         </Link>
-        <a
-          href="#extension"
+        <Link
+          href="/install"
           className="btn-interactive px-5 py-2.5 border border-stone-300 text-[13px] font-medium rounded-md hover:border-stone-900 transition-colors"
         >
           Get the extension
-        </a>
+        </Link>
       </div>
     );
   }
@@ -77,10 +77,10 @@ export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) 
       {token ? (
         <>
           <Link
-            href="/dashboard"
-            className="btn-interactive btn-sheen btn-arrow px-6 py-3 bg-stone-900 text-white text-sm font-medium rounded-md hover:bg-stone-700 transition-colors text-center shadow-xs inline-flex items-center justify-center gap-1.5"
+            href="/install"
+            className="btn-interactive btn-sheen px-6 py-3 bg-stone-900 text-white text-sm font-medium rounded-md hover:bg-stone-700 transition-colors text-center shadow-xs"
           >
-            Open dashboard <Arrow />
+            Get the extension
           </Link>
           <a
             href="#how"
