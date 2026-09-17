@@ -94,12 +94,6 @@ export default async function InstallPage() {
           <Logo />
           <div className="flex items-center gap-2.5">
             <Link
-              href="/"
-              className="px-4 py-2 text-[13px] font-medium text-stone-600 hover:text-stone-950 transition-colors"
-            >
-              Home
-            </Link>
-            <Link
               href="/register"
               className="px-4 py-2 bg-stone-900 text-white text-[13px] font-medium rounded-md hover:bg-stone-700 transition-colors"
             >
