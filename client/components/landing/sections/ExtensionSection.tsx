@@ -28,7 +28,7 @@ export function ExtensionSection() {
               ))}
             </ol>
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <a href="https://github.com/yashbhidawe" target="_blank" rel="noreferrer" className="btn-interactive px-5 py-2.5 bg-white text-stone-950 text-[13px] font-semibold rounded-md hover:bg-stone-200 transition-colors text-center">
+              <a href="/install" className="btn-interactive px-5 py-2.5 bg-white text-stone-950 text-[13px] font-semibold rounded-md hover:bg-stone-200 transition-colors text-center">
                 Get the extension
               </a>
               <a href="#faq" className="btn-interactive px-5 py-2.5 border border-stone-700 text-stone-200 text-[13px] font-medium rounded-md hover:border-stone-400 transition-colors text-center">

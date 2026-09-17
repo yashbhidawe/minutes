@@ -1,4 +1,17 @@
-const API_BASE = "http://localhost:8000";
+// Extension config (API_BASE, DASHBOARD_URL). build.sh injects prod values
+// into config.js when packaging the distributable zip.
+try {
+  importScripts("config.js");
+} catch (e) {
+  // config.js missing (dev) — fallbacks below apply.
+}
+
+const API_BASE =
+  (typeof MINUTE_AI_CONFIG !== "undefined" && MINUTE_AI_CONFIG.API_BASE) ||
+  "http://localhost:8000";
+const DASHBOARD_URL =
+  (typeof MINUTE_AI_CONFIG !== "undefined" && MINUTE_AI_CONFIG.DASHBOARD_URL) ||
+  "http://localhost:3000";
 
 let recordingState = {
   isRecording: false,
@@ -268,7 +281,7 @@ if (chrome.notifications && chrome.notifications.onClicked) {
   chrome.notifications.onClicked.addListener((notificationId) => {
     if (notificationId.startsWith("meeting_")) {
       const meetingId = notificationId.replace("meeting_", "");
-      chrome.tabs.create({ url: `http://localhost:3000/meetings/${meetingId}` });
+      chrome.tabs.create({ url: `${DASHBOARD_URL}/meetings/${meetingId}` });
     }
   });
 }
