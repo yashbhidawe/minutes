@@ -32,9 +32,6 @@ export const metadata: Metadata = {
   authors: [{ name: "Yash Bhidawe", url: "https://itsokyash.online" }],
   creator: SITE_NAME,
   category: "productivity",
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     type: "website",
     locale: "en_US",
