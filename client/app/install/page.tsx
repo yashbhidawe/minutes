@@ -4,12 +4,31 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { Logo } from "@/components/landing/Logo";
 import { SiteFooter } from "@/components/landing/sections";
+import { SITE_URL } from "@/lib/site";
+
+const title = "Install the Chrome Extension";
+const description =
+  "Download the Minute AI Chrome extension and install it in about 2 minutes. Free manual install while we prepare the Chrome Web Store listing.";
 
 export const metadata: Metadata = {
-  title: "Install the Chrome Extension",
-  description:
-    "Download the Minute AI Chrome extension and install it in about 2 minutes. Free manual install while we prepare the Chrome Web Store listing.",
+  title,
+  description,
   alternates: { canonical: "/install" },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/install`,
+    title: `${title} · Minute AI`,
+    description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${title} · Minute AI`,
+    description,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 async function getExtensionVersion(): Promise<string> {
