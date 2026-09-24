@@ -1,16 +1,20 @@
-
 from fastapi import HTTPException
-from passlib.context import CryptContext  
+import bcrypt
 import re
 
 email_regex = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
-  
-def verify_password(plain_password, hashed_password):
-    pwd_context = CryptContext(
-        schemes=["bcrypt"],
-        deprecated="auto"
-    )
-    return pwd_context.verify(plain_password, hashed_password)
+
+
+def hash_password(plain_password: str) -> str:
+    return bcrypt.hashpw(plain_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    try:
+        return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
+    except (TypeError, ValueError):
+        return False
+
 
 def verify_email_format(email):
     if not email_regex.match(email):

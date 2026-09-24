@@ -8,7 +8,7 @@ alembic==1.13.3
 psycopg[binary]==3.3.4
 # auth
 python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
+bcrypt==4.3.0
 python-multipart==0.0.12
 
 # ai (openai>=1.55.3 required for httpx>=0.28 compat — 'proxies' kwarg was removed in httpx 0.28)

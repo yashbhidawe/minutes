@@ -6,6 +6,15 @@ from fastapi import HTTPException
 
 from app.schemas.user import LoginRequest
 from app.services.user import UserService
+from app.utils.verifyPassword import hash_password, verify_password
+
+
+def test_password_hash_round_trip():
+    password_hash = hash_password("StrongPassword1!")
+
+    assert password_hash != "StrongPassword1!"
+    assert verify_password("StrongPassword1!", password_hash)
+    assert not verify_password("WrongPassword1!", password_hash)
 
 
 def test_login_returns_token_for_valid_credentials():
@@ -16,7 +25,7 @@ def test_login_returns_token_for_valid_credentials():
 
     with (
         patch("app.services.user.verify_email_format"),
-        patch("app.services.user.pwd_context.verify", return_value=True),
+        patch("app.services.user.verify_password", return_value=True),
         patch("app.services.user.create_access_token", return_value="access-token") as create_token,
     ):
         result = service.login_user(LoginRequest(email="PERSON@example.com", password="secret"))
@@ -34,7 +43,7 @@ def test_login_rejects_invalid_password():
 
     with (
         patch("app.services.user.verify_email_format"),
-        patch("app.services.user.pwd_context.verify", return_value=False),
+        patch("app.services.user.verify_password", return_value=False),
         pytest.raises(HTTPException) as error,
     ):
         service.login_user(LoginRequest(email="person@example.com", password="wrong"))
