@@ -11,7 +11,9 @@ DEFAULT_SQLITE_URL = f"sqlite:///{BASE_DIR / 'app.db'}"
 
 DATABASE_URL = getenv("DATABASE_URL", DEFAULT_SQLITE_URL)
 if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+elif DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 
 connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 
