@@ -1,6 +1,14 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useSyncExternalStore,
+} from "react";
+import type { ReactNode } from "react";
 import { api, User } from "@/lib/api";
 
 interface AuthContextType {
@@ -13,6 +21,13 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
+const AUTH_CHANGE_MESSAGE = "MINUTE_AI_AUTH_CHANGE";
+const EMPTY_AUTH_SNAPSHOT = "";
+
+type StoredAuth = {
+  token: string | null;
+  user: User | null;
+};
 
 function isTokenExpired(token: string): boolean {
   try {
@@ -23,11 +38,62 @@ function isTokenExpired(token: string): boolean {
   }
 }
 
+function getAuthSnapshot(): string {
+  if (typeof window === "undefined") return EMPTY_AUTH_SNAPSHOT;
+  return JSON.stringify([localStorage.getItem("token"), localStorage.getItem("user")]);
+}
+
+function getServerAuthSnapshot(): string {
+  return EMPTY_AUTH_SNAPSHOT;
+}
+
+function subscribeToAuth(callback: () => void): () => void {
+  const handleMessage = (event: MessageEvent<{ type?: string }>) => {
+    if (event.data?.type === AUTH_CHANGE_MESSAGE) callback();
+  };
+
+  window.addEventListener("storage", callback);
+  window.addEventListener("message", handleMessage);
+
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener("message", handleMessage);
+  };
+}
+
+function getHydratedClientSnapshot(): boolean {
+  return true;
+}
+
+function getHydratedServerSnapshot(): boolean {
+  return false;
+}
+
+function subscribeToHydration(): () => void {
+  return () => {};
+}
+
+function parseAuthSnapshot(snapshot: string): StoredAuth {
+  if (!snapshot) return { token: null, user: null };
+
+  try {
+    const [savedToken, savedUser] = JSON.parse(snapshot) as [unknown, unknown];
+    if (typeof savedToken !== "string" || typeof savedUser !== "string") {
+      return { token: null, user: null };
+    }
+
+    const user = JSON.parse(savedUser) as User | null;
+    return { token: savedToken, user };
+  } catch {
+    return { token: null, user: null };
+  }
+}
+
 function broadcastAuthChange(token: string | null, user: User | null) {
   if (typeof window !== "undefined") {
     window.postMessage(
       {
-        type: "MINUTE_AI_AUTH_CHANGE",
+        type: AUTH_CHANGE_MESSAGE,
         token,
         user,
       },
@@ -37,37 +103,32 @@ function broadcastAuthChange(token: string | null, user: User | null) {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const authSnapshot = useSyncExternalStore(
+    subscribeToAuth,
+    getAuthSnapshot,
+    getServerAuthSnapshot
+  );
+  const isHydrated = useSyncExternalStore(
+    subscribeToHydration,
+    getHydratedClientSnapshot,
+    getHydratedServerSnapshot
+  );
+  const storedAuth = useMemo(() => parseAuthSnapshot(authSnapshot), [authSnapshot]);
+  const token = storedAuth.token && !isTokenExpired(storedAuth.token) ? storedAuth.token : null;
+  const user = token ? storedAuth.user : null;
+  const isLoading = !isHydrated;
 
   const logout = useCallback(() => {
-    setToken(null);
-    setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     broadcastAuthChange(null, null);
   }, []);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
-    if (savedToken && savedUser) {
-      if (isTokenExpired(savedToken)) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        broadcastAuthChange(null, null);
-      } else {
-        const parsedUser = JSON.parse(savedUser);
-        setToken(savedToken);
-        setUser(parsedUser);
-        broadcastAuthChange(savedToken, parsedUser);
-      }
-    } else {
-      broadcastAuthChange(null, null);
+    if (storedAuth.token && !token) {
+      logout();
     }
-    setIsLoading(false);
-  }, []);
+  }, [logout, storedAuth.token, token]);
 
   useEffect(() => {
     if (!token) return;
@@ -83,8 +144,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const res = await api.auth.login(email, password);
-    setToken(res.access_token);
-    setUser(res.user);
     localStorage.setItem("token", res.access_token);
     localStorage.setItem("user", JSON.stringify(res.user));
     broadcastAuthChange(res.access_token, res.user);

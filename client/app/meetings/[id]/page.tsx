@@ -101,6 +101,7 @@ export default function MeetingDetailPage() {
   const [toastMsg, setToastMsg] = useState("");
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const meetingStatus = meeting?.status;
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
@@ -137,11 +138,11 @@ export default function MeetingDetailPage() {
   }, [token, meetingId]);
 
   useEffect(() => {
-    if (!token || !meeting) return;
-    const isProcessing = PROCESSING_STATUSES.includes(meeting.status);
+    if (!token || !meetingStatus) return;
+    const isProcessing = PROCESSING_STATUSES.includes(meetingStatus);
     if (!isProcessing) return;
 
-    let lastStatus = meeting.status;
+    let lastStatus = meetingStatus;
     let stalePollCount = 0;
     // 200 polls x 3s = 10 min without a status change before giving up.
     // Long transcriptions legitimately sit in one status for minutes.
@@ -183,7 +184,7 @@ export default function MeetingDetailPage() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [token, meetingId, meeting?.status]);
+  }, [token, meetingId, meetingStatus]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
