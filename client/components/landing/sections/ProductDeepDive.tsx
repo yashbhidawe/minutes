@@ -18,7 +18,7 @@ export function ProductDeepDive() {
             </p>
             <ul className="mt-6 space-y-3 text-sm text-stone-600">
               {[
-                "Copy or share your summary in one click",
+                "Copy or export your summary in one click",
                 "Track every action item through to done",
                 "Listen back to any moment, whenever you need it",
               ].map((li) => (

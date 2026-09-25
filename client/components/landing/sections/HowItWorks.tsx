@@ -8,11 +8,11 @@ export function HowItWorks() {
         <div className="max-w-2xl mb-10">
           <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-400 mb-3">How it works</p>
           <h2 id="how-heading" className="text-3xl md:text-4xl font-light tracking-tight text-stone-950">
-            Hang up. <span className="font-semibold">Notes appear.</span>
+            Record. <span className="font-semibold">Process. Review.</span>
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-stone-500">
-            You run the meeting. Minute AI handles the notes — capture,
-            transcript, and a summary you can actually act on.
+             You run the meeting. Minute AI captures and processes the
+             recording, then gives you a transcript and summary you can act on.
           </p>
         </div>
       </Reveal>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ActivationChecklist } from "@/components/activation-checklist";
 import { useAuth } from "@/lib/auth-context";
 import { api, Meeting } from "@/lib/api";
 
@@ -103,7 +104,7 @@ export default function DashboardPage() {
     e.preventDefault();
     e.stopPropagation();
     if (!token || deletingId !== null) return;
-    if (!confirm(`Delete meeting "${title}"?`)) return;
+     if (!confirm(`Delete meeting "${title}"? This also deletes its transcript, notes, action items and stored audio.`)) return;
 
     setDeletingId(id);
     try {
@@ -124,6 +125,9 @@ export default function DashboardPage() {
 
   const totalDurationSec = meetings.reduce((acc, m) => acc + (m.duration_sec || 0), 0);
   const completedCount = meetings.filter((m) => m.status === "completed").length;
+  const hasRecording = meetings.some(
+    (m) => Boolean(m.audio_key) || ["uploaded", "queued", "transcribing", "transcribed", "summarizing", "completed"].includes(m.status)
+  );
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
@@ -158,6 +162,8 @@ export default function DashboardPage() {
           <p className="text-2xl font-bold text-stone-900 mt-1">{completedCount}</p>
         </div>
       </div>
+
+      <ActivationChecklist hasRecording={hasRecording} hasSummary={completedCount > 0} />
 
       {/* Search Bar */}
       <div className="mb-6">

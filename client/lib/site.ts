@@ -11,4 +11,4 @@ export const SITE_URL = (
 export const SITE_NAME = "Minute AI";
 
 export const SITE_DESCRIPTION =
-  "Minute AI turns your Google Meet calls into clear summaries, decisions and action items — minutes after you hang up. No bots, no setup, free to start.";
+  "Minute AI turns meetings you are authorized to record into timestamped transcripts, summaries, decisions and action items. No bot joins your call, no admin setup, free to start.";

@@ -16,32 +16,32 @@ export interface Step {
 }
 
 export const DEFINITION_ANSWER =
-  "Minute AI is an automatic note-taker for Google Meet. It captures your meeting, writes a searchable transcript, and produces a clear summary — key decisions, highlights, blockers, next steps and owned action items — minutes after you hang up. No bots join your call and no setup is required.";
+  "Minute AI is an automatic note-taker for Google Meet. It captures meetings you are authorized to record, creates a timestamped transcript, and produces decisions, blockers, next steps and action items. No bot joins your call and no admin setup is required.";
 
 export const FAQS: Faq[] = [
   {
     q: "What is Minute AI?",
-    a: "Minute AI is an automatic note-taker for Google Meet. It captures your meeting, writes a searchable transcript, and produces decisions, highlights and action items — minutes after you hang up.",
+    a: "Minute AI is an automatic note-taker for Google Meet. It captures meetings you are authorized to record, creates a timestamped transcript, and produces decisions, highlights and action items.",
   },
   {
     q: "Does a bot join my meeting?",
-    a: "No. Nothing joins your call and your team sees no change. Minute AI works quietly in the background while you meet like normal.",
+    a: "No bot joins your call. Minute AI records from your browser after you install and sign in, so you remain responsible for following applicable recording and participant-notice requirements.",
   },
   {
     q: "Do I need permission from IT or the host?",
-    a: "No. There is nothing for an admin to install and no settings to change. If you can join the call, Minute AI can take notes for you.",
+    a: "No admin installation is required. You install the extension in your own browser, sign in, and can then record meetings you are authorized to capture.",
   },
   {
     q: "How fast do I get notes?",
-    a: "Minutes after you hang up. Your dashboard updates on its own — you'll see the meeting move from recording to a finished summary without refreshing.",
+    a: "After the recording uploads and processing completes, your dashboard updates with the transcript and summary. Processing time depends on recording length and service availability.",
   },
   {
     q: "What do I actually get per meeting?",
-    a: "A searchable transcript, a clean summary (key decisions, highlights, blockers, next steps), action items with owners, plus the audio to listen back. Copy it, share it, done.",
+    a: "A timestamped transcript, a clean summary (key decisions, highlights, blockers, next steps), action items with owners when identified, and the audio to listen back. Copy or export the summary from your dashboard.",
   },
   {
     q: "Is my meeting data private?",
-    a: "Yes. Meetings live in your private account only. Delete a meeting and its notes, action items and transcript are gone for good.",
+    a: "Meetings are associated with your private account. Audio, transcripts and summaries are processed by our infrastructure and AI providers. Deleting a meeting removes its active transcript, notes, action items and stored audio; see the Privacy Policy for details.",
   },
   {
     q: "What does it cost?",
@@ -57,32 +57,32 @@ export const STEPS: Step[] = [
   {
     n: "01",
     title: "Meet like normal",
-    body: "Join your Google Meet as usual. No bots to invite, nothing to click, zero setup for your team.",
+    body: "Join your Google Meet as usual. No bot to invite. You stay responsible for meeting recording permissions and participant notice.",
   },
   {
     n: "02",
     title: "We capture it",
-    body: "Minute AI captures the conversation automatically and takes over the moment the call ends.",
+    body: "With the extension installed and signed in, it captures the active Meet tab while recording is active.",
   },
   {
     n: "03",
     title: "Read every word",
-    body: "Get a full transcript you can skim, search and revisit — every key moment timestamped.",
+    body: "Skim a transcript with timestamps and revisit the original audio when you need more context.",
   },
   {
     n: "04",
     title: "Walk away with clarity",
-    body: "Decisions, highlights, blockers, next steps and owned action items — ready to share in minutes.",
+    body: "Decisions, highlights, blockers, next steps and action items — ready to copy, export and act on.",
   },
 ];
 
 export const TICKER = [
   "Automatic capture",
-  "Instant summaries",
+  "Post-call summaries",
   "Action items",
-  "Searchable transcripts",
+  "Timestamped transcripts",
   "Decisions & next steps",
-  "One-click sharing",
-  "Private by default",
+  "Copy & export",
+  "Private account",
   "No bots",
 ];

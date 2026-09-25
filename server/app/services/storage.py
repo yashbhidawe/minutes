@@ -15,3 +15,7 @@ def download_file(key: str) -> bytes:
     client = get_r2_client()
     response = client.get_object(Bucket=R2_BUCKET_NAME, Key=key)
     return response["Body"].read()
+
+
+def delete_file(key: str) -> None:
+    get_r2_client().delete_object(Bucket=R2_BUCKET_NAME, Key=key)

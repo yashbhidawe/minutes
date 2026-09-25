@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 from app.models.meeting import Meeting
 from app.models.transcript import Transcript
+from app.models.note import Note
+from app.models.actionItem import ActionItem
 
 
 class MeetingRepository:
@@ -71,6 +73,9 @@ class MeetingRepository:
         meeting = self.get_by_id(meeting_id)
         if not meeting:
             return False
+        self.session.query(ActionItem).filter_by(meeting_id=meeting_id).delete(synchronize_session=False)
+        self.session.query(Note).filter_by(meeting_id=meeting_id).delete(synchronize_session=False)
+        self.session.query(Transcript).filter_by(meeting_id=meeting_id).delete(synchronize_session=False)
         self.session.delete(meeting)
         self.session.commit()
         return True

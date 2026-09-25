@@ -15,8 +15,8 @@ export function FinalCta() {
               <span className="font-semibold">Start shipping.</span>
             </h2>
             <p className="mt-5 text-[15px] text-stone-400 max-w-xl mx-auto leading-relaxed">
-              Create an account, add the extension, and walk out of your next
-              Google Meet with decisions, owners and next steps already written.
+               Create an account, add the extension, and review decisions,
+               owners and next steps after your next processed meeting.
             </p>
             <AuthCta variant="final" />
           </div>

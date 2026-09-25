@@ -133,8 +133,16 @@ export default async function InstallPage() {
           <p className="mt-4 text-[15px] leading-relaxed text-stone-500 max-w-2xl">
             We&apos;re not on the Chrome Web Store yet, so installation is a
             free manual setup: download the file, flip on Developer mode, and
-            load the extension. No fees, no terminal commands.
-          </p>
+             load the extension. No fees, no terminal commands.
+           </p>
+           <p className="mt-3 text-sm leading-relaxed text-stone-500">
+             Only record meetings you are authorized to capture. Minute AI displays
+             when capture is active; see our{" "}
+             <Link href="/privacy" className="text-stone-900 underline underline-offset-4">
+               Privacy Policy
+             </Link>{" "}
+             for details.
+           </p>
 
           <div className="mt-8 bg-stone-950 rounded-xl p-6 sm:p-8">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -174,7 +182,8 @@ export default async function InstallPage() {
             {STEPS.map((s) => (
               <li
                 key={s.n}
-                className="flex gap-4 bg-white border border-stone-200 rounded-xl p-5 sm:p-6"
+                id={s.n === "6" ? "sign-in" : undefined}
+                className="flex gap-4 bg-white border border-stone-200 rounded-xl p-5 sm:p-6 scroll-mt-24"
               >
                 <span className="w-8 h-8 rounded-md bg-stone-900 text-white text-[13px] font-bold flex items-center justify-center shrink-0">
                   {s.n}

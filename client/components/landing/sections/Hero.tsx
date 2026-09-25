@@ -19,9 +19,9 @@ export function Hero() {
           </h1>
 
           <p className="animate-fade-up-2 mt-6 text-[15px] md:text-base leading-relaxed text-stone-500 max-w-xl">
-            Minute AI turns your Google Meet into clear summaries, decisions
-            and owned action items —{" "}
-            <span className="text-stone-900 font-medium">minutes after you hang up.</span>
+             Minute AI turns meetings you are authorized to record into clear
+             summaries, decisions and action items —{" "}
+             <span className="text-stone-900 font-medium">after processing.</span>
           </p>
 
           <div className="animate-fade-up-3">
@@ -33,10 +33,10 @@ export function Hero() {
               <Check /> No bots in your call
             </li>
             <li className="flex items-center gap-1.5">
-              <Check /> Zero setup for your team
+              <Check /> No admin setup for your team
             </li>
             <li className="flex items-center gap-1.5">
-              <Check /> No manual notes again
+              <Check /> You control what is recorded
             </li>
           </ul>
         </div>

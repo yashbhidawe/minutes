@@ -8,7 +8,7 @@ export function SiteFooter() {
         <div>
           <Logo />
           <p className="mt-4 text-[13px] leading-relaxed text-stone-500 max-w-xs">
-            Automatic meeting notes for Google Meet. Decisions, action items and summaries — minutes after you hang up.
+             Automatic meeting notes for Google Meet. Timestamped transcripts, decisions, action items and summaries for meetings you are authorized to record.
           </p>
         </div>
         <nav aria-label="Product">
@@ -26,6 +26,7 @@ export function SiteFooter() {
             <li><Link href="/login" className="hover:text-stone-950 transition-colors">Sign in</Link></li>
             <li><Link href="/register" className="hover:text-stone-950 transition-colors">Create account</Link></li>
             <li><a href="#faq" className="hover:text-stone-950 transition-colors">FAQ</a></li>
+            <li><Link href="/privacy" className="hover:text-stone-950 transition-colors">Privacy policy</Link></li>
           </ul>
         </nav>
         <div>
@@ -39,7 +40,7 @@ export function SiteFooter() {
       <div className="border-t border-stone-200">
         <div className="max-w-6xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-xs text-stone-400">© 2026 Minute AI. Meeting notes, automatically.</p>
-          <p className="text-[11px] font-mono uppercase tracking-wider text-stone-300">No bots were invited to this meeting</p>
+          <p className="text-[11px] font-mono uppercase tracking-wider text-stone-300">No bots join your calls. You control what you record.</p>
         </div>
       </div>
     </footer>

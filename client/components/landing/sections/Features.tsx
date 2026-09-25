@@ -16,8 +16,8 @@ const FEATURES = [
     ),
   },
   {
-    title: "Summaries worth sharing",
-    body: "Every meeting becomes decisions, highlights, blockers and next steps — copy or share in one click.",
+    title: "Summaries worth copying",
+    body: "Every meeting becomes decisions, highlights, blockers and next steps — copy or export them from your dashboard.",
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>
     ),
@@ -30,15 +30,15 @@ const FEATURES = [
     ),
   },
   {
-    title: "A dashboard you'll open",
-    body: "All your meetings in one calm place. Search, filter and jump into any conversation in one click.",
+    title: "A dashboard you'll return to",
+    body: "All your meetings in one calm place. Filter your history and jump into a conversation in one click.",
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><rect x="3" y="3" width="7" height="9" /><rect x="14" y="3" width="7" height="5" /><rect x="14" y="12" width="7" height="9" /><rect x="3" y="16" width="7" height="5" /></svg>
     ),
   },
   {
-    title: "Private by design",
-    body: "Your meetings stay yours. Secure sign-in, a private workspace, and full delete anytime — everything goes with it.",
+    title: "Private account controls",
+    body: "Your meeting history belongs to your account. Delete a meeting to remove its active transcript, notes, action items and stored audio. See our Privacy Policy for processing details.",
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
     ),

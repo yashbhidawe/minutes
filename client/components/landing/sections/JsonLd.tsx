@@ -41,7 +41,7 @@ export function JsonLd() {
         "@type": "HowTo",
         name: "How to get automatic meeting notes for Google Meet",
         description:
-          "Join your call as normal and receive a transcript, summary and action items minutes after you hang up.",
+           "Record a meeting you are authorized to capture and review its transcript, summary and action items after processing.",
         step: STEPS.map((s, i) => ({
           "@type": "HowToStep",
           position: i + 1,

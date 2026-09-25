@@ -1,4 +1,21 @@
 (function () {
+  function notifyExtensionStatus(authenticated) {
+    window.postMessage(
+      { type: "MINUTE_AI_EXTENSION_STATUS", authenticated },
+      window.location.origin
+    );
+  }
+
+  function requestExtensionStatus() {
+    chrome.runtime.sendMessage({ type: "GET_TOKEN" }, (response) => {
+      if (chrome.runtime.lastError) {
+        notifyExtensionStatus(false);
+        return;
+      }
+      notifyExtensionStatus(Boolean(response?.token));
+    });
+  }
+
   function syncAuthWithExtension() {
     try {
       const token = localStorage.getItem("token");
@@ -15,17 +32,20 @@
       }
 
       if (token) {
-        chrome.runtime.sendMessage({
-          type: "SET_TOKEN",
-          token: token,
-          email: email,
-        });
+        chrome.runtime.sendMessage(
+          {
+            type: "SET_TOKEN",
+            token: token,
+            email: email,
+          },
+          requestExtensionStatus
+        );
       } else {
-        // If extension currently has a token stored, notify it of logout
-        chrome.runtime.sendMessage({ type: "GET_TOKEN" }, (res) => {
-          if (res && res.token) {
+        chrome.runtime.sendMessage({ type: "GET_TOKEN" }, (response) => {
+          if (response?.token) {
             chrome.runtime.sendMessage({ type: "LOGOUT" });
           }
+          notifyExtensionStatus(false);
         });
       }
     } catch (err) {
@@ -38,7 +58,11 @@
 
   // Listen for window postMessage events from the Next.js app (auth-context)
   window.addEventListener("message", (event) => {
-    if (event.source !== window) return;
+    if (event.source !== window || event.origin !== window.location.origin) return;
+    if (event.data?.type === "MINUTE_AI_EXTENSION_STATUS_REQUEST") {
+      syncAuthWithExtension();
+      return;
+    }
     if (event.data && event.data.type === "MINUTE_AI_AUTH_CHANGE") {
       const { token, user } = event.data;
       if (token) {

@@ -12,7 +12,7 @@ export function Ticker() {
         ))}
       </div>
       <span className="sr-only">
-        Automatic capture, instant summaries, action items, searchable transcripts.
+         Automatic capture, post-call summaries, action items, timestamped transcripts.
       </span>
     </div>
   );

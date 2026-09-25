@@ -216,7 +216,7 @@ export default function MeetingDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!token || !confirm("Are you sure you want to delete this meeting?")) return;
+     if (!token || !confirm("Delete this meeting? This also deletes its transcript, notes, action items and stored audio.")) return;
     setDeleting(true);
     setError("");
     try {

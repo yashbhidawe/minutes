@@ -12,7 +12,7 @@ from app.services.audio import upload_audio
 from app.services.audio_chunker import process_and_transcribe_audio
 from app.services.transcription import transcribe_audio
 from app.services.summarization import summarize_transcript
-from app.services.storage import download_file
+from app.services.storage import delete_file, download_file
 from app.services.celery_tasks import dispatch_meeting_task, execute_meeting_pipeline, BUSY_STATUSES
 from app.schemas.meeting import MeetingResponse, MeetingUploadResponse, TranscriptResponse, TranscriptSegment
 from app.schemas.note import NoteResponse
@@ -95,6 +95,11 @@ def delete_meeting(
     meeting = repo.get_by_id(meeting_id)
     if not meeting or meeting.user_id != user.id:
         raise HTTPException(status_code=404, detail="Meeting not found")
+    if meeting.audio_key:
+        try:
+            delete_file(meeting.audio_key)
+        except Exception as exc:
+            raise HTTPException(status_code=502, detail="Meeting audio could not be deleted") from exc
     repo.delete(meeting_id)
     return {"detail": "Meeting deleted"}
 
