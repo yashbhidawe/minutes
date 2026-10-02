@@ -5,3 +5,4 @@ from .meeting import Meeting
 from .transcript import Transcript
 from .note import Note
 from .actionItem import ActionItem
+from .meeting_chunk import MeetingChunk

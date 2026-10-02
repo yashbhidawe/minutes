@@ -7,6 +7,8 @@ from google.genai import types
 
 load_dotenv()
 
+GENERATION_MODEL = getenv("GEMINI_MODEL", "gemini-3.6-flash")
+
 _client = None
 
 
@@ -58,7 +60,7 @@ def summarize_transcript(transcript_text: str) -> dict:
     try:
         client = get_client()
         response = client.models.generate_content(
-            model="gemini-3.6-flash",
+            model=GENERATION_MODEL,
             contents=SUMMARY_PROMPT.format(transcript=transcript_text),
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",

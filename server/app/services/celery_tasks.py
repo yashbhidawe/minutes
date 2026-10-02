@@ -75,6 +75,15 @@ def execute_meeting_pipeline(meeting_id: int, is_final_attempt: bool = True):
             )
             repo.update_status(meeting_id, "transcribed")
 
+            # Index transcript chunks for RAG search (best-effort: never fail
+            # the pipeline if embeddings are down — /ask auto-indexes later).
+            try:
+                from app.services.rag import index_meeting as _index_meeting
+
+                _index_meeting(meeting_id, session)
+            except Exception as e:
+                print(f"[Pipeline Warning] RAG indexing skipped for meeting {meeting_id}: {e}")
+
             # Summarize via Gemini
             repo.update_status(meeting_id, "summarizing")
             summary = summarize_transcript(raw_text)
