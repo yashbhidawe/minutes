@@ -3,6 +3,7 @@ from app.models.meeting import Meeting
 from app.models.transcript import Transcript
 from app.models.note import Note
 from app.models.actionItem import ActionItem
+from app.models.meeting_chunk import MeetingChunk
 
 
 class MeetingRepository:
@@ -76,6 +77,7 @@ class MeetingRepository:
         self.session.query(ActionItem).filter_by(meeting_id=meeting_id).delete(synchronize_session=False)
         self.session.query(Note).filter_by(meeting_id=meeting_id).delete(synchronize_session=False)
         self.session.query(Transcript).filter_by(meeting_id=meeting_id).delete(synchronize_session=False)
+        self.session.query(MeetingChunk).filter_by(meeting_id=meeting_id).delete(synchronize_session=False)
         self.session.delete(meeting)
         self.session.commit()
         return True
