@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { api, Meeting, Note, ActionItem, Transcript } from "@/lib/api";
+import MeetingChat from "@/components/meeting-chat";
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("en-US", {
@@ -97,6 +98,7 @@ export default function MeetingDetailPage() {
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const [error, setError] = useState("");
   const [toastMsg, setToastMsg] = useState("");
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -309,6 +311,15 @@ export default function MeetingDetailPage() {
     if (audioRef.current) {
       audioRef.current.currentTime += seconds;
     }
+  };
+
+  const handleCitationSeek = (sec: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = sec;
+      audioRef.current.play().catch(() => {});
+    }
+    setShowTranscript(true);
+    showToast(`Jumped to ${formatTimestamp(sec)} in recording`);
   };
 
   if (authLoading || !token || loading) {
@@ -613,6 +624,24 @@ export default function MeetingDetailPage() {
             </div>
           )}
         </div>
+      )}
+
+      {/* Floating chat launcher */}
+      {!chatOpen && transcript && (
+        <button
+          onClick={() => setChatOpen(true)}
+          className="fixed bottom-6 right-6 z-40 px-4 py-2.5 text-xs font-semibold bg-stone-900 text-white rounded-full shadow-lg hover:bg-stone-700 transition-colors"
+        >
+          Ask AI ✦
+        </button>
+      )}
+      {chatOpen && token && (
+        <MeetingChat
+          meetingId={meetingId}
+          token={token}
+          onSeek={handleCitationSeek}
+          onClose={() => setChatOpen(false)}
+        />
       )}
     </div>
   );
