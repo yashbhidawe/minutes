@@ -94,6 +94,28 @@ export interface LoginResponse {
   access_token: string;
 }
 
+export interface ChatCitation {
+  chunk_index: number;
+  start_sec: number | null;
+  end_sec: number | null;
+  text: string;
+  score: number;
+}
+
+export interface AskResponse {
+  meeting_id: number;
+  question: string;
+  answer: string;
+  citations: ChatCitation[];
+  retrieved_chunks: ChatCitation[];
+}
+
+export interface IndexResponse {
+  meeting_id: number;
+  chunks_indexed: number;
+  status: string;
+}
+
 export const api = {
   auth: {
     register: (email: string, password: string) =>
@@ -150,5 +172,15 @@ export const api = {
         body: { status },
         token,
       }),
+  },
+  chat: {
+    ask: (id: number, question: string, token: string, top_k = 5) =>
+      request<AskResponse>(`/meetings/${id}/ask`, {
+        method: "POST",
+        body: { question, top_k },
+        token,
+      }),
+    index: (id: number, token: string) =>
+      request<IndexResponse>(`/meetings/${id}/index`, { method: "POST", token }),
   },
 };
