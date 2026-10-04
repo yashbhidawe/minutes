@@ -33,6 +33,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
             </Link>
             <nav className="flex items-center gap-6">
               <NavLink href="/dashboard">Meetings</NavLink>
+              <NavLink href="/search">Ask all</NavLink>
             </nav>
           </div>
           <div className="flex items-center gap-4">

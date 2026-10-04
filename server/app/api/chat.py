@@ -4,11 +4,18 @@ from app.core.db_connection import SessionLocal
 from app.models.user import User
 from app.repositories.chunks import ChunkRepository
 from app.repositories.meeting import MeetingRepository
-from app.schemas.chat import AskRequest, AskResponse, IndexResponse
-from app.services.rag import answer_question, index_meeting
+from app.schemas.chat import (
+    AskRequest,
+    AskResponse,
+    GlobalAskRequest,
+    GlobalAskResponse,
+    IndexResponse,
+)
+from app.services.rag import answer_global, answer_question, index_meeting
 from app.utils.auth import get_current_user
 
 router = APIRouter(prefix="/meetings", tags=["chat"])
+global_router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 def get_session():
@@ -54,6 +61,21 @@ def ask_meeting(
     result = answer_question(meeting_id, body.question, session, top_k=body.top_k)
     return AskResponse(
         meeting_id=meeting_id,
+        question=body.question,
+        answer=result["answer"],
+        citations=result["citations"],
+        retrieved_chunks=result["retrieved_chunks"],
+    )
+
+
+@global_router.post("/ask", response_model=GlobalAskResponse)
+def ask_all_meetings(
+    body: GlobalAskRequest,
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    result = answer_global(user.id, body.question, session, top_k=body.top_k)
+    return GlobalAskResponse(
         question=body.question,
         answer=result["answer"],
         citations=result["citations"],

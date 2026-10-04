@@ -26,3 +26,25 @@ class IndexResponse(BaseModel):
     meeting_id: int
     chunks_indexed: int
     status: str = "indexed"
+
+
+class GlobalAskRequest(BaseModel):
+    question: str = Field(..., min_length=1, max_length=2000)
+    top_k: int = Field(default=8, ge=1, le=12)
+
+
+class GlobalCitation(BaseModel):
+    meeting_id: int
+    meeting_title: str
+    chunk_index: int
+    start_sec: float | None = None
+    end_sec: float | None = None
+    text: str
+    score: float
+
+
+class GlobalAskResponse(BaseModel):
+    question: str
+    answer: str
+    citations: list[GlobalCitation]
+    retrieved_chunks: list[GlobalCitation]
