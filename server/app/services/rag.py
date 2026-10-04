@@ -11,6 +11,8 @@ from fastapi import HTTPException
 from google.genai import types
 from sqlalchemy.orm import Session
 
+from app.models.meeting import Meeting
+from app.models.meeting_chunk import MeetingChunk
 from app.repositories.chunks import ChunkRepository
 from app.repositories.meeting import MeetingRepository
 from app.services.chunking import build_chunks
@@ -19,6 +21,8 @@ from app.services.summarization import GENERATION_MODEL, get_client as get_gemin
 
 DEFAULT_TOP_K = 5
 MAX_TOP_K = 12
+GLOBAL_DEFAULT_TOP_K = 8
+GLOBAL_PER_MEETING_CAP = 3
 
 RAG_PROMPT = """You answer questions about a meeting using ONLY the provided transcript excerpts.
 
@@ -183,4 +187,146 @@ def answer_question(meeting_id: int, question: str, session: Session, top_k: int
             }
             for h in hits
         ],
+    }
+
+
+GLOBAL_RAG_PROMPT = """You answer questions using ONLY the provided transcript excerpts, which come from DIFFERENT meetings. Each excerpt notes its meeting title.
+
+Question:
+{question}
+
+Excerpts (index, meeting, time range, text):
+{excerpts}
+
+Return a JSON object with exactly this structure (no markdown, no code fences, just raw JSON):
+{{
+  "answer": "Concise answer grounded in the excerpts. Mention which meeting each fact comes from. If the excerpts don't contain the answer, say so explicitly.",
+  "citations": [0, 2]
+}}
+
+Rules:
+- citations must be excerpt indices (integers) that directly support the answer, max 5.
+- Use an empty array if nothing supports the answer.
+- Never invent meetings, timestamps, names, or decisions not present in the excerpts.
+- Return ONLY the JSON object, no other text."""
+
+
+def retrieve_global(
+    user_id: int,
+    query: str,
+    session: Session,
+    top_k: int = GLOBAL_DEFAULT_TOP_K,
+    per_meeting_cap: int = GLOBAL_PER_MEETING_CAP,
+) -> list[dict]:
+    """Brute-force cosine search over ALL of a user's indexed chunks.
+
+    Results are diversity-capped per meeting so one long meeting can't
+    crowd out the rest.
+    """
+    if not (query or "").strip():
+        raise HTTPException(status_code=400, detail="Question must not be empty")
+    top_k = max(1, min(top_k or GLOBAL_DEFAULT_TOP_K, MAX_TOP_K))
+
+    rows = (
+        session.query(MeetingChunk, Meeting)
+        .join(Meeting, Meeting.id == MeetingChunk.meeting_id)
+        .filter(Meeting.user_id == user_id)
+        .order_by(MeetingChunk.meeting_id.asc(), MeetingChunk.chunk_index.asc())
+        .all()
+    )
+    if not rows:
+        raise HTTPException(
+            status_code=404,
+            detail="No indexed meetings yet. Open a meeting and ask it something first, or wait for processing to finish.",
+        )
+
+    query_vec = embed_texts([query.strip()])[0]
+    scored = []
+    for chunk, meeting in rows:
+        vec = _decode_embedding(chunk.embedding)
+        if vec is None:
+            continue
+        scored.append(
+            {
+                "meeting_id": meeting.id,
+                "meeting_title": meeting.title,
+                "chunk_index": chunk.chunk_index,
+                "text": chunk.text,
+                "start_sec": chunk.start_sec,
+                "end_sec": chunk.end_sec,
+                "score": _cosine(query_vec, vec),
+            }
+        )
+    scored.sort(key=lambda c: c["score"], reverse=True)
+
+    # Diversity cap: at most `per_meeting_cap` chunks per meeting, then top_k overall.
+    picked, per_meeting = [], {}
+    for hit in scored:
+        if per_meeting.get(hit["meeting_id"], 0) >= per_meeting_cap:
+            continue
+        per_meeting[hit["meeting_id"]] = per_meeting.get(hit["meeting_id"], 0) + 1
+        picked.append(hit)
+        if len(picked) >= top_k:
+            break
+    return picked
+
+
+def answer_global(
+    user_id: int,
+    question: str,
+    session: Session,
+    top_k: int = GLOBAL_DEFAULT_TOP_K,
+) -> dict:
+    hits = retrieve_global(user_id, question, session, top_k=top_k)
+
+    excerpts = "\n".join(
+        f"[{i}] (Meeting: {h['meeting_title']!r}, {h['start_sec']}-{h['end_sec']}s): {h['text']}"
+        for i, h in enumerate(hits)
+    )
+    try:
+        client = get_gemini_client()
+        response = client.models.generate_content(
+            model=GENERATION_MODEL,
+            contents=GLOBAL_RAG_PROMPT.format(question=question.strip(), excerpts=excerpts),
+            config=types.GenerateContentConfig(response_mime_type="application/json"),
+        )
+        raw = response.text.strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1]
+            if raw.endswith("```"):
+                raw = raw[: raw.rfind("```")]
+            raw = raw.strip()
+        result = json.loads(raw)
+    except HTTPException:
+        raise
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="Failed to parse Gemini response as JSON")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"RAG answering failed: {str(e)}")
+
+    def _shape(h: dict) -> dict:
+        return {
+            "meeting_id": h["meeting_id"],
+            "meeting_title": h["meeting_title"],
+            "chunk_index": h["chunk_index"],
+            "start_sec": h["start_sec"],
+            "end_sec": h["end_sec"],
+            "text": h["text"][:500],
+            "score": round(h["score"], 4),
+        }
+
+    valid_indices = {i for i in range(len(hits))}
+    citations = []
+    for idx in result.get("citations", []) or []:
+        try:
+            idx = int(idx)
+        except (TypeError, ValueError):
+            continue
+        if idx in valid_indices:
+            citations.append(_shape(hits[idx]))
+
+    return {
+        "answer": result.get("answer", ""),
+        "citations": citations,
+        "retrieved_chunks": [_shape(h) for h in hits],
     }

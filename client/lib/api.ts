@@ -116,6 +116,23 @@ export interface IndexResponse {
   status: string;
 }
 
+export interface GlobalCitation {
+  meeting_id: number;
+  meeting_title: string;
+  chunk_index: number;
+  start_sec: number | null;
+  end_sec: number | null;
+  text: string;
+  score: number;
+}
+
+export interface GlobalAskResponse {
+  question: string;
+  answer: string;
+  citations: GlobalCitation[];
+  retrieved_chunks: GlobalCitation[];
+}
+
 export const api = {
   auth: {
     register: (email: string, password: string) =>
@@ -182,5 +199,11 @@ export const api = {
       }),
     index: (id: number, token: string) =>
       request<IndexResponse>(`/meetings/${id}/index`, { method: "POST", token }),
+    askGlobal: (question: string, token: string, top_k = 8) =>
+      request<GlobalAskResponse>("/chat/ask", {
+        method: "POST",
+        body: { question, top_k },
+        token,
+      }),
   },
 };
