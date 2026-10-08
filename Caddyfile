@@ -1,0 +1,7 @@
+# Front door: automatic HTTPS (Let's Encrypt) for the nip.io name,
+# reverse-proxying to the FastAPI api service.
+# Browsers refuse to call plain-http APIs from https pages (mixed content),
+# so the Vercel dashboard can only use this backend over TLS.
+137-23-40-60.nip.io {
+	reverse_proxy api:8000
+}
