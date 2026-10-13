@@ -1,0 +1,4 @@
+# local-only artifacts
+*.db
+*.sqlite*
+server/.env
