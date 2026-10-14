@@ -28,7 +28,7 @@
       "matches": [
         "http://localhost:3000/*",
         "http://127.0.0.1:3000/*",
-        "https://minuteai.vercel.app/*",
+        "https://minuteai-six.vercel.app/*",
         "https://*.vercel.app/*"
       ],
       "js": ["dashboard-sync.js"]
