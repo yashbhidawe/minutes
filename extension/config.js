@@ -10,8 +10,10 @@
 
 /* eslint-disable no-unused-vars */
 const MINUTE_AI_CONFIG = {
-  API_BASE: "http://localhost:8000",
-  DASHBOARD_URL: "http://localhost:3000",
+  // LOCAL-ONLY override: points dev-unpacked extension at the Oracle VM.
+  // Do NOT commit this — production URL is baked by extension/build.sh.
+  API_BASE: "https://137-23-40-60.nip.io",
+  DASHBOARD_URL: "https://minuteai-six.vercel.app",
   // Dashboard origins the extension syncs auth with (popup tab-query + docs).
-  DASHBOARD_HOSTS: ["http://localhost:3000/*", "http://127.0.0.1:3000/*"],
+  DASHBOARD_HOSTS: ["http://localhost:3000/*", "http://127.0.0.1:3000/*", "https://minuteai-six.vercel.app/*"],
 };

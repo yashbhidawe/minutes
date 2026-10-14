@@ -3,8 +3,8 @@
 # Build the distributable Minute AI Chrome extension zip.
 #
 # Usage:
-#   MINUTE_AI_API_URL=https://<your-backend>.onrender.com \
-#   MINUTE_AI_SITE_URL=https://minuteai.vercel.app \
+#   MINUTE_AI_API_URL=https://137-23-40-60.nip.io \
+#   MINUTE_AI_SITE_URL=https://minuteai-six.vercel.app \
 #     ./extension/build.sh
 #
 # Output:
@@ -20,8 +20,8 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 EXT_DIR="$ROOT_DIR/extension"
 CLIENT_PUBLIC="$ROOT_DIR/client/public"
 
-API_URL="${MINUTE_AI_API_URL:-https://minuteai-backend.onrender.com}"
-SITE_URL="${MINUTE_AI_SITE_URL:-https://minuteai.vercel.app}"
+API_URL="${MINUTE_AI_API_URL:-https://137-23-40-60.nip.io}"
+SITE_URL="${MINUTE_AI_SITE_URL:-https://minuteai-six.vercel.app}"
 # Strip trailing slash so URL joins are predictable.
 SITE_URL="${SITE_URL%/}"
 API_URL="${API_URL%/}"
