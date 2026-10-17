@@ -16,7 +16,7 @@ export interface Step {
 }
 
 export const DEFINITION_ANSWER =
-  "Minute AI is an automatic note-taker for Google Meet. It captures meetings you are authorized to record, creates a timestamped transcript, and produces decisions, blockers, next steps and action items. No bot joins your call and no admin setup is required.";
+  "Minute AI is an automatic note-taker for Google Meet. It captures meetings you are authorized to record, creates a timestamped transcript, and produces decisions, blockers, next steps and action items. Ask anything, and every answer cites the transcript. No bot joins your call and no admin setup is required.";
 
 export const FAQS: Faq[] = [
   {
@@ -37,7 +37,15 @@ export const FAQS: Faq[] = [
   },
   {
     q: "What do I actually get per meeting?",
-    a: "A timestamped transcript, a clean summary (key decisions, highlights, blockers, next steps), action items with owners when identified, and the audio to listen back. Copy or export the summary from your dashboard.",
+    a: "A timestamped transcript, a clean summary (key decisions, highlights, blockers, next steps), action items with owners when identified, and the audio to listen back. Ask anything and answers cite the transcript — copy or export the summary from your dashboard.",
+  },
+  {
+    q: "Can I ask questions about a meeting?",
+    a: "Yes. Open any processed meeting and ask — answers are grounded in that meeting's transcript and cite the exact moments, so you can click a citation and listen back to the source.",
+  },
+  {
+    q: "Can I search across all my meetings?",
+    a: "Yes. Ask a question across your indexed meeting history and the answer names the meetings it drew from, with links straight to the source.",
   },
   {
     q: "Is my meeting data private?",
@@ -67,7 +75,7 @@ export const STEPS: Step[] = [
   {
     n: "03",
     title: "Read every word",
-    body: "Skim a transcript with timestamps and revisit the original audio when you need more context.",
+    body: "Skim a transcript with timestamps, ask a question and jump to the exact moment, or revisit the original audio when you need more context.",
   },
   {
     n: "04",
@@ -82,6 +90,8 @@ export const TICKER = [
   "Action items",
   "Timestamped transcripts",
   "Decisions & next steps",
+  "Ask AI",
+  "Cited answers",
   "Copy & export",
   "Private account",
   "No bots",

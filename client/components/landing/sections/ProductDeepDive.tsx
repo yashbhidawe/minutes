@@ -14,12 +14,14 @@ export function ProductDeepDive() {
             </h2>
             <p className="mt-4 text-[15px] leading-relaxed text-stone-500">
               Structured notes on the left, accountable action items on the
-              right, and the full conversation one click below.
+              right, and the full conversation one click below. Ask anything —
+              answers cite the source.
             </p>
             <ul className="mt-6 space-y-3 text-sm text-stone-600">
               {[
                 "Copy or export your summary in one click",
                 "Track every action item through to done",
+                "Ask anything — answers link to the exact moment",
                 "Listen back to any moment, whenever you need it",
               ].map((li) => (
                 <li key={li} className="flex items-start gap-2.5">
@@ -91,6 +93,31 @@ export function ProductDeepDive() {
                   <p className="text-stone-200 leading-relaxed font-sans text-[13px]">{text}</p>
                 </div>
               ))}
+            </div>
+          </Reveal>
+          <Reveal delay={160}>
+            <div className="bg-white border border-stone-200 rounded-lg p-5 sm:p-6">
+              <div className="flex items-center justify-between mb-4 border-b border-stone-100 pb-3">
+                <h3 className="text-xs font-semibold tracking-wider uppercase text-stone-500">Ask this meeting</h3>
+                <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-stone-900 text-white">AI</span>
+              </div>
+              <div className="space-y-2.5">
+                <div className="flex justify-end">
+                  <p className="max-w-[85%] bg-stone-900 text-white text-xs leading-relaxed rounded-lg rounded-br-sm px-3 py-2">
+                    What did we decide about the launch?
+                  </p>
+                </div>
+                <div className="flex justify-start">
+                  <div className="max-w-[95%] bg-stone-50 border border-stone-200 text-xs text-stone-800 leading-relaxed rounded-lg rounded-bl-sm px-3 py-2">
+                    <p>Launch stays on Friday. The homepage rewrite is paused until research lands.</p>
+                    <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-stone-200/60">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white border border-stone-200 text-stone-600">▶ 04:12</span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white border border-stone-200 text-stone-600">▶ 18:40</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p className="text-[11px] text-stone-400 mt-3.5">Click a citation to jump the audio to that moment.</p>
             </div>
           </Reveal>
         </div>
