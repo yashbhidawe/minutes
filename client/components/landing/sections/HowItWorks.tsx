@@ -3,29 +3,26 @@ import { Reveal } from "../Reveal";
 
 export function HowItWorks() {
   return (
-    <section id="how" className="max-w-6xl mx-auto px-6 pb-20 scroll-mt-24" aria-labelledby="how-heading">
-      <Reveal>
-        <div className="max-w-2xl mb-10">
+    <section id="how" className="max-w-6xl mx-auto px-6 pb-24 scroll-mt-24" aria-labelledby="how-heading">
+      <div className="max-w-3xl mb-14 text-center">
+        <Reveal>
           <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-400 mb-3">How it works</p>
-          <h2 id="how-heading" className="text-3xl md:text-4xl font-light tracking-tight text-stone-950">
-            Record. <span className="font-semibold">Process. Review.</span>
+          <h2 id="how-heading" className="text-3xl md:text-5xl font-light tracking-tight text-stone-950 mb-6">
+            Three steps. No bot.
           </h2>
-          <p className="mt-4 text-[15px] leading-relaxed text-stone-500">
-             You run the meeting. Minute AI captures and processes the
-             recording, then gives you a transcript, summary and cited answers you can act on.
-          </p>
-        </div>
-      </Reveal>
-      <ol className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 list-none">
+        </Reveal>
+      </div>
+
+      <ol className="grid grid-cols-1 md:grid-cols-3 gap-8 list-none">
         {STEPS.map((s, i) => (
           <li key={s.n}>
-            <Reveal delay={i * 80} className="h-full">
-              <div className="card-lift feature-card group bg-white border border-stone-200 rounded-lg p-6 hover:border-stone-900 hover:shadow-[0_16px_40px_-20px_rgb(0_0_0/0.3)] h-full">
-                <div className="flex items-center justify-between mb-8">
-                  <span className="step-num text-xs font-mono font-bold text-stone-300 group-hover:text-stone-900 transition-colors">{s.n}</span>
+            <Reveal delay={i * 80}>
+              <div className="flex flex-col gap-3">
+                <div className="w-10 h-10 rounded-lg border border-stone-200 flex items-center justify-center bg-stone-50 text-stone-600">
+                  <span className="text-sm font-mono font-bold">{s.n}</span>
                 </div>
-                <h3 className="text-[15px] font-semibold tracking-tight text-stone-950 mb-2">{s.title}</h3>
-                <p className="text-[13px] leading-relaxed text-stone-500">{s.body}</p>
+                <h3 className="text-base font-semibold tracking-tight text-stone-900">{s.title}</h3>
+                <p className="text-sm text-stone-500 leading-relaxed">{s.body}</p>
               </div>
             </Reveal>
           </li>

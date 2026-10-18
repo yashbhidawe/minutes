@@ -3,74 +3,69 @@ import { Reveal } from "../Reveal";
 
 export function ExtensionSection() {
   return (
-    <section id="extension" className="max-w-6xl mx-auto px-6 pb-20 scroll-mt-24" aria-labelledby="extension-heading">
-      <Reveal>
-        <div className="bg-stone-950 rounded-xl overflow-hidden grid lg:grid-cols-2">
-          <div className="p-6 sm:p-8 md:p-12">
-            <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-500 mb-4">Chrome extension</p>
-            <h2 id="extension-heading" className="text-3xl md:text-[34px] font-light tracking-tight text-stone-100 leading-tight">
-              Installs in a minute. <span className="font-semibold">Records when you need it.</span>
+    <section id="extension" className="max-w-6xl mx-auto px-6 pb-24 scroll-mt-24" aria-labelledby="extension-heading">
+      <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <Reveal>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="w-1 h-3 rounded bg-red-500" aria-hidden />
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-stone-400">
+                Chrome extension
+              </span>
+            </div>
+            <h2 id="extension-heading" className="text-3xl md:text-5xl font-light tracking-tight text-stone-950 mb-4">
+              Installs in a minute.
             </h2>
-            <p className="mt-4 text-[14px] leading-relaxed text-stone-400">
-              Add Minute AI once, sign in, and use it on meetings you are
-              authorized to record. The extension shows when capture is active.
+            <p className="text-lg text-stone-500 leading-relaxed mb-8">
+              Add Minute AI once, sign in, and it captures your Google Meet
+              tab audio while you record. A floating widget shows you're live —
+              then the notes appear in your dashboard when the call ends.
             </p>
-            <ol className="mt-8 space-y-4">
-              {[
-                ["1", "Add Minute AI to Chrome"],
-                ["2", "Sign in once"],
-                ["3", "Record a Meet — notes appear after processing"],
-              ].map(([n, t]) => (
-                <li key={n} className="flex items-center gap-4">
-                  <span className="w-8 h-8 rounded-md bg-stone-800 border border-stone-700 text-stone-100 text-[13px] font-bold flex items-center justify-center shrink-0">{n}</span>
-                  <p className="text-sm text-stone-300 font-medium">{t}</p>
-                </li>
-              ))}
-            </ol>
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <a href="/install" className="btn-interactive px-5 py-2.5 bg-white text-stone-950 text-[13px] font-semibold rounded-md hover:bg-stone-200 transition-colors text-center">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <a href="/install" className="btn-interactive px-5 py-2.5 bg-stone-900 text-white text-[13px] font-semibold rounded-md hover:bg-stone-800 transition-colors">
                 Get the extension
               </a>
-              <a href="/privacy" className="btn-interactive px-5 py-2.5 border border-stone-700 text-stone-200 text-[13px] font-medium rounded-md hover:border-stone-400 transition-colors text-center">
+              <a href="/privacy" className="px-5 py-2.5 border border-stone-300 text-[13px] font-medium rounded-md hover:border-stone-400 transition-colors text-center">
                 Privacy policy
               </a>
             </div>
-          </div>
-          <div className="bg-stone-900 border-t lg:border-t-0 lg:border-l border-stone-800 p-6 sm:p-8 md:p-12 flex flex-col justify-center gap-4">
-            <div className="bg-stone-950 border border-stone-800 rounded-lg p-6">
-              <p className="text-[10px] font-mono uppercase tracking-[0.16em] text-stone-500 mb-4">What you get</p>
-              <ul className="space-y-3">
-                {[
-                  "Summaries after processing",
-                  "Decisions, blockers & owners when identified",
-                  "Ask AI — cited answers to your questions",
-                  "Meeting history in one place",
-                ].map((t) => (
-                  <li key={t} className="flex items-start gap-2.5 text-sm text-stone-200">
-                    <Check className="text-emerald-400 mt-0.5 shrink-0" />
-                    <span className="leading-relaxed">{t}</span>
-                  </li>
-                ))}
-              </ul>
+          </Reveal>
+        </div>
+
+        <div className="relative hidden lg:block">
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-200/40 via-transparent to-transparent blur-3xl rounded-2xl" aria-hidden />
+          <div className="relative bg-white border border-stone-200 rounded-2xl shadow-xl overflow-hidden">
+            <div className="px-4 py-3 border-b border-stone-100 bg-stone-50 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-stone-300" aria-hidden />
+              <span className="w-2 h-2 rounded-full bg-stone-300" aria-hidden />
+              <span className="w-2 h-2 rounded-full bg-stone-800" aria-hidden />
             </div>
-            <div className="bg-stone-950 border border-stone-800 rounded-lg p-6">
-              <p className="text-[10px] font-mono uppercase tracking-[0.16em] text-stone-500 mb-4">What you&apos;ll never see</p>
-              <ul className="space-y-3">
-                {[
-                  "No bots joining your calls",
-                  "No popups or extra windows",
-                  "No setup for your teammates",
-                ].map((t) => (
-                  <li key={t} className="flex items-start gap-2.5 text-sm text-stone-400">
-                    <span className="w-[13px] text-center leading-none mt-0.5 shrink-0" aria-hidden>—</span>
-                    <span className="leading-relaxed">{t}</span>
-                  </li>
-                ))}
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-mono font-bold text-stone-900 uppercase tracking-wider">Minute AI</span>
+                <span className="text-[10px] uppercase font-mono tracking-wider px-1.5 py-0.5 rounded border font-semibold bg-red-50 text-red-700 border-red-200">REC</span>
+              </div>
+              <div className="h-2 bg-stone-100 rounded-full overflow-hidden mb-4">
+                <div className="h-full bg-red-500 w-[65%] animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]" aria-hidden />
+              </div>
+              <ul className="space-y-2 text-sm text-stone-600">
+                <li className="flex items-start gap-2">
+                  <span className="w-5 h-5 rounded-full bg-stone-900 flex items-center justify-center text-[10px] text-white shrink-0">1</span>
+                  <span className="leading-relaxed">Recording tab audio</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="w-5 h-5 rounded-full bg-stone-900 flex items-center justify-center text-[10px] text-white shrink-0">2</span>
+                  <span className="leading-relaxed">Capturing your microphone</span>
+                </li>
+                <li className="flex items-start gap-2 opacity-50">
+                  <span className="w-5 h-5 rounded-full bg-stone-900 flex items-center justify-center text-[10px] text-white shrink-0">3</span>
+                  <span className="leading-relaxed">Transcribing after the call</span>
+                </li>
               </ul>
             </div>
           </div>
         </div>
-      </Reveal>
+      </div>
     </section>
   );
 }
