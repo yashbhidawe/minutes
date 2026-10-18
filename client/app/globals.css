@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #fafaf9;
   --foreground: #1c1917;
@@ -12,6 +14,20 @@
   --danger: #dc2626;
   --success: #16a34a;
   --warning: #d97706;
+}
+
+.dark {
+  --background: #0f0f0e;
+  --foreground: #fafaf9;
+  --muted: #a8a29e;
+  --border: #44403c;
+  --accent: #e7e5e4;
+  --accent-hover: #a8a29e;
+  --surface: #1a1817;
+  --surface-hover: #292524;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
 }
 
 @theme inline {
@@ -125,6 +141,12 @@ textarea:focus {
     linear-gradient(to bottom, rgb(0 0 0 / 0.045) 1px, transparent 1px);
   background-size: 44px 44px;
   mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 55%, transparent 100%);
+}
+
+.dark .landing-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.06) 1px, transparent 1px);
 }
 
 /* ---- Micro-interactions ---- */
@@ -357,6 +379,19 @@ textarea:focus {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* Theme toggle: circular reveal via View Transitions API */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 2;
 }
 
 @media (prefers-reduced-motion: reduce) {

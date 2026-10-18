@@ -104,8 +104,8 @@ export default async function InstallPage() {
   const version = await getExtensionVersion();
 
   return (
-    <div className="min-h-screen bg-[#fafaf9] text-stone-900 antialiased flex flex-col">
-      <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-[#fafaf9]/85 backdrop-blur-md">
+    <div className="min-h-screen bg-[#fafaf9] dark:bg-[#0f0f0e] text-stone-900 dark:text-stone-50 antialiased flex flex-col">
+      <header className="sticky top-0 z-40 border-b border-stone-200/80 dark:border-stone-800/80 bg-[#fafaf9]/85 dark:bg-stone-950/85 backdrop-blur-md">
         <nav
           className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-4"
           aria-label="Primary"
@@ -114,7 +114,7 @@ export default async function InstallPage() {
           <div className="flex items-center gap-2.5">
             <Link
               href="/register"
-              className="px-4 py-2 bg-stone-900 text-white text-[13px] font-medium rounded-md hover:bg-stone-700 transition-colors"
+              className="px-4 py-2 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-[13px] font-medium rounded-md hover:bg-stone-700 dark:hover:bg-stone-300 transition-colors"
             >
               Get started
             </Link>
@@ -124,21 +124,21 @@ export default async function InstallPage() {
 
       <main className="flex-1">
         <div className="max-w-3xl mx-auto px-6 pt-14 pb-8">
-          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-400 mb-3">
+          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-400 dark:text-stone-500 mb-3">
             Chrome extension · v{version}
           </p>
           <h1 className="text-4xl md:text-5xl font-light tracking-tight leading-tight">
             Install Minute AI <span className="font-semibold">in 2 minutes.</span>
           </h1>
-          <p className="mt-4 text-[15px] leading-relaxed text-stone-500 max-w-2xl">
+          <p className="mt-4 text-[15px] leading-relaxed text-stone-500 dark:text-stone-400 max-w-2xl">
             We&apos;re not on the Chrome Web Store yet, so installation is a
             free manual setup: download the file, flip on Developer mode, and
              load the extension. No fees, no terminal commands.
            </p>
-           <p className="mt-3 text-sm leading-relaxed text-stone-500">
+           <p className="mt-3 text-sm leading-relaxed text-stone-500 dark:text-stone-400">
              Only record meetings you are authorized to capture. Minute AI displays
              when capture is active; see our{" "}
-             <Link href="/privacy" className="text-stone-900 underline underline-offset-4">
+             <Link href="/privacy" className="text-stone-900 dark:text-stone-100 underline underline-offset-4">
                Privacy Policy
              </Link>{" "}
              for details.
@@ -183,16 +183,16 @@ export default async function InstallPage() {
               <li
                 key={s.n}
                 id={s.n === "6" ? "sign-in" : undefined}
-                className="flex gap-4 bg-white border border-stone-200 rounded-xl p-5 sm:p-6 scroll-mt-24"
+                className="flex gap-4 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5 sm:p-6 scroll-mt-24"
               >
-                <span className="w-8 h-8 rounded-md bg-stone-900 text-white text-[13px] font-bold flex items-center justify-center shrink-0">
+                <span className="w-8 h-8 rounded-md bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-[13px] font-bold flex items-center justify-center shrink-0">
                   {s.n}
                 </span>
                 <div>
                   <h2 className="text-[15px] font-semibold tracking-tight">
                     {s.title}
                   </h2>
-                  <p className="mt-1.5 text-sm leading-relaxed text-stone-500">
+                  <p className="mt-1.5 text-sm leading-relaxed text-stone-500 dark:text-stone-400">
                     {s.body}
                   </p>
                 </div>
@@ -201,22 +201,22 @@ export default async function InstallPage() {
           </ol>
 
           <div className="mt-10">
-            <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-400 mb-3">
+            <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-400 dark:text-stone-500 mb-3">
               Troubleshooting
             </p>
-            <div className="divide-y divide-stone-200 border-y border-stone-200">
+            <div className="divide-y divide-stone-200 dark:divide-stone-800 border-y border-stone-200 dark:border-stone-800">
               {TROUBLESHOOTING.map((t) => (
                 <details key={t.q} className="group py-5">
-                  <summary className="cursor-pointer text-[15px] font-medium tracking-tight text-stone-700 group-open:text-stone-950 hover:text-stone-950 list-none flex items-center justify-between gap-4">
+                  <summary className="cursor-pointer text-[15px] font-medium tracking-tight text-stone-700 dark:text-stone-300 group-open:text-stone-950 dark:group-open:text-stone-50 hover:text-stone-950 dark:hover:text-stone-50 list-none flex items-center justify-between gap-4">
                     {t.q}
                     <span
                       aria-hidden
-                      className="w-7 h-7 rounded-full border border-stone-300 text-stone-500 flex items-center justify-center shrink-0 text-lg leading-none group-open:rotate-45 group-open:bg-stone-950 group-open:text-white group-open:border-stone-950 transition-all"
+                      className="w-7 h-7 rounded-full border border-stone-300 dark:border-stone-700 text-stone-500 dark:text-stone-400 flex items-center justify-center shrink-0 text-lg leading-none group-open:rotate-45 group-open:bg-stone-950 dark:group-open:bg-stone-100 group-open:text-white dark:group-open:text-stone-900 group-open:border-stone-950 dark:group-open:border-stone-100 transition-all"
                     >
                       +
                     </span>
                   </summary>
-                  <p className="mt-2 text-sm leading-relaxed text-stone-500 max-w-2xl">
+                  <p className="mt-2 text-sm leading-relaxed text-stone-500 dark:text-stone-400 max-w-2xl">
                     {t.a}
                   </p>
                 </details>
@@ -227,13 +227,13 @@ export default async function InstallPage() {
           <div className="mt-10 flex flex-col sm:flex-row gap-3">
             <Link
               href="/register"
-              className="px-6 py-3 bg-stone-900 text-white text-sm font-medium rounded-md hover:bg-stone-700 transition-colors text-center"
+              className="px-6 py-3 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-sm font-medium rounded-md hover:bg-stone-700 dark:hover:bg-stone-300 transition-colors text-center"
             >
               Create your free account
             </Link>
             <Link
               href="/dashboard"
-              className="px-6 py-3 bg-white border border-stone-300 text-stone-800 text-sm font-medium rounded-md hover:border-stone-900 transition-colors text-center"
+              className="px-6 py-3 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-stone-800 dark:text-stone-200 text-sm font-medium rounded-md hover:border-stone-900 dark:hover:border-stone-400 transition-colors text-center"
             >
               Open dashboard
             </Link>
