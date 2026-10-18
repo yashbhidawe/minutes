@@ -28,6 +28,81 @@
   --warning: #f59e0b;
 }
 
+body.dark,
+html.dark body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.dark .bg-white {
+  background-color: #1a1817;
+}
+
+.dark .bg-stone-50 {
+  background-color: #272727;
+}
+
+.dark .bg-stone-950 {
+  background-color: #121212;
+}
+
+.dark .bg-stone-900 {
+  background-color: #1a1817;
+}
+
+.dark .text-stone-950,
+.dark .text-stone-900 {
+  color: #fafaf9;
+}
+
+.dark .text-stone-800 {
+  color: #e7e5e4;
+}
+
+.dark .text-stone-700 {
+  color: #d6d3d1;
+}
+
+.dark .text-stone-600 {
+  color: #a8a29e;
+}
+
+.dark .text-stone-500 {
+  color: #78716c;
+}
+
+.dark .text-stone-400 {
+  color: #57534e;
+}
+
+.dark .text-stone-300 {
+  color: #78716c;
+}
+
+.dark .text-stone-200 {
+  color: #a8a29e;
+}
+
+.dark .border-stone-200 {
+  border-color: #44403c;
+}
+
+.dark .border-stone-100 {
+  border-color: #44403c;
+}
+
+.dark .border-stone-300 {
+  border-color: #44403c;
+}
+
+.dark .border-stone-800 {
+  border-color: #44403c;
+}
+
+.dark .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
