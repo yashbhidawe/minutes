@@ -14,6 +14,20 @@
   --warning: #d97706;
 }
 
+.dark {
+  --background: #0f0f0e;
+  --foreground: #fafaf9;
+  --muted: #a8a29e;
+  --border: #44403c;
+  --accent: #e7e5e4;
+  --accent-hover: #a8a29e;
+  --surface: #1a1817;
+  --surface-hover: #292524;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

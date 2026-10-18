@@ -6,7 +6,7 @@ export function Hero() {
   return (
     <section className="relative" aria-labelledby="hero-heading">
       <div className="landing-grid absolute inset-0" aria-hidden />
-      <div className="relative max-w-6xl mx-auto px-6 pt-12 pb-16 sm:pt-20 md:pt-28 md:pb-28 grid lg:grid-cols-[1.15fr_1fr] gap-12 lg:gap-16 items-center">
+      <div className="relative max-w-6xl mx-auto px-6 pt-12 pb-16 sm:pt-20 md:pt-28 md:pb-28 grid lg:grid-cols-[1.15fr_1fr] gap-12 lg:gap-16 items-center dark:text-stone-950">
         <div className="min-w-0">
           <h1
             id="hero-heading"
