@@ -12,7 +12,7 @@ export function HowItWorks() {
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-stone-500">
              You run the meeting. Minute AI captures and processes the
-             recording, then gives you a transcript and summary you can act on.
+             recording, then gives you a transcript, summary and cited answers you can act on.
           </p>
         </div>
       </Reveal>

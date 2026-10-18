@@ -43,6 +43,7 @@ export function ExtensionSection() {
                 {[
                   "Summaries after processing",
                   "Decisions, blockers & owners when identified",
+                  "Ask AI — cited answers to your questions",
                   "Meeting history in one place",
                 ].map((t) => (
                   <li key={t} className="flex items-start gap-2.5 text-sm text-stone-200">

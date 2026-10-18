@@ -30,8 +30,22 @@ const FEATURES = [
     ),
   },
   {
+    title: "Ask your meetings anything",
+    body: "Type a question and get an answer grounded in the transcript, with citations you can click to jump straight to the moment.",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" /></svg>
+    ),
+  },
+  {
+    title: "Search every meeting at once",
+    body: "Ask across your whole meeting history. Answers name the meetings they came from, linked straight to the source.",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+    ),
+  },
+  {
     title: "A dashboard you'll return to",
-    body: "All your meetings in one calm place. Filter your history and jump into a conversation in one click.",
+    body: "All your meetings in one calm place. Search across every transcript and jump into a conversation in one click.",
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><rect x="3" y="3" width="7" height="9" /><rect x="14" y="3" width="7" height="5" /><rect x="14" y="12" width="7" height="9" /><rect x="3" y="16" width="7" height="5" /></svg>
     ),
@@ -62,9 +76,9 @@ export function Features() {
             </p>
           </div>
         </Reveal>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {FEATURES.map((f, i) => (
-            <Reveal key={f.title} delay={(i % 3) * 80}>
+            <Reveal key={f.title} delay={(i % 4) * 80}>
               <div className="card-lift feature-card group p-6 bg-[#fafaf9] border border-stone-200 rounded-lg hover:bg-white hover:border-stone-300 hover:shadow-xs h-full">
                 <div className="feature-icon w-9 h-9 rounded-md bg-stone-900 text-white flex items-center justify-center mb-5">
                   {f.icon}

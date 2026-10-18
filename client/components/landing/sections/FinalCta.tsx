@@ -16,7 +16,8 @@ export function FinalCta() {
             </h2>
             <p className="mt-5 text-[15px] text-stone-400 max-w-xl mx-auto leading-relaxed">
                Create an account, add the extension, and review decisions,
-               owners and next steps after your next processed meeting.
+               owners and next steps after your next processed meeting. Then
+               ask anything — answers cite the source.
             </p>
             <AuthCta variant="final" />
           </div>
