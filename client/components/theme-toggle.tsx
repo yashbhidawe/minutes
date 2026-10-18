@@ -1,5 +1,6 @@
 "use client";
 
+import type { MouseEvent } from "react";
 import { useTheme } from "@/components/theme-provider";
 
 function MoonIcon() {
@@ -30,10 +31,17 @@ export function ThemeToggle({
   const { theme, toggleTheme } = useTheme();
   const label = theme === "light" ? "Switch to dark mode" : "Switch to light mode";
 
+  const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX > 0 ? e.clientX : rect.left + rect.width / 2;
+    const y = e.clientY > 0 ? e.clientY : rect.top + rect.height / 2;
+    toggleTheme({ clientX: x, clientY: y });
+  };
+
   return (
     <button
       type="button"
-      onClick={toggleTheme}
+      onClick={handleClick}
       aria-label={label}
       title={label}
       tabIndex={tabIndex}
@@ -44,7 +52,9 @@ export function ThemeToggle({
       }
     >
       {showLabel && <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>}
-      {theme === "light" ? <MoonIcon /> : <SunIcon />}
+      <span className="transition-transform duration-300">
+        {theme === "light" ? <MoonIcon /> : <SunIcon />}
+      </span>
     </button>
   );
 }

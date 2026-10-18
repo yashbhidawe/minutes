@@ -5,51 +5,128 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
+import { flushSync } from "react-dom";
 
 type Theme = "light" | "dark";
 
+type TogglePoint = { clientX: number; clientY: number };
+
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (callback: () => void) => {
+    ready: Promise<void>;
+    finished: Promise<void>;
+  };
+};
+
 const ThemeContext = createContext<{
   theme: Theme;
-  toggleTheme: () => void;
+  toggleTheme: (point?: TogglePoint) => void;
 } | undefined>(undefined);
 
-export function ThemeProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  // Start light to avoid hydration mismatch, then sync from localStorage.
-  const [theme, setTheme] = useState<Theme>("light");
-  const [mounted, setMounted] = useState(false);
-
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  }, []);
-
-  useEffect(() => {
-    setMounted(true);
-    const stored = localStorage.getItem("theme") as Theme | null;
-    if (stored) {
-      setTheme(stored);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-    } else {
-      document.documentElement.classList.remove("dark");
-      document.documentElement.classList.add("light");
-    }
+function applyTheme(theme: Theme) {
+  const root = document.documentElement;
+  root.classList.toggle("dark", theme === "dark");
+  root.classList.toggle("light", theme === "light");
+  try {
     localStorage.setItem("theme", theme);
-  }, [theme, mounted]);
+  } catch {
+    // storage can be unavailable in private mode
+  }
+}
 
-  // Always provide context so client components can read it during SSR.
+function playTick() {
+  try {
+    const Ctor =
+      window.AudioContext ||
+      (window as typeof window & { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
+    if (!Ctor) return;
+    const ctx = new Ctor();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(1500, now);
+    osc.frequency.exponentialRampToValueAtTime(750, now + 0.035);
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.055);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.06);
+    osc.onended = () => void ctx.close();
+  } catch {
+    // sound is best-effort
+  }
+}
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<Theme>("light");
+  const themeRef = useRef<Theme>("light");
+
+  useEffect(() => {
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem("theme");
+    } catch {
+      stored = null;
+    }
+    const initial: Theme = stored === "dark" ? "dark" : "light";
+    themeRef.current = initial;
+    setTheme(initial);
+    applyTheme(initial);
+  }, []);
+
+  const toggleTheme = useCallback((point?: TogglePoint) => {
+    const next: Theme = themeRef.current === "light" ? "dark" : "light";
+
+    const commit = () => {
+      themeRef.current = next;
+      applyTheme(next);
+      flushSync(() => setTheme(next));
+    };
+
+    playTick();
+
+    const doc = document as ViewTransitionDocument;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (point && !prefersReducedMotion && typeof doc.startViewTransition === "function") {
+      const { clientX: x, clientY: y } = point;
+      const radius = Math.hypot(
+        Math.max(x, window.innerWidth - x),
+        Math.max(y, window.innerHeight - y)
+      );
+      const transition = doc.startViewTransition(commit);
+      transition.ready
+        .then(() => {
+          document.documentElement.animate(
+            {
+              clipPath: [
+                `circle(0px at ${x}px ${y}px)`,
+                `circle(${radius}px at ${x}px ${y}px)`,
+              ],
+            },
+            {
+              duration: 500,
+              easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+              pseudoElement: "::view-transition-new(root)",
+            }
+          );
+        })
+        .catch(() => {});
+      transition.finished.catch(() => {});
+    } else {
+      commit();
+    }
+  }, []);
+
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       {children}
