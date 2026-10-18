@@ -21,13 +21,16 @@ export function ThemeProvider({
 }: {
   children: ReactNode;
 }) {
+  // Start light to avoid hydration mismatch, then sync from localStorage.
   const [theme, setTheme] = useState<Theme>("light");
+  const [mounted, setMounted] = useState(false);
 
   const toggleTheme = useCallback(() => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   }, []);
 
   useEffect(() => {
+    setMounted(true);
     const stored = localStorage.getItem("theme") as Theme | null;
     if (stored) {
       setTheme(stored);
@@ -35,16 +38,18 @@ export function ThemeProvider({
   }, []);
 
   useEffect(() => {
+    if (!mounted) return;
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
       document.documentElement.classList.remove("light");
     } else {
-      document.documentElement.classList.add("light");
       document.documentElement.classList.remove("dark");
+      document.documentElement.classList.add("light");
     }
     localStorage.setItem("theme", theme);
-  }, [theme]);
+  }, [theme, mounted]);
 
+  // Always provide context so client components can read it during SSR.
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       {children}
