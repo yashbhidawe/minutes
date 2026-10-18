@@ -3,7 +3,7 @@ import { Check } from "../Check";
 
 export function AskSection() {
   return (
-    <section id="ask" className="bg-white dark:bg-stone-900 border-y border-stone-200 dark:border-stone-800 px-6 pb-24 scroll-mt-24" aria-labelledby="ask-heading">
+    <section id="ask" className="bg-white dark:bg-stone-950 border-y border-stone-200 dark:border-stone-900 px-6 pb-24 scroll-mt-24" aria-labelledby="ask-heading">
       <div className="max-w-4xl mx-auto">
         <Reveal>
           <h2 id="ask-heading" className="text-3xl md:text-4xl font-light tracking-tight text-stone-950 dark:text-stone-50 mb-6">
@@ -17,10 +17,10 @@ export function AskSection() {
         </Reveal>
 
         <div className="relative overflow-hidden bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-xl">
-          <div className="absolute inset-0 bg-gradient-to-b from-stone-50 dark:from-stone-800/60 via-transparent to-transparent blur-2xl" aria-hidden />
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-50 dark:from-stone-700/30 via-transparent to-transparent blur-2xl" aria-hidden />
           <div className="relative p-6 sm:p-8">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xs font-bold tracking-wider uppercase text-stone-400 dark:text-stone-500">Weekly Team Sync</h3>
+              <h3 className="text-xs font-bold tracking-wider uppercase text-stone-400 dark:text-stone-400">Weekly Team Sync</h3>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded border font-semibold bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-900">answered</span>
             </div>
             <div className="space-y-3">
@@ -30,7 +30,7 @@ export function AskSection() {
                 </p>
               </div>
               <div className="flex justify-start">
-                <div className="max-w-[90%] bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 text-xs text-stone-800 dark:text-stone-200 leading-relaxed rounded-lg rounded-bl-sm px-3 py-2">
+                <div className="max-w-[90%] bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-xs text-stone-800 dark:text-stone-200 leading-relaxed rounded-lg rounded-bl-sm px-3 py-2">
                   <p>Launch stays on Friday. The homepage rewrite is paused until research lands.</p>
                   <div className="flex gap-1.5 mt-2 pt-2 border-t border-stone-200/60 dark:border-stone-700/60">
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300">▶ 04:12</span>

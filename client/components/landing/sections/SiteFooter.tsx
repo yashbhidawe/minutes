@@ -13,17 +13,17 @@ export function SiteFooter() {
               Meeting notes that write themselves. For meetings you are authorized to record.
             </p>
           </div>
-          <div className="space-y-2.5 text-xs font-medium text-stone-500 dark:text-stone-400">
+          <div className="flex flex-col items-start gap-2.5 text-xs font-medium text-stone-500 dark:text-stone-400">
             <a href="#how" className="hover:text-stone-900 dark:hover:text-white transition-colors">How it works</a>
             <a href="/install" className="hover:text-stone-900 dark:hover:text-white transition-colors">Get the extension</a>
             <a href="/dashboard" className="hover:text-stone-900 dark:hover:text-white transition-colors">Dashboard</a>
           </div>
-          <div className="space-y-2.5 text-xs font-medium text-stone-500 dark:text-stone-400">
+          <div className="flex flex-col items-start gap-2.5 text-xs font-medium text-stone-500 dark:text-stone-400">
             <a href="/login" className="hover:text-stone-900 dark:hover:text-white transition-colors">Sign in</a>
             <a href="/register" className="hover:text-stone-900 dark:hover:text-white transition-colors">Create account</a>
             <a href="/privacy" className="hover:text-stone-900 dark:hover:text-white transition-colors">Privacy policy</a>
           </div>
-          <div className="space-y-2.5 text-xs font-medium text-stone-500 dark:text-stone-400">
+          <div className="flex flex-col items-start gap-2.5 text-xs font-medium text-stone-500 dark:text-stone-400">
             <a
               href="https://itsokyash.online"
               target="_blank"
