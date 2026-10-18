@@ -9,23 +9,23 @@ export function ExtensionSection() {
           <Reveal>
             <div className="flex items-center gap-2 mb-3">
               <span className="w-1 h-3 rounded bg-red-500" aria-hidden />
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-stone-400">
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500">
                 Chrome extension
               </span>
             </div>
-            <h2 id="extension-heading" className="text-3xl md:text-5xl font-light tracking-tight text-stone-950 mb-4">
+            <h2 id="extension-heading" className="text-3xl md:text-5xl font-light tracking-tight text-stone-950 dark:text-stone-50 mb-4">
               Installs in a minute.
             </h2>
-            <p className="text-lg text-stone-500 leading-relaxed mb-8">
+            <p className="text-lg text-stone-500 dark:text-stone-400 leading-relaxed mb-8">
               Add Minute AI once, sign in, and it captures your Google Meet
               tab audio while you record. A floating widget shows you're live —
               then the notes appear in your dashboard when the call ends.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
-              <a href="/install" className="btn-interactive px-5 py-2.5 bg-stone-900 text-white text-[13px] font-semibold rounded-md hover:bg-stone-800 transition-colors">
+              <a href="/install" className="btn-interactive px-5 py-2.5 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-[13px] font-semibold rounded-md hover:bg-stone-800 dark:hover:bg-stone-300 transition-colors">
                 Get the extension
               </a>
-              <a href="/privacy" className="px-5 py-2.5 border border-stone-300 text-[13px] font-medium rounded-md hover:border-stone-400 transition-colors text-center">
+              <a href="/privacy" className="px-5 py-2.5 border border-stone-300 dark:border-stone-700 dark:text-stone-300 text-[13px] font-medium rounded-md hover:border-stone-400 dark:hover:border-stone-500 transition-colors text-center">
                 Privacy policy
               </a>
             </div>

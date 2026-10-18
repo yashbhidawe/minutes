@@ -50,7 +50,7 @@ function StatusSelect({ status, onChange }: { status: string; onChange: (s: stri
     <select
       value={status}
       onChange={(e) => onChange(e.target.value)}
-      className="text-xs uppercase tracking-wider bg-stone-100 border border-stone-300 px-2 py-1 rounded text-stone-700 focus:outline-none focus:ring-1 focus:ring-stone-400 cursor-pointer font-mono"
+      className="text-xs uppercase tracking-wider bg-stone-100 dark:bg-stone-800 border border-stone-300 dark:border-stone-700 px-2 py-1 rounded text-stone-700 dark:text-stone-200 focus:outline-none focus:ring-1 focus:ring-stone-400 cursor-pointer font-mono"
     >
       {options.map((s) => (
         <option key={s} value={s}>
@@ -65,14 +65,14 @@ function SectionCard({ title, content }: { title: string; content: string }) {
   if (!content) return null;
   const lines = content.split("\n").filter((l) => l.trim());
   return (
-    <div className="bg-white border border-stone-200 rounded-lg p-6 mb-6">
-      <div className="flex items-center gap-2 mb-4 border-b border-stone-100 pb-3">
-        <h3 className="text-xs font-semibold tracking-wider uppercase text-stone-500">{title}</h3>
+    <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg p-6 mb-6">
+      <div className="flex items-center gap-2 mb-4 border-b border-stone-100 dark:border-stone-800 pb-3">
+        <h3 className="text-xs font-semibold tracking-wider uppercase text-stone-500 dark:text-stone-400">{title}</h3>
       </div>
       <div className="space-y-2.5">
         {lines.map((line, i) => (
-          <div key={i} className="flex items-start gap-2.5 text-sm text-stone-800 leading-relaxed">
-            <span className="text-stone-400 font-bold select-none">•</span>
+          <div key={i} className="flex items-start gap-2.5 text-sm text-stone-800 dark:text-stone-200 leading-relaxed">
+            <span className="text-stone-400 dark:text-stone-500 font-bold select-none">•</span>
             <p className="flex-1">{line.replace(/^[-*]\s*/, "")}</p>
           </div>
         ))}
@@ -325,8 +325,8 @@ export default function MeetingDetailPage() {
   if (authLoading || !token || loading) {
     return (
       <div className="max-w-6xl mx-auto px-6 py-20 flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="w-6 h-6 border-2 border-stone-800 border-t-transparent rounded-full animate-spin mb-3" />
-        <p className="text-xs font-medium text-stone-500">Loading meeting summary...</p>
+        <div className="w-6 h-6 border-2 border-stone-800 dark:border-stone-200 border-t-transparent rounded-full animate-spin mb-3" />
+        <p className="text-xs font-medium text-stone-500 dark:text-stone-400">Loading meeting summary...</p>
       </div>
     );
   }
@@ -334,8 +334,8 @@ export default function MeetingDetailPage() {
   if (!meeting) {
     return (
       <div className="max-w-6xl mx-auto px-6 py-16 text-center">
-        <p className="text-sm text-stone-600 font-medium">Meeting not found.</p>
-        <Link href="/dashboard" className="text-xs font-semibold text-stone-900 underline underline-offset-4 mt-4 inline-block">
+        <p className="text-sm text-stone-600 dark:text-stone-400 font-medium">Meeting not found.</p>
+        <Link href="/dashboard" className="text-xs font-semibold text-stone-900 dark:text-stone-100 underline underline-offset-4 mt-4 inline-block">
           &larr; Back to Dashboard
         </Link>
       </div>
@@ -362,7 +362,7 @@ export default function MeetingDetailPage() {
       <div className="flex items-center justify-between mb-8">
         <Link
           href="/dashboard"
-          className="text-xs uppercase tracking-wider font-semibold text-stone-500 hover:text-stone-900 transition-colors flex items-center gap-1.5"
+          className="text-xs uppercase tracking-wider font-semibold text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors flex items-center gap-1.5"
         >
           &larr; All Meetings
         </Link>
@@ -372,14 +372,14 @@ export default function MeetingDetailPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopySummary}
-              className="px-3 py-1.5 text-xs font-medium bg-stone-100 hover:bg-stone-200 text-stone-800 rounded border border-stone-200 transition-colors"
+              className="px-3 py-1.5 text-xs font-medium bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 rounded border border-stone-200 dark:border-stone-700 transition-colors"
               title="Copy summary to clipboard"
             >
               Copy Summary
             </button>
             <button
               onClick={handleDownloadMarkdown}
-              className="px-3 py-1.5 text-xs font-medium bg-stone-100 hover:bg-stone-200 text-stone-800 rounded border border-stone-200 transition-colors"
+              className="px-3 py-1.5 text-xs font-medium bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 rounded border border-stone-200 dark:border-stone-700 transition-colors"
               title="Export notes as Markdown"
             >
               Export Markdown
@@ -389,15 +389,15 @@ export default function MeetingDetailPage() {
       </div>
 
       {/* Title & Metadata */}
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8 pb-6 border-b border-stone-200">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8 pb-6 border-b border-stone-200 dark:border-stone-800">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-stone-900">{meeting.title}</h1>
-          <div className="flex items-center gap-3 mt-2 text-xs text-stone-500 font-medium">
+          <h1 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-100">{meeting.title}</h1>
+          <div className="flex items-center gap-3 mt-2 text-xs text-stone-500 dark:text-stone-400 font-medium">
             <span>{formatDate(meeting.created_at)}</span>
             <span>&middot;</span>
             <span>{formatDuration(meeting.duration_sec)}</span>
             <span>&middot;</span>
-            <span className="uppercase tracking-wider font-mono text-[10px] px-2 py-0.5 rounded bg-stone-100 border border-stone-200">
+            <span className="uppercase tracking-wider font-mono text-[10px] px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700">
               Status: {meeting.status}
             </span>
           </div>
@@ -406,8 +406,8 @@ export default function MeetingDetailPage() {
         {/* Header Action Controls */}
         <div className="flex items-center gap-2">
           {meeting.status === "pending" && (
-            <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 p-2 rounded">
-              <span className="text-xs font-mono font-medium text-amber-800 flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900 p-2 rounded">
+              <span className="text-xs font-mono font-medium text-amber-800 dark:text-amber-300 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
                 Awaiting Audio...
               </span>
@@ -431,7 +431,7 @@ export default function MeetingDetailPage() {
           {(meeting.status === "failed" || meeting.status === "completed") && (
             <button
               onClick={handleRetry}
-              className="px-3 py-1.5 bg-stone-900 text-white text-xs font-medium rounded hover:bg-stone-800 transition-colors"
+              className="px-3 py-1.5 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-xs font-medium rounded hover:bg-stone-800 dark:hover:bg-stone-300 transition-colors"
             >
               Re-process AI
             </button>
@@ -440,7 +440,7 @@ export default function MeetingDetailPage() {
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="px-3 py-1.5 text-xs font-medium text-stone-400 hover:text-red-600 transition-colors"
+            className="px-3 py-1.5 text-xs font-medium text-stone-400 dark:text-stone-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"
           >
             {deleting ? "Deleting..." : "Delete"}
           </button>
@@ -449,7 +449,7 @@ export default function MeetingDetailPage() {
 
       {/* Error Alert */}
       {error && (
-        <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-xs font-medium">
+        <div className="mb-6 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-900 rounded text-red-700 dark:text-red-300 text-xs font-medium">
           {error}
         </div>
       )}
@@ -543,9 +543,9 @@ export default function MeetingDetailPage() {
           )}
 
           {notes.length === 0 && !isProcessing && (
-            <div className="p-12 text-center bg-white border border-stone-200 rounded-lg">
-              <p className="text-stone-500 text-xs font-medium">No structured summary generated yet</p>
-              <p className="text-stone-400 text-[11px] mt-1">
+            <div className="p-12 text-center bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg">
+              <p className="text-stone-500 dark:text-stone-400 text-xs font-medium">No structured summary generated yet</p>
+              <p className="text-stone-400 dark:text-stone-500 text-[11px] mt-1">
                 {meeting.status === "completed"
                   ? "The recording contained insufficient speech to extract bullet points. Review the transcript below."
                   : "Click 'Re-process AI' above to trigger summarization."}
@@ -556,28 +556,28 @@ export default function MeetingDetailPage() {
 
         {/* Right Column: Interactive Action Items */}
         <div>
-          <div className="bg-white border border-stone-200 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4 border-b border-stone-100 pb-3">
-              <h3 className="text-xs font-semibold tracking-wider uppercase text-stone-500">Action Items</h3>
-              <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-stone-100 text-stone-600">
+          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-4 border-b border-stone-100 dark:border-stone-800 pb-3">
+              <h3 className="text-xs font-semibold tracking-wider uppercase text-stone-500 dark:text-stone-400">Action Items</h3>
+              <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300">
                 {actionItems.length}
               </span>
             </div>
 
             {actionItems.length === 0 ? (
-              <p className="text-xs text-stone-400 italic py-4 text-center">No action items detected.</p>
+              <p className="text-xs text-stone-400 dark:text-stone-500 italic py-4 text-center">No action items detected.</p>
             ) : (
               <div className="space-y-3">
                 {actionItems.map((item) => (
-                  <div key={item.id} className="p-3.5 bg-stone-50 border border-stone-200 rounded">
+                  <div key={item.id} className="p-3.5 bg-stone-50 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-800 rounded">
                     <div className="flex items-start gap-2 mb-2">
                       <PriorityDot priority={item.priority} />
-                      <p className="text-xs text-stone-900 font-medium leading-relaxed flex-1">
+                      <p className="text-xs text-stone-900 dark:text-stone-100 font-medium leading-relaxed flex-1">
                         {item.description}
                       </p>
                     </div>
-                    <div className="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-stone-200/60 text-[11px]">
-                      <span className="font-medium text-stone-500">
+                    <div className="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-stone-200/60 dark:border-stone-700/60 text-[11px]">
+                      <span className="font-medium text-stone-500 dark:text-stone-400">
                         {item.assigned_to || "Unassigned"}
                       </span>
                       <StatusSelect status={item.status} onChange={(s) => handleStatusChange(item.id, s)} />
@@ -592,14 +592,14 @@ export default function MeetingDetailPage() {
 
       {/* Timestamped Transcript */}
       {transcript && (
-        <div className="mt-12 pt-8 border-t border-stone-200">
+        <div className="mt-12 pt-8 border-t border-stone-200 dark:border-stone-800">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xs font-semibold tracking-wider uppercase text-stone-500">
+            <h3 className="text-xs font-semibold tracking-wider uppercase text-stone-500 dark:text-stone-400">
               Full Transcript ({transcript.language || "en"})
             </h3>
             <button
               onClick={() => setShowTranscript(!showTranscript)}
-              className="text-xs font-medium uppercase tracking-wider text-stone-600 hover:text-stone-900 transition-colors cursor-pointer bg-stone-100 hover:bg-stone-200 px-3 py-1.5 rounded"
+              className="text-xs font-medium uppercase tracking-wider text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors cursor-pointer bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 px-3 py-1.5 rounded"
             >
               {showTranscript ? "Hide Transcript ▲" : "Show Full Transcript ▼"}
             </button>
@@ -630,7 +630,7 @@ export default function MeetingDetailPage() {
       {!chatOpen && transcript && (
         <button
           onClick={() => setChatOpen(true)}
-          className="fixed bottom-6 right-6 z-40 px-4 py-2.5 text-xs font-semibold bg-stone-900 text-white rounded-full shadow-lg hover:bg-stone-700 transition-colors"
+          className="fixed bottom-6 right-6 z-40 px-4 py-2.5 text-xs font-semibold bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-full shadow-lg hover:bg-stone-700 dark:hover:bg-stone-300 transition-colors"
         >
           Ask AI ✦
         </button>

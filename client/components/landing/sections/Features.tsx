@@ -30,8 +30,8 @@ export function Features() {
     <section id="features" className="max-w-6xl mx-auto px-6 pb-24 scroll-mt-24" aria-labelledby="features-heading">
       <div className="max-w-2xl mb-16 text-center">
         <Reveal>
-          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-400 mb-3">Features</p>
-          <h2 id="features-heading" className="text-3xl md:text-4xl font-light tracking-tight text-stone-950">
+          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-400 dark:text-stone-500 mb-3">Features</p>
+          <h2 id="features-heading" className="text-3xl md:text-4xl font-light tracking-tight text-stone-950 dark:text-stone-50">
             Everything after <span className="font-semibold">“bye, thanks all”</span>
           </h2>
         </Reveal>
@@ -39,12 +39,12 @@ export function Features() {
       <div className="grid sm:grid-cols-3 gap-5">
         {FEATURES.map((f, i) => (
           <Reveal key={f.title} delay={i * 80}>
-            <article className="bg-white border border-stone-200 rounded-xl p-6 hover:border-stone-300 hover:shadow-sm transition-colors">
-              <div className="w-10 h-10 rounded-lg bg-stone-100 text-stone-600 flex items-center justify-center mb-4">
+            <article className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-6 hover:border-stone-300 dark:hover:border-stone-700 hover:shadow-sm transition-colors">
+              <div className="w-10 h-10 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 flex items-center justify-center mb-4">
                 {f.icon}
               </div>
-              <h3 className="text-sm font-semibold tracking-tight text-stone-950 mb-2">{f.title}</h3>
-              <p className="text-sm text-stone-500 leading-relaxed">{f.body}</p>
+              <h3 className="text-sm font-semibold tracking-tight text-stone-950 dark:text-stone-50 mb-2">{f.title}</h3>
+              <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">{f.body}</p>
             </article>
           </Reveal>
         ))}

@@ -33,15 +33,15 @@ function formatDuration(sec: number) {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    pending: "bg-amber-50 text-amber-700 border-amber-200",
-    uploaded: "bg-blue-50 text-blue-700 border-blue-200",
-    queued: "bg-blue-50 text-blue-700 border-blue-200",
-    processing: "bg-amber-50 text-amber-700 border-amber-200",
-    transcribing: "bg-purple-50 text-purple-700 border-purple-200",
-    transcribed: "bg-purple-50 text-purple-700 border-purple-200",
-    summarizing: "bg-purple-50 text-purple-700 border-purple-200",
-    completed: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    failed: "bg-red-50 text-red-700 border-red-200",
+    pending: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-900",
+    uploaded: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-900",
+    queued: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-900",
+    processing: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-900",
+    transcribing: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950 dark:text-purple-300 dark:border-purple-900",
+    transcribed: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950 dark:text-purple-300 dark:border-purple-900",
+    summarizing: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950 dark:text-purple-300 dark:border-purple-900",
+    completed: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-900",
+    failed: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-900",
   };
 
   const isLive = ["uploaded", "queued", "transcribing", "transcribed", "summarizing"].includes(status);
@@ -134,14 +134,14 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-stone-900">Dashboard</h1>
-          <p className="text-xs text-stone-500 mt-1 font-medium">
+          <h1 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-100">Dashboard</h1>
+          <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 font-medium">
             Google Meet notes & AI-extracted action items
           </p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="px-4 py-2 bg-stone-900 text-white text-xs font-medium rounded hover:bg-stone-800 transition-colors shadow-xs self-start sm:self-auto"
+          className="px-4 py-2 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-xs font-medium rounded hover:bg-stone-800 dark:hover:bg-stone-300 transition-colors shadow-xs self-start sm:self-auto"
         >
           New Meeting
         </button>
@@ -149,17 +149,17 @@ export default function DashboardPage() {
 
       {/* Analytics Summary Widgets */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="p-4 bg-white border border-stone-200 rounded-lg">
-          <p className="text-[11px] uppercase tracking-wider font-semibold text-stone-500">Total Meetings</p>
-          <p className="text-2xl font-bold text-stone-900 mt-1">{meetings.length}</p>
+        <div className="p-4 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-stone-500 dark:text-stone-400">Total Meetings</p>
+          <p className="text-2xl font-bold text-stone-900 dark:text-stone-100 mt-1">{meetings.length}</p>
         </div>
-        <div className="p-4 bg-white border border-stone-200 rounded-lg">
-          <p className="text-[11px] uppercase tracking-wider font-semibold text-stone-500">Recorded Duration</p>
-          <p className="text-2xl font-bold text-stone-900 mt-1">{formatDuration(totalDurationSec)}</p>
+        <div className="p-4 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-stone-500 dark:text-stone-400">Recorded Duration</p>
+          <p className="text-2xl font-bold text-stone-900 dark:text-stone-100 mt-1">{formatDuration(totalDurationSec)}</p>
         </div>
-        <div className="p-4 bg-white border border-stone-200 rounded-lg">
-          <p className="text-[11px] uppercase tracking-wider font-semibold text-stone-500">Summaries Completed</p>
-          <p className="text-2xl font-bold text-stone-900 mt-1">{completedCount}</p>
+        <div className="p-4 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-stone-500 dark:text-stone-400">Summaries Completed</p>
+          <p className="text-2xl font-bold text-stone-900 dark:text-stone-100 mt-1">{completedCount}</p>
         </div>
       </div>
 
@@ -172,18 +172,18 @@ export default function DashboardPage() {
           placeholder="Filter meetings by title..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full max-w-md px-3 py-2 bg-white border border-stone-200 rounded-md text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors shadow-xs"
+          className="w-full max-w-md px-3 py-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-md text-xs text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none focus:border-stone-900 dark:focus:border-stone-400 transition-colors shadow-xs"
         />
       </div>
 
       {/* Create Modal */}
       {showCreate && (
-        <div className="fixed inset-0 bg-stone-900/30 flex items-center justify-center z-50 p-4" onClick={() => setShowCreate(false)}>
-          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md border border-stone-200" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-sm font-bold text-stone-900 mb-4 uppercase tracking-wider">New Meeting Record</h2>
+        <div className="fixed inset-0 bg-stone-900/30 dark:bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setShowCreate(false)}>
+          <div className="bg-white dark:bg-stone-900 p-6 rounded-lg shadow-xl w-full max-w-md border border-stone-200 dark:border-stone-800" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-sm font-bold text-stone-900 dark:text-stone-100 mb-4 uppercase tracking-wider">New Meeting Record</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="block text-[11px] uppercase tracking-wider font-medium text-stone-500 mb-1">
+                <label className="block text-[11px] uppercase tracking-wider font-medium text-stone-500 dark:text-stone-400 mb-1">
                   Title
                 </label>
                 <input
@@ -191,12 +191,12 @@ export default function DashboardPage() {
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   required
-                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded text-stone-900 text-xs focus:outline-none focus:border-stone-900"
+                  className="w-full px-3 py-2 bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-700 rounded text-stone-900 dark:text-stone-100 text-xs focus:outline-none focus:border-stone-900 dark:focus:border-stone-400"
                   placeholder="e.g. Architecture Sync"
                 />
               </div>
               <div>
-                <label className="block text-[11px] uppercase tracking-wider font-medium text-stone-500 mb-1">
+                <label className="block text-[11px] uppercase tracking-wider font-medium text-stone-500 dark:text-stone-400 mb-1">
                   Duration (minutes)
                 </label>
                 <input
@@ -205,21 +205,21 @@ export default function DashboardPage() {
                   onChange={(e) => setNewDuration(e.target.value)}
                   min="1"
                   required
-                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded text-stone-900 text-xs focus:outline-none focus:border-stone-900"
+                  className="w-full px-3 py-2 bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-700 rounded text-stone-900 dark:text-stone-100 text-xs focus:outline-none focus:border-stone-900 dark:focus:border-stone-400"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowCreate(false)}
-                  className="px-3 py-1.5 text-xs text-stone-500 hover:text-stone-900"
+                  className="px-3 py-1.5 text-xs text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={creating}
-                  className="px-3 py-1.5 bg-stone-900 text-white text-xs font-medium rounded hover:bg-stone-800 disabled:opacity-50"
+                  className="px-3 py-1.5 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-xs font-medium rounded hover:bg-stone-800 dark:hover:bg-stone-300 disabled:opacity-50"
                 >
                   {creating ? "Creating..." : "Create"}
                 </button>
@@ -231,30 +231,30 @@ export default function DashboardPage() {
 
       {/* Meetings List */}
       {loading ? (
-        <div className="py-16 text-center text-xs font-medium text-stone-400">
+        <div className="py-16 text-center text-xs font-medium text-stone-400 dark:text-stone-500">
           Loading meetings...
         </div>
       ) : filteredMeetings.length === 0 ? (
-        <div className="text-center py-16 bg-white border border-stone-200 rounded-lg">
-          <p className="text-stone-700 text-sm font-medium mb-1">
+        <div className="text-center py-16 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg">
+          <p className="text-stone-700 dark:text-stone-300 text-sm font-medium mb-1">
             {searchQuery ? "No matching meetings found" : "No meetings recorded yet"}
           </p>
-          <p className="text-stone-400 text-xs">
+          <p className="text-stone-400 dark:text-stone-500 text-xs">
             {searchQuery ? "Try searching with a different term." : "Join a Google Meet call or create a manual meeting record."}
           </p>
         </div>
       ) : (
-        <div className="divide-y divide-stone-200 border-t border-b border-stone-200 bg-white rounded-lg">
+        <div className="divide-y divide-stone-200 dark:divide-stone-800 border-t border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 rounded-lg">
           {filteredMeetings.map((m) => (
-            <div key={m.id} className="flex items-center justify-between p-4 hover:bg-stone-50 transition-colors group">
+            <div key={m.id} className="flex items-center justify-between p-4 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors group">
               <Link href={`/meetings/${m.id}`} className="flex-1 min-w-0 pr-4">
                 <div className="flex items-center gap-3 mb-1">
-                  <h3 className="text-sm font-semibold text-stone-900 truncate group-hover:text-stone-700">
+                  <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate group-hover:text-stone-700 dark:group-hover:text-stone-300">
                     {m.title}
                   </h3>
                   <StatusBadge status={m.status} />
                 </div>
-                <p className="text-xs text-stone-400 font-medium">
+                <p className="text-xs text-stone-400 dark:text-stone-500 font-medium">
                   {formatDuration(m.duration_sec)} &middot; {formatDate(m.created_at)}
                 </p>
               </Link>
@@ -263,12 +263,12 @@ export default function DashboardPage() {
                 <button
                   onClick={(e) => handleDeleteMeeting(e, m.id, m.title)}
                   disabled={deletingId === m.id}
-                  className="px-2.5 py-1 text-xs font-medium text-stone-400 hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200 rounded transition-all"
+                  className="px-2.5 py-1 text-xs font-medium text-stone-400 dark:text-stone-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 border border-transparent hover:border-red-200 dark:hover:border-red-900 rounded transition-all"
                   title="Delete meeting"
                 >
                   {deletingId === m.id ? "Deleting..." : "Delete"}
                 </button>
-                <Link href={`/meetings/${m.id}`} className="text-stone-400 hover:text-stone-900 text-xs font-semibold px-2 py-1">
+                <Link href={`/meetings/${m.id}`} className="text-stone-400 dark:text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 text-xs font-semibold px-2 py-1">
                   View &rarr;
                 </Link>
               </div>

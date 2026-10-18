@@ -49,7 +49,7 @@ export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) 
       <div className="mt-7 flex gap-3">
         <Link
           href={token ? "/dashboard" : "/register"}
-          className="btn-interactive btn-sheen btn-arrow px-5 py-2.5 bg-stone-900 text-white text-[13px] font-medium rounded-md hover:bg-stone-700 transition-colors inline-flex items-center gap-1.5"
+          className="btn-interactive btn-sheen btn-arrow px-5 py-2.5 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-[13px] font-medium rounded-md hover:bg-stone-700 dark:hover:bg-stone-300 transition-colors inline-flex items-center gap-1.5"
         >
           {token ? (
             <>
@@ -63,7 +63,7 @@ export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) 
         </Link>
         <Link
           href="/install"
-          className="btn-interactive px-5 py-2.5 border border-stone-300 text-[13px] font-medium rounded-md hover:border-stone-900 transition-colors"
+          className="btn-interactive px-5 py-2.5 border border-stone-300 dark:border-stone-700 dark:text-stone-300 text-[13px] font-medium rounded-md hover:border-stone-900 dark:hover:border-stone-400 transition-colors"
         >
           Get the extension
         </Link>
@@ -78,13 +78,13 @@ export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) 
         <>
           <Link
             href="/install"
-            className="btn-interactive btn-sheen px-6 py-3 bg-stone-900 text-white text-sm font-medium rounded-md hover:bg-stone-700 transition-colors text-center shadow-xs"
+            className="btn-interactive btn-sheen px-6 py-3 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-sm font-medium rounded-md hover:bg-stone-700 dark:hover:bg-stone-300 transition-colors text-center shadow-xs"
           >
             Get the extension
           </Link>
           <a
             href="#how"
-            className="btn-interactive px-6 py-3 bg-white border border-stone-300 text-stone-800 text-sm font-medium rounded-md hover:border-stone-900 transition-colors text-center"
+            className="btn-interactive px-6 py-3 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-stone-800 dark:text-stone-200 text-sm font-medium rounded-md hover:border-stone-900 dark:hover:border-stone-400 transition-colors text-center"
           >
             How it works
           </a>
@@ -93,13 +93,13 @@ export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) 
         <>
           <Link
             href="/register"
-            className="btn-interactive btn-sheen px-6 py-3 bg-stone-900 text-white text-sm font-medium rounded-md hover:bg-stone-700 transition-colors text-center shadow-xs"
+            className="btn-interactive btn-sheen px-6 py-3 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-sm font-medium rounded-md hover:bg-stone-700 dark:hover:bg-stone-300 transition-colors text-center shadow-xs"
           >
             Start capturing — it&apos;s free
           </Link>
           <Link
             href="/login"
-            className="btn-interactive px-6 py-3 bg-white border border-stone-300 text-stone-800 text-sm font-medium rounded-md hover:border-stone-900 transition-colors text-center"
+            className="btn-interactive px-6 py-3 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-stone-800 dark:text-stone-200 text-sm font-medium rounded-md hover:border-stone-900 dark:hover:border-stone-400 transition-colors text-center"
           >
             Sign in
           </Link>

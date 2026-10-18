@@ -96,16 +96,16 @@ export function ActivationChecklist({ hasRecording, hasSummary }: ActivationChec
 
   if (completedCount === steps.length) {
     return (
-      <section className="mb-8 rounded-lg border border-emerald-200 bg-emerald-50 p-5" aria-labelledby="activation-complete-heading">
+      <section className="mb-8 rounded-lg border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/50 p-5" aria-labelledby="activation-complete-heading">
         <div className="flex items-start gap-3">
           <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-sm text-white">
             ✓
           </span>
           <div>
-            <h2 id="activation-complete-heading" className="text-sm font-semibold text-emerald-950">
+            <h2 id="activation-complete-heading" className="text-sm font-semibold text-emerald-950 dark:text-emerald-200">
               Setup complete
             </h2>
-            <p className="mt-1 text-xs leading-relaxed text-emerald-800">
+            <p className="mt-1 text-xs leading-relaxed text-emerald-800 dark:text-emerald-300">
               Your extension is connected and your first meeting summary is ready.
             </p>
           </div>
@@ -115,20 +115,20 @@ export function ActivationChecklist({ hasRecording, hasSummary }: ActivationChec
   }
 
   return (
-    <section className="mb-8 rounded-lg border border-stone-200 bg-white p-5 sm:p-6" aria-labelledby="activation-heading">
+    <section className="mb-8 rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5 sm:p-6" aria-labelledby="activation-heading">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-400">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">
             First meeting setup
           </p>
-          <h2 id="activation-heading" className="mt-1 text-lg font-semibold tracking-tight text-stone-950">
+          <h2 id="activation-heading" className="mt-1 text-lg font-semibold tracking-tight text-stone-950 dark:text-stone-50">
             Get from install to your first summary
           </h2>
-          <p className="mt-1 text-xs leading-relaxed text-stone-500">
+          <p className="mt-1 text-xs leading-relaxed text-stone-500 dark:text-stone-400">
             Follow these four steps once. Minute AI will take care of the rest.
           </p>
         </div>
-        <p className="text-xs font-medium text-stone-500 sm:pt-1">
+        <p className="text-xs font-medium text-stone-500 dark:text-stone-400 sm:pt-1">
           {completedCount} of {steps.length} complete
         </p>
       </div>
@@ -136,22 +136,22 @@ export function ActivationChecklist({ hasRecording, hasSummary }: ActivationChec
         {steps.map((step, index) => (
           <li
             key={step.key}
-            className={`rounded-lg border p-4 ${step.complete ? "border-emerald-200 bg-emerald-50/50" : "border-stone-200 bg-stone-50"}`}
+            className={`rounded-lg border p-4 ${step.complete ? "border-emerald-200 dark:border-emerald-900 bg-emerald-50/50 dark:bg-emerald-950/30" : "border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/40"}`}
           >
             <div className="flex items-start gap-3">
               <span
-                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${step.complete ? "bg-emerald-600 text-white" : "bg-stone-900 text-white"}`}
+                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${step.complete ? "bg-emerald-600 text-white" : "bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900"}`}
                 aria-hidden
               >
                 {step.complete ? "✓" : index + 1}
               </span>
               <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-stone-900">{step.title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-stone-500">{step.body}</p>
+                <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">{step.title}</h3>
+                <p className="mt-1 text-xs leading-relaxed text-stone-500 dark:text-stone-400">{step.body}</p>
                 {step.href && step.linkLabel && (
                   <Link
                     href={step.href}
-                    className="mt-2 inline-block text-xs font-semibold text-stone-900 underline underline-offset-4 hover:text-stone-600"
+                    className="mt-2 inline-block text-xs font-semibold text-stone-900 dark:text-stone-100 underline underline-offset-4 hover:text-stone-600 dark:hover:text-stone-300"
                   >
                     {step.linkLabel}
                   </Link>

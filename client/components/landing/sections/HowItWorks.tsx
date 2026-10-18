@@ -6,8 +6,8 @@ export function HowItWorks() {
     <section id="how" className="max-w-6xl mx-auto px-6 pb-24 scroll-mt-24" aria-labelledby="how-heading">
       <div className="max-w-3xl mb-14 text-center">
         <Reveal>
-          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-400 mb-3">How it works</p>
-          <h2 id="how-heading" className="text-3xl md:text-5xl font-light tracking-tight text-stone-950 mb-6">
+          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-400 dark:text-stone-500 mb-3">How it works</p>
+          <h2 id="how-heading" className="text-3xl md:text-5xl font-light tracking-tight text-stone-950 dark:text-stone-50 mb-6">
             Three steps. No bot.
           </h2>
         </Reveal>
