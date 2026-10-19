@@ -32,7 +32,7 @@ jobs:
       - name: Pull and rebuild on the VM
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.ORACLE_HOST }}
+          host: ${{ secrets.ORACLE_HOST || '137.23.40.60' }}
           username: ${{ secrets.ORACLE_USER }}
           key: ${{ secrets.ORACLE_SSH_KEY }}
           request_pty: false
