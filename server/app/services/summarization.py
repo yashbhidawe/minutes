@@ -10,7 +10,8 @@ load_dotenv()
 
 GENERATION_MODEL = getenv("GEMINI_MODEL", "gemini-3.8-flash")
 # Fallback models tried in order when the primary is rate-limited / overloaded.
-FALLBACK_MODELS = ["gemini-2.0-flash-lite", "gemini-1.5-flash"]
+# Only current (non-shut-down) models — verified against Google's model page.
+FALLBACK_MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"]
 MAX_RETRIES = 3
 BASE_BACKOFF_SECONDS = 2.0
 
