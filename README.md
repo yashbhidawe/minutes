@@ -1,4 +1,4 @@
-# Minute AI
+# Minutes
 
 Automatic meeting notes for Google Meet. Records tab audio upon call completion, transcribes via Groq Whisper (`whisper-large-v3`), and generates structured summaries and action items using Google Gemini (`gemini-3.6-flash`). Notes and timestamped transcripts are stored and accessible via a Next.js web dashboard.
 
@@ -6,7 +6,7 @@ Automatic meeting notes for Google Meet. Records tab audio upon call completion,
 
 ## Overview
 
-**Minute AI** is an intelligent meeting assistant pairing a Manifest V3 Chrome Extension with a FastAPI backend and a Next.js web dashboard. It captures Google Meet tab audio automatically without requiring host permissions, processes it through a serverless AI pipeline (with audio chunking & GCP Cloud Tasks queueing), and surfaces clean meeting notes, key decisions, action items, and timestamped transcripts within minutes of the call ending.
+**Minutes** is an intelligent meeting assistant pairing a Manifest V3 Chrome Extension with a FastAPI backend and a Next.js web dashboard. It captures Google Meet tab audio automatically without requiring host permissions, processes it through a serverless AI pipeline (with audio chunking & GCP Cloud Tasks queueing), and surfaces clean meeting notes, key decisions, action items, and timestamped transcripts within minutes of the call ending.
 
 Built for small teams, managers, and individuals who want full meeting context without manual note-taking.
 
@@ -29,7 +29,7 @@ Built for small teams, managers, and individuals who want full meeting context w
 ## Repository Structure
 
 ```
-minuteai/
+minutes/
 ├── server/                   # FastAPI backend
 │   ├── app/
 │   │   ├── api/              # Route handlers (users, meetings)
@@ -129,7 +129,7 @@ npm run dev                # Starts Next.js dashboard on http://localhost:3000
 1. Open Chrome and navigate to `chrome://extensions`.
 2. Enable **Developer mode** in the top right corner.
 3. Click **Load unpacked** and select the `extension/` directory.
-4. Click the Minute AI extension icon and log in with your credentials.
+4. Click the Minutes extension icon and log in with your credentials.
 
 ---
 
@@ -149,7 +149,7 @@ GEMINI_API_KEY=AIzaSy_your_gemini_api_key
 R2_ACCOUNT_ID=your_cloudflare_account_id
 R2_ACCESS_KEY_ID=your_r2_access_key_id
 R2_SECRET_ACCESS_KEY=your_r2_secret_access_key
-R2_BUCKET_NAME=minuteai
+R2_BUCKET_NAME=minutes
 
 # Production Database (Optional for local SQLite dev)
 DATABASE_URL=postgresql://user:password@host:5432/dbname

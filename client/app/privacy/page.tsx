@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/landing/sections";
 import { SITE_URL } from "@/lib/site";
 
 const title = "Privacy Policy";
-const description = "How Minute AI handles meeting audio, transcripts, account data, and AI processing.";
+const description = "How Minutes handles meeting audio, transcripts, account data, and AI processing.";
 
 export const metadata: Metadata = {
   title,
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: `${SITE_URL}/privacy`,
-    title: `${title} · Minute AI`,
+    title: `${title} · Minutes`,
     description,
   },
   robots: {
@@ -45,14 +45,14 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-lg font-semibold text-stone-950 dark:text-stone-50">Overview</h2>
               <p className="mt-3">
-                Minute AI records Google Meet audio from a browser extension, creates a timestamped transcript, and generates a summary with decisions and action items. This policy explains what is collected, why it is used, and how to delete meeting data.
+                Minutes records Google Meet audio from a browser extension, creates a timestamped transcript, and generates a summary with decisions and action items. This policy explains what is collected, why it is used, and how to delete meeting data.
               </p>
             </section>
 
             <section>
               <h2 className="text-lg font-semibold text-stone-950 dark:text-stone-50">Recording responsibility</h2>
               <p className="mt-3">
-                You are responsible for having permission to record a conversation and for informing meeting participants when recording or processing is required. Minute AI does not join calls as a bot, but the extension records tab and microphone audio while recording is active. Do not use Minute AI to record conversations without the rights or consent required by applicable law and your organization&apos;s policies.
+                You are responsible for having permission to record a conversation and for informing meeting participants when recording or processing is required. Minutes does not join calls as a bot, but the extension records tab and microphone audio while recording is active. Do not use Minutes to record conversations without the rights or consent required by applicable law and your organization&apos;s policies.
               </p>
             </section>
 
@@ -70,7 +70,7 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-lg font-semibold text-stone-950 dark:text-stone-50">How data is used</h2>
               <p className="mt-3">
-                We use data to provide authentication, record and upload meetings, generate transcripts and summaries, display your dashboard, troubleshoot failures, prevent abuse, and improve Minute AI. Audio is sent to Groq for transcription. Transcript text is sent to Google Gemini for summarization. Meeting audio is stored in Cloudflare R2 and application records are stored in a managed PostgreSQL database.
+                We use data to provide authentication, record and upload meetings, generate transcripts and summaries, display your dashboard, troubleshoot failures, prevent abuse, and improve Minutes. Audio is sent to Groq for transcription. Transcript text is sent to Google Gemini for summarization. Meeting audio is stored in Cloudflare R2 and application records are stored in a managed PostgreSQL database.
               </p>
               <p className="mt-3">
                 These service providers process data only to provide their respective services and under their own terms and policies. They may change as our infrastructure changes.
@@ -87,7 +87,7 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-lg font-semibold text-stone-950 dark:text-stone-50">Sharing and sale</h2>
               <p className="mt-3">
-                Minute AI does not sell personal information. We share data only with infrastructure and AI providers needed to operate the service, or when required to protect the service, comply with law, or respond to a valid legal request.
+                Minutes does not sell personal information. We share data only with infrastructure and AI providers needed to operate the service, or when required to protect the service, comply with law, or respond to a valid legal request.
               </p>
             </section>
 

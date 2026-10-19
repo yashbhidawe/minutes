@@ -1,7 +1,7 @@
 services:
   redis:
     image: redis:7-alpine
-    container_name: minuteai_redis
+    container_name: minutes_redis
     ports:
       - "6379:6379"
     restart: always
@@ -10,7 +10,7 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
-    container_name: minuteai_api
+    container_name: minutes_api
     ports:
       - "8000:8000"
     env_file:
@@ -25,7 +25,7 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
-    container_name: minuteai_worker
+    container_name: minutes_worker
     # Solo pool: the default DATABASE_URL is SQLite, which corrupts/locks
     # under prefork concurrency. If you switch to Postgres, use prefork:
     # celery -A app.core.celery_app.celery_app worker --loglevel=info --concurrency=2
@@ -41,7 +41,7 @@ services:
 
   caddy:
     image: caddy:2-alpine
-    container_name: minuteai_caddy
+    container_name: minutes_caddy
     ports:
       - "80:80"
       - "443:443"

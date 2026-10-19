@@ -6,7 +6,7 @@ REDIS_URL = getenv("REDIS_URL", "redis://localhost:6379/0")
 ENABLE_CELERY = getenv("ENABLE_CELERY", "true").lower() in ("true", "1", "yes")
 
 celery_app = Celery(
-    "minuteai_tasks",
+    "minutes_tasks",
     broker=REDIS_URL,
     backend=REDIS_URL,
     include=["app.services.celery_tasks"],

@@ -1,12 +1,12 @@
-# AGENTS.md — Minute AI Developer & AI Assistant Guidelines
+# AGENTS.md — Minutes Developer & AI Assistant Guidelines
 
-This document provides instructions, conventions, and architectural context for AI assistants and software engineers working on the **Minute AI** codebase.
+This document provides instructions, conventions, and architectural context for AI assistants and software engineers working on the **Minutes** codebase.
 
 ---
 
 ## 1. System Architecture & Overview
 
-Minute AI consists of three interconnected subsystems:
+Minutes consists of three interconnected subsystems:
 
 ```
 [ Google Meet Call ]

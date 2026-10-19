@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 #
-# Build the distributable Minute AI Chrome extension zip.
+# Build the distributable Minutes Chrome extension zip.
 #
 # Usage:
 #   MINUTE_AI_API_URL=https://137-23-40-60.nip.io \
-#   MINUTE_AI_SITE_URL=https://minuteai-six.vercel.app \
+#   MINUTE_AI_SITE_URL=https://minutes.itsokyash.online \
 #     ./extension/build.sh
 #
 # Output:
-#   extension/minute-ai-extension.zip          (source of truth)
-#   client/public/minute-ai-extension.zip      (served by Next.js / Vercel)
+#   extension/minutes-extension.zip          (source of truth)
+#   client/public/minutes-extension.zip      (served by Next.js / Vercel)
 #   client/public/extension-version.json       (version metadata for /install)
 #
 # The script copies extension/ into a temp dir, rewrites config.js with the
@@ -21,7 +21,7 @@ EXT_DIR="$ROOT_DIR/extension"
 CLIENT_PUBLIC="$ROOT_DIR/client/public"
 
 API_URL="${MINUTE_AI_API_URL:-https://137-23-40-60.nip.io}"
-SITE_URL="${MINUTE_AI_SITE_URL:-https://minuteai-six.vercel.app}"
+SITE_URL="${MINUTE_AI_SITE_URL:-https://minutes.itsokyash.online}"
 # Strip trailing slash so URL joins are predictable.
 SITE_URL="${SITE_URL%/}"
 API_URL="${API_URL%/}"
@@ -37,7 +37,7 @@ STAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
-DIST="$TMP_DIR/minute-ai-extension"
+DIST="$TMP_DIR/minutes-extension"
 mkdir -p "$DIST/icons"
 
 # Copy packaged files (config.js is generated below with prod URLs).
@@ -65,7 +65,7 @@ EOF
 
 # Zip from inside the staging dir so manifest.json sits at the archive root
 # (required for "Load unpacked" / zip installs).
-python3 - "$DIST" "$EXT_DIR/minute-ai-extension.zip" <<'PYEOF'
+python3 - "$DIST" "$EXT_DIR/minutes-extension.zip" <<'PYEOF'
 import sys, zipfile
 from pathlib import Path
 
@@ -78,7 +78,7 @@ print(f"wrote {out} ({out.stat().st_size} bytes)")
 PYEOF
 
 mkdir -p "$CLIENT_PUBLIC"
-cp "$EXT_DIR/minute-ai-extension.zip" "$CLIENT_PUBLIC/minute-ai-extension.zip"
+cp "$EXT_DIR/minutes-extension.zip" "$CLIENT_PUBLIC/minutes-extension.zip"
 
 python3 - "$CLIENT_PUBLIC/extension-version.json" "$VERSION" "$STAMP" <<'PYEOF'
 import json, sys
@@ -87,7 +87,7 @@ with open(out, "w") as f:
     json.dump(
         {
             "version": version,
-            "downloadUrl": "/minute-ai-extension.zip",
+            "downloadUrl": "/minutes-extension.zip",
             "updatedAt": stamp,
         },
         f,
@@ -97,4 +97,4 @@ with open(out, "w") as f:
 print(f"wrote {out} (v{version})")
 PYEOF
 
-echo "✅ Done. Download URL after deploy: $SITE_URL/minute-ai-extension.zip"
+echo "✅ Done. Download URL after deploy: $SITE_URL/minutes-extension.zip"

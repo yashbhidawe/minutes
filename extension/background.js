@@ -42,7 +42,7 @@ async function ensureOffscreenDocument() {
   await chrome.offscreen.createDocument({
     url: "offscreen.html",
     reasons: ["USER_MEDIA"],
-    justification: "Record meeting tab audio for Minute AI notes generation",
+    justification: "Record meeting tab audio for Minutes notes generation",
   });
 }
 
@@ -76,7 +76,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       chrome.notifications.create(`meeting_${message.meetingId}`, {
         type: "basic",
         iconUrl: "icons/icon128.png",
-        title: "Minute AI — Meeting Notes Ready",
+        title: "Minutes — Meeting Notes Ready",
         message: "Audio processing started. Click to view notes and action items.",
         priority: 2,
       });
@@ -156,7 +156,7 @@ async function handleMeetingStarted(message, sender, sendResponse) {
 
   chrome.storage.local.get(["token"], async (data) => {
     if (!data.token) {
-      sendResponse({ error: "Not logged in to Minute AI extension" });
+      sendResponse({ error: "Not logged in to Minutes extension" });
       return;
     }
 

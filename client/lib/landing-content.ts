@@ -14,7 +14,7 @@ export const STEPS: Step[] = [
   {
     n: "01",
     title: "Install the extension",
-    body: "Add Minute AI to Chrome in one click and sign in.",
+    body: "Add Minutes to Chrome in one click and sign in.",
   },
   {
     n: "02",
@@ -35,12 +35,12 @@ export interface Faq {
 
 export const FAQS: Faq[] = [
   {
-    q: "What is Minute AI?",
-    a: "Minute AI is an automatic note-taker for Google Meet. It captures meetings you are authorized to record, creates a timestamped transcript, and produces decisions, highlights and action items.",
+    q: "What is Minutes?",
+    a: "Minutes is an automatic note-taker for Google Meet. It captures meetings you are authorized to record, creates a timestamped transcript, and produces decisions, highlights and action items.",
   },
   {
     q: "Does a bot join my meeting?",
-    a: "No bot joins your call. Minute AI records from your browser after you install and sign in, so you remain responsible for following applicable recording and participant-notice requirements.",
+    a: "No bot joins your call. Minutes records from your browser after you install and sign in, so you remain responsible for following applicable recording and participant-notice requirements.",
   },
   {
     q: "Can I ask questions about a meeting?",
@@ -57,7 +57,7 @@ export const FAQS: Faq[] = [
 ];
 
 export const DEFINITION_ANSWER =
-  "Minute AI is an automatic note-taker for Google Meet. It captures meetings you are authorized to record, creates a timestamped transcript, and produces decisions, blockers, next steps and action items. Ask anything, and every answer cites the transcript. No bot joins your call and no admin setup is required.";
+  "Minutes is an automatic note-taker for Google Meet. It captures meetings you are authorized to record, creates a timestamped transcript, and produces decisions, blockers, next steps and action items. Ask anything, and every answer cites the transcript. No bot joins your call and no admin setup is required.";
 
 export const TICKER = [
   "Automatic capture",

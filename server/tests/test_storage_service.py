@@ -8,11 +8,11 @@ def test_delete_file_removes_r2_object():
 
     with (
         patch("app.services.storage.get_r2_client", return_value=client),
-        patch("app.services.storage.R2_BUCKET_NAME", "minute-ai"),
+        patch("app.services.storage.R2_BUCKET_NAME", "minutes"),
     ):
         delete_file("7/12/audio.webm")
 
     client.delete_object.assert_called_once_with(
-        Bucket="minute-ai",
+        Bucket="minutes",
         Key="7/12/audio.webm",
     )

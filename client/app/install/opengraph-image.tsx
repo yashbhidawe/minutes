@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og";
 export const runtime = "edge";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "Minute AI — Install the Chrome extension in 2 minutes.";
+export const alt = "Minutes — Install the Chrome extension in 2 minutes.";
 
 export default function OgImage() {
   return new ImageResponse(
@@ -39,7 +39,7 @@ export default function OgImage() {
             M
           </div>
           <div style={{ fontSize: "28px", letterSpacing: "8px", color: "#a8a29e" }}>
-            MINUTE AI
+            minutes
           </div>
         </div>
         <div style={{ fontSize: "80px", lineHeight: 1.05, fontWeight: 300 }}>

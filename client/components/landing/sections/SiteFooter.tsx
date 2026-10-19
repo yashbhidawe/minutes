@@ -7,7 +7,7 @@ export function SiteFooter() {
         <div className="grid sm:grid-cols-4 gap-12 mb-12">
           <div className="flex flex-col gap-2">
             <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-stone-600 dark:text-stone-400">
-              Minute AI
+              Minutes
             </span>
             <p className="text-[12px] text-stone-500 dark:text-stone-400 max-w-xs leading-relaxed">
               Meeting notes that write themselves. For meetings you are authorized to record.
@@ -44,7 +44,7 @@ export function SiteFooter() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-stone-100 dark:border-stone-800 pt-6">
-          <p className="text-[11px] text-stone-400 dark:text-stone-500">© 2026 Minute AI.</p>
+          <p className="text-[11px] text-stone-400 dark:text-stone-500">© 2026 Minutes.</p>
           <p className="text-[11px] font-mono text-stone-400 dark:text-stone-500">No bots join your calls.</p>
         </div>
       </div>

@@ -30,7 +30,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/dashboard" className="text-xs tracking-widest uppercase text-stone-400 dark:text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">
-              Minute AI
+              Minutes
             </Link>
             <nav className="flex items-center gap-6">
               <NavLink href="/dashboard">Meetings</NavLink>

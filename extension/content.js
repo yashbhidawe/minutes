@@ -39,10 +39,10 @@
       return;
     }
 
-    let widget = document.getElementById("minute-ai-floating-widget");
+    let widget = document.getElementById("minutes-floating-widget");
     if (!widget) {
       widget = document.createElement("div");
-      widget.id = "minute-ai-floating-widget";
+      widget.id = "minutes-floating-widget";
       widget.style.cssText = `
         position: fixed;
         bottom: 84px;
@@ -68,7 +68,7 @@
           <span style="font-size: 11px; font-weight: 700; font-family: monospace; color: #f87171; letter-spacing: 0.05em;" id="minute-widget-timer">00:00</span>
         </div>
         <div style="flex: 1;">
-          <div style="font-size: 11px; font-weight: 600; color: #f5f5f4; line-height: 1.2;">Minute AI</div>
+          <div style="font-size: 11px; font-weight: 600; color: #f5f5f4; line-height: 1.2;">Minutes</div>
           <div style="font-size: 10px; color: #a8a29e;">Recording Tab + Mic</div>
         </div>
         <button id="minute-stop-btn" style="
@@ -130,7 +130,7 @@
   }
 
   function removeFloatingWidget() {
-    const widget = document.getElementById("minute-ai-floating-widget");
+    const widget = document.getElementById("minutes-floating-widget");
     if (widget) {
       widget.remove();
     }

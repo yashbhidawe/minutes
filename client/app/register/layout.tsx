@@ -4,7 +4,7 @@ import { SITE_URL } from "@/lib/site";
 
 const title = "Create your free account";
 const description =
-  "Create a free Minute AI account to turn your Google Meet calls into summaries, decisions and action items.";
+  "Create a free Minutes account to turn your Google Meet calls into summaries, decisions and action items.";
 
 export const metadata: Metadata = {
   title,
@@ -13,12 +13,12 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: `${SITE_URL}/register`,
-    title: `${title} · Minute AI`,
+    title: `${title} · Minutes`,
     description,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${title} · Minute AI`,
+    title: `${title} · Minutes`,
     description,
   },
   robots: {

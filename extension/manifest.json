@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Minute AI",
+  "name": "Minutes",
   "version": "1.1.0",
   "description": "Automatic meeting notes for Google Meet",
   "permissions": [
@@ -28,7 +28,7 @@
       "matches": [
         "http://localhost:3000/*",
         "http://127.0.0.1:3000/*",
-        "https://minuteai-six.vercel.app/*",
+        "https://minutes.itsokyash.online/*",
         "https://*.vercel.app/*"
       ],
       "js": ["dashboard-sync.js"]
