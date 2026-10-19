@@ -8,9 +8,9 @@ from google.genai import types
 
 load_dotenv()
 
-GENERATION_MODEL = getenv("GEMINI_MODEL", "gemini-3.6-flash")
+GENERATION_MODEL = getenv("GEMINI_MODEL", "gemini-3.8-flash")
 # Fallback models tried in order when the primary is rate-limited / overloaded.
-FALLBACK_MODELS = ["gemini-1.5-flash", "gemini-2.0-flash-lite"]
+FALLBACK_MODELS = ["gemini-2.0-flash-lite", "gemini-1.5-flash"]
 MAX_RETRIES = 3
 BASE_BACKOFF_SECONDS = 2.0
 
