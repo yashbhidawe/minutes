@@ -3,6 +3,7 @@ import { SITE_DESCRIPTION } from "@/lib/site";
 import { LandingNav } from "@/components/landing";
 import {
   ExtensionSection,
+  FaqSection,
   AskSection,
   Features,
   Hero,
@@ -28,6 +29,7 @@ export default function LandingPage() {
         <Features />
         <ExtensionSection />
         <AskSection />
+        <FaqSection />
         <SiteFooter />
       </main>
     </div>

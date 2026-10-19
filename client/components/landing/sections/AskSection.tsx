@@ -3,7 +3,7 @@ import { Check } from "../Check";
 
 export function AskSection() {
   return (
-    <section id="ask" className="bg-white dark:bg-stone-950 border-y border-stone-200 dark:border-stone-900 px-6 pt-16 pb-24 scroll-mt-24" aria-labelledby="ask-heading">
+    <section id="ask" className="bg-white dark:bg-stone-950 border-t border-stone-200 dark:border-stone-900 px-6 pt-16 pb-24 scroll-mt-24" aria-labelledby="ask-heading">
       <div className="max-w-4xl mx-auto">
         <Reveal>
           <h2 id="ask-heading" className="text-3xl md:text-4xl font-light tracking-tight text-stone-950 dark:text-stone-50 mb-6">
