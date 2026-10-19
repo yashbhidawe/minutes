@@ -8,7 +8,6 @@ per-meeting scope (tens to low-hundreds of chunks).
 import json
 import math
 from fastapi import HTTPException
-from google.genai import types
 from sqlalchemy.orm import Session
 
 from app.models.meeting import Meeting
@@ -17,7 +16,7 @@ from app.repositories.chunks import ChunkRepository
 from app.repositories.meeting import MeetingRepository
 from app.services.chunking import build_chunks
 from app.services.embeddings import embed_texts
-from app.services.summarization import GENERATION_MODEL, get_client as get_gemini_client
+from app.services.summarization import generate_with_retry
 
 DEFAULT_TOP_K = 5
 MAX_TOP_K = 12
@@ -62,6 +61,15 @@ def _decode_embedding(raw) -> list[float] | None:
         return [float(v) for v in vec] if isinstance(vec, list) else None
     except (ValueError, TypeError, json.JSONDecodeError):
         return None
+
+
+def _strip_markdown_fence(raw: str) -> str:
+    if raw.startswith("```"):
+        raw = raw.split("\n", 1)[1]
+        if raw.endswith("```"):
+            raw = raw[: raw.rfind("```")]
+        raw = raw.strip()
+    return raw
 
 
 def index_meeting(meeting_id: int, session: Session) -> int:
@@ -134,18 +142,11 @@ def answer_question(meeting_id: int, question: str, session: Session, top_k: int
         for i, h in enumerate(hits)
     )
     try:
-        client = get_gemini_client()
-        response = client.models.generate_content(
-            model=GENERATION_MODEL,
-            contents=RAG_PROMPT.format(question=question.strip(), excerpts=excerpts),
-            config=types.GenerateContentConfig(response_mime_type="application/json"),
+        raw = generate_with_retry(
+            RAG_PROMPT.format(question=question.strip(), excerpts=excerpts),
+            response_mime_type="application/json",
         )
-        raw = response.text.strip()
-        if raw.startswith("```"):
-            raw = raw.split("\n", 1)[1]
-            if raw.endswith("```"):
-                raw = raw[: raw.rfind("```")]
-            raw = raw.strip()
+        raw = _strip_markdown_fence(raw)
         result = json.loads(raw)
     except HTTPException:
         raise
@@ -284,18 +285,11 @@ def answer_global(
         for i, h in enumerate(hits)
     )
     try:
-        client = get_gemini_client()
-        response = client.models.generate_content(
-            model=GENERATION_MODEL,
-            contents=GLOBAL_RAG_PROMPT.format(question=question.strip(), excerpts=excerpts),
-            config=types.GenerateContentConfig(response_mime_type="application/json"),
+        raw = generate_with_retry(
+            GLOBAL_RAG_PROMPT.format(question=question.strip(), excerpts=excerpts),
+            response_mime_type="application/json",
         )
-        raw = response.text.strip()
-        if raw.startswith("```"):
-            raw = raw.split("\n", 1)[1]
-            if raw.endswith("```"):
-                raw = raw[: raw.rfind("```")]
-            raw = raw.strip()
+        raw = _strip_markdown_fence(raw)
         result = json.loads(raw)
     except HTTPException:
         raise

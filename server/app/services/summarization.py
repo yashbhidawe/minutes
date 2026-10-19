@@ -1,13 +1,19 @@
 import json
+import time
 from fastapi import HTTPException
 from os import getenv
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from google.api_core.exceptions import ServiceUnavailable, GoogleAPICallError
 
 load_dotenv()
 
 GENERATION_MODEL = getenv("GEMINI_MODEL", "gemini-3.6-flash")
+# Fallback models tried in order when the primary is rate-limited / overloaded.
+FALLBACK_MODELS = ["gemini-1.5-flash", "gemini-2.0-flash-lite"]
+MAX_RETRIES = 3
+BASE_BACKOFF_SECONDS = 2.0
 
 _client = None
 
@@ -22,6 +28,71 @@ def get_client():
         raise HTTPException(status_code=500, detail="GEMINI_API_KEY is not configured")
     _client = genai.Client(api_key=api_key)
     return _client
+
+
+def _is_overload_error(exc: Exception) -> bool:
+    text = str(exc).lower()
+    return (
+        "503" in text
+        or "unavailable" in text
+        or "overloaded" in text
+        or "high demand" in text
+        or isinstance(exc, ServiceUnavailable)
+    )
+
+
+def generate_with_retry(prompt: str, response_mime_type: str = "application/json") -> str:
+    """Call Gemini with exponential-backoff retries and model fallbacks.
+
+    Returns the raw response text. Raises HTTPException(503) if every model
+    and retry attempt is exhausted.
+    """
+    client = get_client()
+    models = [GENERATION_MODEL] + [m for m in FALLBACK_MODELS if m != GENERATION_MODEL]
+
+    last_error = None
+    for model in models:
+        for attempt in range(1, MAX_RETRIES + 1):
+            try:
+                response = client.models.generate_content(
+                    model=model,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        response_mime_type=response_mime_type,
+                    ),
+                )
+                return response.text.strip()
+            except HTTPException:
+                raise
+            except (ServiceUnavailable, GoogleAPICallError) as exc:
+                last_error = exc
+                if not _is_overload_error(exc) and not isinstance(exc, ServiceUnavailable):
+                    raise
+                if attempt < MAX_RETRIES:
+                    sleep_for = BASE_BACKOFF_SECONDS * (2 ** (attempt - 1))
+                    time.sleep(sleep_for)
+                    continue
+                break  # try next model
+            except Exception as exc:  # transient network blip, retry once more
+                last_error = exc
+                if attempt < MAX_RETRIES:
+                    sleep_for = BASE_BACKOFF_SECONDS * (2 ** (attempt - 1))
+                    time.sleep(sleep_for)
+                    continue
+                break
+
+    detail = f"Gemini generation failed after {len(models)} model(s) x {MAX_RETRIES} attempt(s): {last_error}"
+    raise HTTPException(status_code=503, detail=detail)
+
+
+def _strip_markdown_fence(raw: str) -> str:
+    if raw.startswith("```"):
+        raw = raw.split("\n", 1)[1]
+        if raw.endswith("```"):
+            raw = raw[: raw.rfind("```")]
+        raw = raw.strip()
+    return raw
+
 
 SUMMARY_PROMPT = """You are an expert meeting assistant. Analyze the following meeting transcript and produce a structured output.
 
@@ -58,30 +129,15 @@ Rules:
 
 def summarize_transcript(transcript_text: str) -> dict:
     try:
-        client = get_client()
-        response = client.models.generate_content(
-            model=GENERATION_MODEL,
-            contents=SUMMARY_PROMPT.format(transcript=transcript_text),
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-            ),
+        raw = generate_with_retry(
+            SUMMARY_PROMPT.format(transcript=transcript_text),
+            response_mime_type="application/json",
         )
-        raw = response.text.strip()
-
-        if raw.startswith("```"):
-            raw = raw.split("\n", 1)[1]
-            if raw.endswith("```"):
-                raw = raw[: raw.rfind("```")]
-            raw = raw.strip()
-
+        raw = _strip_markdown_fence(raw)
         return json.loads(raw)
     except HTTPException:
         raise
     except json.JSONDecodeError:
         raise HTTPException(
             status_code=500, detail="Failed to parse Gemini response as JSON"
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Summarization failed: {str(e)}"
         )
