@@ -5,7 +5,6 @@ from os import getenv
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from google.api_core.exceptions import ServiceUnavailable, GoogleAPICallError
 
 load_dotenv()
 
@@ -32,12 +31,14 @@ def get_client():
 
 def _is_overload_error(exc: Exception) -> bool:
     text = str(exc).lower()
+    type_name = type(exc).__name__.lower()
     return (
         "503" in text
         or "unavailable" in text
         or "overloaded" in text
         or "high demand" in text
-        or isinstance(exc, ServiceUnavailable)
+        or "serviceunavailable" in type_name
+        or "googleapicallerror" in type_name
     )
 
 
@@ -64,22 +65,15 @@ def generate_with_retry(prompt: str, response_mime_type: str = "application/json
                 return response.text.strip()
             except HTTPException:
                 raise
-            except (ServiceUnavailable, GoogleAPICallError) as exc:
+            except Exception as exc:
                 last_error = exc
-                if not _is_overload_error(exc) and not isinstance(exc, ServiceUnavailable):
+                if not _is_overload_error(exc):
                     raise
                 if attempt < MAX_RETRIES:
                     sleep_for = BASE_BACKOFF_SECONDS * (2 ** (attempt - 1))
                     time.sleep(sleep_for)
                     continue
                 break  # try next model
-            except Exception as exc:  # transient network blip, retry once more
-                last_error = exc
-                if attempt < MAX_RETRIES:
-                    sleep_for = BASE_BACKOFF_SECONDS * (2 ** (attempt - 1))
-                    time.sleep(sleep_for)
-                    continue
-                break
 
     detail = f"Gemini generation failed after {len(models)} model(s) x {MAX_RETRIES} attempt(s): {last_error}"
     raise HTTPException(status_code=503, detail=detail)
