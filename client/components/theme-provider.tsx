@@ -9,7 +9,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { flushSync } from "react-dom";
 
 type Theme = "light" | "dark";
 
@@ -87,7 +86,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const commit = () => {
       themeRef.current = next;
       applyTheme(next);
-      flushSync(() => setTheme(next));
+      setTheme(next);
     };
 
     playTick();
