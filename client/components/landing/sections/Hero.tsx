@@ -18,7 +18,7 @@ export function Hero() {
           </h1>
 
           <p className="animate-fade-up-3 mt-6 text-[16px] md:text-lg leading-relaxed text-stone-500 dark:text-stone-400 max-w-xl">
-             Minute AI captures your Google Meet audio, transcribes every
+             Minutes captures your Google Meet audio, transcribes every
              word, and summarizes the decisions, blockers, and action items
              — then lets you ask anything about the call, with answers cited
              back to the transcript.

@@ -57,8 +57,8 @@ export function ActivationChecklist({ hasRecording, hasSummary }: ActivationChec
         extensionStatus === "checking"
           ? "Checking this browser..."
           : extensionStatus === "not-installed"
-            ? "Install Minute AI to record Google Meet calls."
-            : "Minute AI is installed in this browser.",
+            ? "Install Minutes to record Google Meet calls."
+            : "Minutes is installed in this browser.",
       complete: extensionInstalled,
       href: extensionInstalled ? undefined : "/install",
       linkLabel: extensionInstalled ? undefined : "Install extension",
@@ -125,7 +125,7 @@ export function ActivationChecklist({ hasRecording, hasSummary }: ActivationChec
             Get from install to your first summary
           </h2>
           <p className="mt-1 text-xs leading-relaxed text-stone-500 dark:text-stone-400">
-            Follow these four steps once. Minute AI will take care of the rest.
+            Follow these four steps once. Minutes will take care of the rest.
           </p>
         </div>
         <p className="text-xs font-medium text-stone-500 dark:text-stone-400 sm:pt-1">

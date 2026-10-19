@@ -4,7 +4,7 @@ import { DashboardShell } from "@/components/dashboard-shell";
 
 export const metadata: Metadata = {
   title: "Dashboard",
-  description: "Your private Minute AI dashboard — meetings, summaries and action items.",
+  description: "Your private Minutes dashboard — meetings, summaries and action items.",
   robots: {
     index: false,
     follow: false,

@@ -47,7 +47,7 @@ export default function LoginPage() {
         <div className="w-full max-w-sm">
           <div className="mb-12">
             <Link href="/" className="text-sm tracking-widest uppercase text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">
-              Minute AI
+              Minutes
             </Link>
           </div>
 

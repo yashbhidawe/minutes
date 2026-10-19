@@ -4,7 +4,7 @@ import { SITE_URL } from "@/lib/site";
 
 const title = "Sign in";
 const description =
-  "Sign in to Minute AI to access your meeting notes, summaries and action items.";
+  "Sign in to Minutes to access your meeting notes, summaries and action items.";
 
 export const metadata: Metadata = {
   title,
@@ -13,12 +13,12 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: `${SITE_URL}/login`,
-    title: `${title} · Minute AI`,
+    title: `${title} · Minutes`,
     description,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${title} · Minute AI`,
+    title: `${title} · Minutes`,
     description,
   },
   robots: {

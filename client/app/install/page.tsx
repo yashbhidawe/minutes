@@ -8,7 +8,7 @@ import { SITE_URL } from "@/lib/site";
 
 const title = "Install the Chrome Extension";
 const description =
-  "Download the Minute AI Chrome extension and install it in about 2 minutes. Free manual install while we prepare the Chrome Web Store listing.";
+  "Download the Minutes Chrome extension and install it in about 2 minutes. Free manual install while we prepare the Chrome Web Store listing.";
 
 export const metadata: Metadata = {
   title,
@@ -17,12 +17,12 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: `${SITE_URL}/install`,
-    title: `${title} · Minute AI`,
+    title: `${title} · Minutes`,
     description,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${title} · Minute AI`,
+    title: `${title} · Minutes`,
     description,
   },
   robots: {
@@ -48,7 +48,7 @@ const STEPS = [
   {
     n: "1",
     title: "Download and unzip",
-    body: "Click the download button below to get minute-ai-extension.zip, then unzip it. You'll get a folder called minute-ai-extension — keep it somewhere safe (don't delete it after installing, Chrome reads from it).",
+    body: "Click the download button below to get minutes-extension.zip, then unzip it. You'll get a folder called minutes-extension — keep it somewhere safe (don't delete it after installing, Chrome reads from it).",
   },
   {
     n: "2",
@@ -63,17 +63,17 @@ const STEPS = [
   {
     n: "4",
     title: "Load the extension",
-    body: "Click Load unpacked and select the unzipped minute-ai-extension folder. Minute AI should appear in your extensions list.",
+    body: "Click Load unpacked and select the unzipped minutes-extension folder. Minutes should appear in your extensions list.",
   },
   {
     n: "5",
     title: "Pin it to your toolbar",
-    body: "Click the puzzle-piece icon in Chrome's toolbar, then pin Minute AI so you can see when it's recording.",
+    body: "Click the puzzle-piece icon in Chrome's toolbar, then pin Minutes so you can see when it's recording.",
   },
   {
     n: "6",
     title: "Sign in",
-    body: "Click the Minute AI icon and sign in with your Minute AI account (or sign in on the web dashboard first — the session syncs automatically). Then join a Google Meet and you're set.",
+    body: "Click the Minutes icon and sign in with your Minutes account (or sign in on the web dashboard first — the session syncs automatically). Then join a Google Meet and you're set.",
   },
 ];
 
@@ -96,7 +96,7 @@ const TROUBLESHOOTING = [
   },
   {
     q: "How do I update to a new version?",
-    a: "There's no auto-update outside the Web Store yet. Download the new zip, unzip it over the old folder (or delete the old folder and unzip fresh), then go to chrome://extensions and hit Reload on Minute AI. Your login is preserved.",
+    a: "There's no auto-update outside the Web Store yet. Download the new zip, unzip it over the old folder (or delete the old folder and unzip fresh), then go to chrome://extensions and hit Reload on Minutes. Your login is preserved.",
   },
 ];
 
@@ -128,7 +128,7 @@ export default async function InstallPage() {
             Chrome extension · v{version}
           </p>
           <h1 className="text-4xl md:text-5xl font-light tracking-tight leading-tight">
-            Install Minute AI <span className="font-semibold">in 2 minutes.</span>
+            Install Minutes <span className="font-semibold">in 2 minutes.</span>
           </h1>
           <p className="mt-4 text-[15px] leading-relaxed text-stone-500 dark:text-stone-400 max-w-2xl">
             We&apos;re not on the Chrome Web Store yet, so installation is a
@@ -136,7 +136,7 @@ export default async function InstallPage() {
              load the extension. No fees, no terminal commands.
            </p>
            <p className="mt-3 text-sm leading-relaxed text-stone-500 dark:text-stone-400">
-             Only record meetings you are authorized to capture. Minute AI displays
+             Only record meetings you are authorized to capture. Minutes displays
              when capture is active; see our{" "}
              <Link href="/privacy" className="text-stone-900 dark:text-stone-100 underline underline-offset-4">
                Privacy Policy
@@ -147,7 +147,7 @@ export default async function InstallPage() {
           <div className="mt-8 bg-stone-950 rounded-xl p-6 sm:p-8">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               <a
-                href="/minute-ai-extension.zip"
+                href="/minutes-extension.zip"
                 download
                 className="px-6 py-3 bg-white text-stone-950 text-sm font-semibold rounded-md hover:bg-stone-200 transition-colors text-center"
               >
@@ -158,7 +158,7 @@ export default async function InstallPage() {
                 <p className="mt-1">
                   Prefer GitHub? Grab it from{" "}
                   <a
-                    href="https://github.com/yashbhidawe/minuteai"
+                    href="https://github.com/yashbhidawe/minutes"
                     target="_blank"
                     rel="noreferrer"
                     className="underline hover:text-stone-200"

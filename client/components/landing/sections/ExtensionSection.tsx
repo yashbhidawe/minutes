@@ -17,7 +17,7 @@ export function ExtensionSection() {
               Installs in a minute.
             </h2>
             <p className="text-lg text-stone-500 dark:text-stone-400 leading-relaxed mb-8">
-              Add Minute AI once, sign in, and it captures your Google Meet
+              Add Minutes once, sign in, and it captures your Google Meet
               tab audio while you record. A floating widget shows you're live —
               then the notes appear in your dashboard when the call ends.
             </p>
@@ -42,7 +42,7 @@ export function ExtensionSection() {
             </div>
             <div className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-mono font-bold text-stone-900 dark:text-white uppercase tracking-wider">Minute AI</span>
+                <span className="text-[10px] font-mono font-bold text-stone-900 dark:text-white uppercase tracking-wider">Minutes</span>
                 <span className="text-[10px] uppercase font-mono tracking-wider px-1.5 py-0.5 rounded border font-semibold bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900/50">REC</span>
               </div>
               <div className="h-2 bg-stone-100 dark:bg-[#373737] rounded-full overflow-hidden mb-4">

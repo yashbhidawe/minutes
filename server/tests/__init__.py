@@ -1,1 +1,1 @@
-# Minute AI Test Suite
+# Minutes Test Suite

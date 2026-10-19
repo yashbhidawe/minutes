@@ -49,7 +49,7 @@
         });
       }
     } catch (err) {
-      console.error("[Minute AI Sync] Error syncing auth state:", err);
+      console.error("[Minutes Sync] Error syncing auth state:", err);
     }
   }
 
