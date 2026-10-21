@@ -20,11 +20,11 @@ Minutes consists of three interconnected subsystems:
                                                                     │
                                                       ┌─────────────┴─────────────┐
                                                       ▼                           ▼
-                                            [ Groq Whisper API ]         [ Gemini 3.6 Flash ]
+                                             [ Groq Whisper API ]         [ Gemini 3.8 Flash ]
                                             (Speech-to-Text)             (JSON Summarization)
 ```
 
-1. **`server/` (FastAPI Backend)**: Handles auth, SQL database records, Cloudflare R2 audio persistence, Groq Whisper transcription, and Gemini 3.6 Flash summarization.
+1. **`server/` (FastAPI Backend)**: Handles auth, SQL database records, Cloudflare R2 audio persistence, Groq Whisper transcription, and Gemini 3.8 Flash summarization.
 2. **`extension/` (Chrome Extension V3)**: Detects Google Meet sessions, spawns an offscreen audio recorder document (`offscreen.html`), records tab audio into `.webm` format via `MediaRecorder`, and uploads audio directly to the backend.
 3. **`client/` (Next.js 16 Web Dashboard)**: App Router frontend for reviewing meeting notes, managing action item statuses, and reading timestamped transcripts.
 
