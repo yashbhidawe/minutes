@@ -22,7 +22,7 @@ def execute_meeting_pipeline(meeting_id: int, is_final_attempt: bool = True):
     1. Downloads audio from Cloudflare R2
     2. Chunks audio (FFmpeg/Pydub <=10 min) & transcribes via Groq Whisper API
     3. Saves timestamped transcript segments
-    4. Summarizes & extracts action items via Gemini 3.6 Flash
+    4. Summarizes & extracts action items via Gemini 3.8 Flash
     5. Saves notes and updates meeting status to completed
 
     Idempotent: existing transcript/notes/action items are deleted just

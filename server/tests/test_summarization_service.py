@@ -24,6 +24,6 @@ def test_summarization_requests_json_and_parses_response():
     assert result["key_decisions"] == "- Ship Friday"
     assert result["action_items"] == []
     call = client.models.generate_content.call_args
-    assert call.kwargs["model"] == "gemini-3.6-flash"
+    assert call.kwargs["model"] == "gemini-3.8-flash"
     assert "The team discussed the release." in call.kwargs["contents"]
     assert call.kwargs["config"].response_mime_type == "application/json"
