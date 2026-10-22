@@ -1,5 +1,7 @@
 import json
+
 from sqlalchemy.orm import Session
+
 from app.models.meeting_chunk import MeetingChunk
 
 

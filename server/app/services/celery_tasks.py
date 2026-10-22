@@ -1,15 +1,15 @@
 import json
-import os
+
 from fastapi import BackgroundTasks
-from app.core.celery_app import celery_app, ENABLE_CELERY
+
+from app.core.celery_app import ENABLE_CELERY, celery_app
 from app.core.db_connection import SessionLocal
+from app.repositories.action_item import ActionItemRepository
 from app.repositories.meeting import MeetingRepository
 from app.repositories.note import NoteRepository
-from app.repositories.action_item import ActionItemRepository
-from app.services.storage import download_file
 from app.services.audio_chunker import process_and_transcribe_audio
+from app.services.storage import download_file
 from app.services.summarization import summarize_transcript
-
 
 # Statuses that mean a background job is already running for a meeting.
 # The API layer uses this to reject duplicate reprocess requests with 409.
@@ -22,7 +22,7 @@ def execute_meeting_pipeline(meeting_id: int, is_final_attempt: bool = True):
     1. Downloads audio from Cloudflare R2
     2. Chunks audio (FFmpeg/Pydub <=10 min) & transcribes via Groq Whisper API
     3. Saves timestamped transcript segments
-    4. Summarizes & extracts action items via Gemini 3.6 Flash
+    4. Summarizes & extracts action items via Gemini 3.8 Flash
     5. Saves notes and updates meeting status to completed
 
     Idempotent: existing transcript/notes/action items are deleted just
@@ -142,7 +142,7 @@ def process_meeting_celery_task(self, meeting_id: int):
             # Already marked failed inside execute_meeting_pipeline — stop retrying.
             raise
         print(f"[Celery Worker] Retrying meeting {meeting_id} (attempt {self.request.retries + 1}/3) due to error: {exc}")
-        raise self.retry(exc=exc, countdown=10)
+        raise self.retry(exc=exc, countdown=10) from exc
 
 
 def dispatch_meeting_task(meeting_id: int, background_tasks: BackgroundTasks | None = None):

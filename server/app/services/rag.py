@@ -7,6 +7,7 @@ per-meeting scope (tens to low-hundreds of chunks).
 
 import json
 import math
+
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
@@ -45,7 +46,12 @@ Rules:
 
 
 def _cosine(a: list[float], b: list[float]) -> float:
-    dot = sum(x * y for x, y in zip(a, b))
+    # Dimension mismatch means the stored index was built with a different
+    # embedding model than the current one. Truncating to the shorter vector
+    # would silently produce a meaningless score, so treat it as no match.
+    if len(a) != len(b):
+        return 0.0
+    dot = sum(x * y for x, y in zip(a, b, strict=True))
     na = math.sqrt(sum(x * x for x in a))
     nb = math.sqrt(sum(y * y for y in b))
     if na == 0 or nb == 0:
@@ -92,7 +98,7 @@ def index_meeting(meeting_id: int, session: Session) -> int:
             "end_sec": c.get("end_sec"),
             "embedding": vec,
         }
-        for i, (c, vec) in enumerate(zip(chunks, vectors))
+        for i, (c, vec) in enumerate(zip(chunks, vectors, strict=True))
     ]
 
     chunk_repo = ChunkRepository(session)
@@ -150,10 +156,10 @@ def answer_question(meeting_id: int, question: str, session: Session, top_k: int
         result = json.loads(raw)
     except HTTPException:
         raise
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=500, detail="Failed to parse Gemini response as JSON")
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=500, detail="Failed to parse Gemini response as JSON") from e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"RAG answering failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"RAG answering failed: {e!s}") from e
 
     # Sanitize citation indices back to real chunks (with timestamps).
     valid_indices = {i for i in range(len(hits))}
@@ -293,10 +299,10 @@ def answer_global(
         result = json.loads(raw)
     except HTTPException:
         raise
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=500, detail="Failed to parse Gemini response as JSON")
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=500, detail="Failed to parse Gemini response as JSON") from e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"RAG answering failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"RAG answering failed: {e!s}") from e
 
     def _shape(h: dict) -> dict:
         return {

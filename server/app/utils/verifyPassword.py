@@ -1,6 +1,7 @@
-from fastapi import HTTPException
-import bcrypt
 import re
+
+import bcrypt
+from fastapi import HTTPException
 
 email_regex = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 

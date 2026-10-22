@@ -20,11 +20,11 @@ Minutes consists of three interconnected subsystems:
                                                                     │
                                                       ┌─────────────┴─────────────┐
                                                       ▼                           ▼
-                                            [ Groq Whisper API ]         [ Gemini 3.6 Flash ]
+                                             [ Groq Whisper API ]         [ Gemini 3.8 Flash ]
                                             (Speech-to-Text)             (JSON Summarization)
 ```
 
-1. **`server/` (FastAPI Backend)**: Handles auth, SQL database records, Cloudflare R2 audio persistence, Groq Whisper transcription, and Gemini 3.6 Flash summarization.
+1. **`server/` (FastAPI Backend)**: Handles auth, SQL database records, Cloudflare R2 audio persistence, Groq Whisper transcription, and Gemini 3.8 Flash summarization.
 2. **`extension/` (Chrome Extension V3)**: Detects Google Meet sessions, spawns an offscreen audio recorder document (`offscreen.html`), records tab audio into `.webm` format via `MediaRecorder`, and uploads audio directly to the backend.
 3. **`client/` (Next.js 16 Web Dashboard)**: App Router frontend for reviewing meeting notes, managing action item statuses, and reading timestamped transcripts.
 
@@ -84,19 +84,44 @@ source venv/bin/activate
 # Run backend server locally
 uvicorn app.main:app --reload --port 8000
 
-# Check Python syntax
-python3 -m py_compile app/main.py app/models/*.py app/services/*.py app/api/*.py
+# Lint (same rules CI enforces)
+ruff check .
+
+# Run the test suite
+pytest -q
+
+# Run the test suite with coverage
+pytest -q --cov=app --cov-report=term-missing:skip-covered
 ```
+
+**The test suite is hermetic.** `server/tests/conftest.py` redirects `DATABASE_URL` to a
+temporary SQLite file and blanks the provider API keys *before* any `app.*` module is
+imported. Do not remove that guard: `server/.env` points at the production database and
+`app.main` calls `ensure_schema()` at import time, so a test run without it would issue
+DDL against production.
 
 ### Frontend (`client/`)
 
 ```bash
+# Install dependencies
+npm ci
+
 # Start dev server
 npm run dev
+
+# Lint (same rules CI enforces)
+npm run lint -- --max-warnings=0
 
 # Build production bundle / verify TypeScript compilation
 npm run build
 ```
+
+### CI (`.github/workflows/ci.yml`)
+
+Four independent gates run on every push and pull request to `dev`/`main`:
+`lint-server` (Ruff), `test-server` (pytest + coverage), `lint-client` (ESLint), and
+`build-client` (`next build`). Keep them green before pushing — a change that breaks
+lint or tests will block the deploy workflow.
 
 ---
 

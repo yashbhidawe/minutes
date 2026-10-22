@@ -1,5 +1,7 @@
-from datetime import datetime, timezone
-from sqlalchemy import Column, Float, ForeignKey, Integer, Text, String
+from datetime import UTC, datetime
+
+from sqlalchemy import Column, Float, ForeignKey, Integer, String, Text
+
 from app.core.db_connection import Base
 
 
@@ -21,4 +23,4 @@ class MeetingChunk(Base):
     start_sec = Column(Float, nullable=True)
     end_sec = Column(Float, nullable=True)
     embedding = Column(Text, nullable=True)
-    created_at = Column(String(50), nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
+    created_at = Column(String(50), nullable=False, default=lambda: datetime.now(UTC).isoformat())

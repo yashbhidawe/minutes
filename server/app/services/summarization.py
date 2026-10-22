@@ -1,8 +1,9 @@
 import json
 import time
-from fastapi import HTTPException
 from os import getenv
+
 from dotenv import load_dotenv
+from fastapi import HTTPException
 from google import genai
 from google.genai import types
 
@@ -132,7 +133,7 @@ def summarize_transcript(transcript_text: str) -> dict:
         return json.loads(raw)
     except HTTPException:
         raise
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as e:
         raise HTTPException(
             status_code=500, detail="Failed to parse Gemini response as JSON"
-        )
+        ) from e

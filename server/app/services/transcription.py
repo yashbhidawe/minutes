@@ -1,8 +1,9 @@
 import json
+from os import getenv
+
+from dotenv import load_dotenv
 from fastapi import HTTPException
 from openai import OpenAI
-from os import getenv
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -51,4 +52,4 @@ def transcribe_audio(audio_bytes: bytes, filename: str) -> dict:
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Transcription failed: {e!s}") from e

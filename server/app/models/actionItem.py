@@ -1,5 +1,7 @@
-from datetime import datetime, timezone
-from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
+from datetime import UTC, datetime
+
+from sqlalchemy import Column, ForeignKey, Integer, String
+
 from app.core.db_connection import Base
 
 
@@ -13,5 +15,5 @@ class ActionItem(Base):
     due_date = Column(String(50), nullable=True)
     priority = Column(String(10), nullable=False, default="medium")
     status = Column(String(20), nullable=False, default="pending")
-    created_at = Column(String(50), nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
-    updated_at = Column(String(50), nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
+    created_at = Column(String(50), nullable=False, default=lambda: datetime.now(UTC).isoformat())
+    updated_at = Column(String(50), nullable=False, default=lambda: datetime.now(UTC).isoformat())

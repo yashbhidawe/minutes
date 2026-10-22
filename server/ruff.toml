@@ -1,0 +1,51 @@
+# Ruff configuration for the FastAPI server.
+#
+# The rule set is pinned explicitly on purpose: Ruff's default selection
+# changes between releases, so an unpinned config makes CI fail on a
+# dependency bump rather than on a code change.
+#
+# Kept deliberately conservative — this is a lint gate, not a reformatting
+# project. Anything that would require restructuring working code is
+# ignored rather than fixed.
+
+target-version = "py312"
+line-length = 120
+
+[lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes — undefined names, unused imports/variables
+    "I",    # isort — import ordering
+    "UP",   # pyupgrade — modern Python syntax
+    "B",    # flake8-bugbear — real bug patterns
+    "SIM",  # flake8-simplify
+    "RUF",  # ruff-specific rules
+]
+
+ignore = [
+    # FastAPI's `Depends(...)` in a default argument is the framework's
+    # documented dependency-injection idiom, not a mutable-default bug.
+    "B008",
+    # Line length is enforced by the formatter, not the linter.
+    "E501",
+    # `except Exception` is used deliberately in the AI/R2 integration layer,
+    # where any provider failure must degrade to a retriable state.
+    "BLE001",
+    # Module names are not PEP 8 compliant by convention here (`actionItem.py`,
+    # `meeting_chunk.py`); renaming would break imports for no benefit.
+    "N999",
+]
+
+[lint.per-file-ignores]
+# Test files legitimately import symbols to patch them, and use
+# `assert` for control flow in fixtures.
+"tests/*" = ["F401", "F811", "B011"]
+# `__init__.py` files are allowed to be empty.
+"__init__.py" = ["F401"]
+
+[lint.isort]
+known-first-party = ["app"]
+
+[format]
+quote-style = "double"
+indent-style = "space"

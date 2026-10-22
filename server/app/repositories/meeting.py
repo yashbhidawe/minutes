@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
-from app.models.meeting import Meeting
-from app.models.transcript import Transcript
-from app.models.note import Note
+
 from app.models.actionItem import ActionItem
+from app.models.meeting import Meeting
 from app.models.meeting_chunk import MeetingChunk
+from app.models.note import Note
+from app.models.transcript import Transcript
 
 
 class MeetingRepository:
@@ -32,7 +33,7 @@ class MeetingRepository:
         self.session.refresh(meeting)
         return meeting
 
-    def update_status(self, meeting_id: int, status: str, audio_key: str = None) -> Meeting | None:
+    def update_status(self, meeting_id: int, status: str, audio_key: str | None = None) -> Meeting | None:
         meeting = self.get_by_id(meeting_id)
         if not meeting:
             return None
@@ -95,7 +96,7 @@ class MeetingRepository:
         self.session.commit()
         return count
 
-    def save_transcript(self, meeting_id: int, raw_text: str, language: str, segments: str = None) -> Transcript:
+    def save_transcript(self, meeting_id: int, raw_text: str, language: str, segments: str | None = None) -> Transcript:
         transcript = Transcript(
             meeting_id=meeting_id,
             raw_text=raw_text,

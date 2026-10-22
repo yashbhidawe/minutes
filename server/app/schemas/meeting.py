@@ -1,5 +1,6 @@
 import json
-from pydantic import BaseModel, field_validator
+
+from pydantic import BaseModel, ConfigDict, field_validator
 
 
 class MeetingCreate(BaseModel):
@@ -18,8 +19,7 @@ class MeetingResponse(BaseModel):
     created_at: str
     updated_at: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class MeetingUploadResponse(BaseModel):
@@ -44,8 +44,7 @@ class TranscriptResponse(BaseModel):
     segments: list[TranscriptSegment] | None = None
     created_at: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
     @field_validator("segments", mode="before")
     @classmethod

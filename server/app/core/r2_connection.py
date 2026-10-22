@@ -1,5 +1,6 @@
-import boto3
 from os import getenv
+
+import boto3
 from dotenv import load_dotenv
 
 load_dotenv()

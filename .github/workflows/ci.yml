@@ -1,0 +1,138 @@
+# CI for the whole repository.
+#
+# Four independent gates:
+#   lint-server    — Ruff over the FastAPI server
+#   test-server    — pytest against an isolated database
+#   lint-client    — ESLint over the Next.js dashboard
+#   build-client   — `next build` type-checks and compiles the dashboard
+#
+# Every job is self-contained and needs no repository secrets. The server
+# tests run against a throwaway SQLite file (see server/tests/conftest.py) —
+# they never touch a real database or a real provider API.
+name: CI
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - dev
+      - main
+
+# Supersede stale runs on the same branch to save Actions minutes.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-server:
+    name: Lint (ruff, server)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: "server/requirements-dev.txt"
+
+      - name: Install dependencies
+        run: pip install -r server/requirements-dev.txt
+
+      - name: Run ruff
+        working-directory: server
+        # The rule set is pinned in server/ruff.toml so a Ruff release that
+        # changes its defaults cannot break CI on a dependency bump.
+        run: ruff check .
+
+  test-server:
+    name: Test (pytest, server)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12 with pip caching
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: "server/requirements*.txt"
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install dependencies
+        run: pip install -r server/requirements-dev.txt
+
+      - name: Run tests
+        working-directory: server
+        # The suite redirects DATABASE_URL to a temporary SQLite file and
+        # scrubs provider credentials, so this never reaches a real service.
+        run: pytest -q --cov=app --cov-report=term-missing:skip-covered --cov-report=xml
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-coverage
+          path: server/coverage.xml
+          if-no-files-found: ignore
+
+  lint-client:
+    name: Lint (eslint, client)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node 24 with npm caching
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: "client/package-lock.json"
+
+      - name: Install dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Run eslint
+        working-directory: client
+        # --max-warnings=0 keeps warnings from accumulating unnoticed.
+        run: npm run lint -- --max-warnings=0
+
+  build-client:
+    name: Build (next build, client)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node 24 with npm caching
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: "client/package-lock.json"
+
+      - name: Install dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Build
+        working-directory: client
+        env:
+          # Build-time configuration only; no secrets are involved.
+          NEXT_PUBLIC_API_URL: "http://localhost:8000"
+          NEXT_PUBLIC_SITE_URL: "http://localhost:3000"
+        run: npm run build
