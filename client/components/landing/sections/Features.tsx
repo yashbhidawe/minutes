@@ -1,5 +1,4 @@
 import { Reveal } from "../Reveal";
-import { Check } from "../Check";
 
 const FEATURES = [
   {

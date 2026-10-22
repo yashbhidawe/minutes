@@ -1,6 +1,8 @@
 import io
 import json
+
 from pydub import AudioSegment
+
 from app.services.transcription import transcribe_audio
 
 MAX_CHUNK_DURATION_MS = 600 * 1000  # 10 minutes (600,000 ms)
@@ -28,7 +30,7 @@ def split_audio_into_chunks(audio_bytes: bytes, filename: str) -> list[tuple[byt
             audio = AudioSegment.from_file(io.BytesIO(audio_bytes))
         except Exception as e:
             print(f"[audio_chunker] Pydub loading error on large file: {e}")
-            raise RuntimeError(f"Failed to process audio file format ({file_ext}): {e}")
+            raise RuntimeError(f"Failed to process audio file format ({file_ext}): {e}") from e
 
     total_duration_ms = len(audio)
     chunks = []

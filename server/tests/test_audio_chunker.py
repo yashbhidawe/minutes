@@ -1,8 +1,10 @@
 import json
 from io import BytesIO
 from unittest.mock import patch
+
 from pydub.generators import Sine
-from app.services.audio_chunker import split_audio_into_chunks, process_and_transcribe_audio
+
+from app.services.audio_chunker import process_and_transcribe_audio, split_audio_into_chunks
 
 
 def test_split_short_audio():

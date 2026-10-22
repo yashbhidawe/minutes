@@ -1,22 +1,22 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, BackgroundTasks, Header, Response
+
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Response, UploadFile
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+
 from app.core.db_connection import SessionLocal
 from app.models.user import User
-from app.utils.auth import get_current_user
+from app.repositories.action_item import ActionItemRepository
 from app.repositories.meeting import MeetingRepository
 from app.repositories.note import NoteRepository
-from app.repositories.action_item import ActionItemRepository
-from os import getenv
-from app.services.audio import upload_audio
-from app.services.audio_chunker import process_and_transcribe_audio
-from app.services.transcription import transcribe_audio
-from app.services.summarization import summarize_transcript
-from app.services.storage import delete_file, download_file
-from app.services.celery_tasks import dispatch_meeting_task, execute_meeting_pipeline, BUSY_STATUSES
-from app.schemas.meeting import MeetingResponse, MeetingUploadResponse, TranscriptResponse, TranscriptSegment
-from app.schemas.note import NoteResponse
 from app.schemas.action_item import ActionItemResponse
+from app.schemas.meeting import MeetingResponse, MeetingUploadResponse, TranscriptResponse
+from app.schemas.note import NoteResponse
+from app.services.audio import upload_audio
+from app.services.celery_tasks import BUSY_STATUSES, dispatch_meeting_task, execute_meeting_pipeline
+from app.services.storage import delete_file, download_file
+from app.services.summarization import summarize_transcript
+from app.services.transcription import transcribe_audio
+from app.utils.auth import get_current_user
 
 router = APIRouter(prefix="/meetings", tags=["meetings"])
 

@@ -1,8 +1,8 @@
 """Package marker for server.app.models."""
 
-from .user import User
-from .meeting import Meeting
-from .transcript import Transcript
-from .note import Note
 from .actionItem import ActionItem
+from .meeting import Meeting
 from .meeting_chunk import MeetingChunk
+from .note import Note
+from .transcript import Transcript
+from .user import User

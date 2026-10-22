@@ -1,14 +1,14 @@
 from fastapi import HTTPException
 
-from app.schemas.user import UserCreate
-from app.schemas.user import LoginRequest
+from app.schemas.user import LoginRequest, UserCreate
+from app.utils.auth import create_access_token
 from app.utils.verifyPassword import (
     hash_password,
     verify_email_format,
     verify_password,
     verify_password_format,
 )
-from app.utils.auth import create_access_token
+
 
 class UserService:
     def __init__(self, user_repository):

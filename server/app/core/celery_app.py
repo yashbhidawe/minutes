@@ -1,4 +1,5 @@
 from os import getenv
+
 from celery import Celery
 from celery.signals import worker_process_init
 

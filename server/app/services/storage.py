@@ -1,4 +1,4 @@
-from app.core.r2_connection import get_r2_client, R2_BUCKET_NAME
+from app.core.r2_connection import R2_BUCKET_NAME, get_r2_client
 
 
 def upload_file(file_bytes: bytes, key: str) -> str:

@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 export function SiteFooter() {
   return (
     <footer className="border-t border-stone-200 dark:border-stone-800 bg-white dark:bg-[#0f0f0e]">

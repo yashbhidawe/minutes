@@ -1,4 +1,3 @@
-import { Check } from "../Check";
 import { Reveal } from "../Reveal";
 
 export function ExtensionSection() {
@@ -18,7 +17,7 @@ export function ExtensionSection() {
             </h2>
             <p className="text-lg text-stone-500 dark:text-stone-400 leading-relaxed mb-8">
               Add Minutes once, sign in, and it captures your Google Meet
-              tab audio while you record. A floating widget shows you're live —
+              tab audio while you record. A floating widget shows you&apos;re live —
               then the notes appear in your dashboard when the call ends.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">

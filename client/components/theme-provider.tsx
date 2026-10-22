@@ -6,7 +6,7 @@ import {
   useContext,
   useEffect,
   useRef,
-  useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 
@@ -26,15 +26,55 @@ const ThemeContext = createContext<{
   toggleTheme: (point?: TogglePoint) => void;
 } | undefined>(undefined);
 
-function applyTheme(theme: Theme) {
+const THEME_KEY = "theme";
+
+// localStorage is an external store, so the theme is read through
+// useSyncExternalStore rather than mirrored into React state from an effect.
+// That keeps the server-rendered markup and the first client render in
+// agreement (both "light") and lets React reconcile the stored preference
+// right after hydration.
+const themeListeners = new Set<() => void>();
+
+function notifyThemeChange() {
+  for (const listener of themeListeners) listener();
+}
+
+function subscribeToTheme(onStoreChange: () => void) {
+  themeListeners.add(onStoreChange);
+  // Fires in other tabs, so the theme stays in sync across windows.
+  window.addEventListener("storage", onStoreChange);
+  return () => {
+    themeListeners.delete(onStoreChange);
+    window.removeEventListener("storage", onStoreChange);
+  };
+}
+
+function getThemeSnapshot(): Theme {
+  try {
+    return localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light";
+  } catch {
+    // storage can be unavailable in private mode
+    return "light";
+  }
+}
+
+function getServerThemeSnapshot(): Theme {
+  return "light";
+}
+
+function applyThemeClass(theme: Theme) {
   const root = document.documentElement;
   root.classList.toggle("dark", theme === "dark");
   root.classList.toggle("light", theme === "light");
+}
+
+function persistTheme(theme: Theme) {
   try {
-    localStorage.setItem("theme", theme);
+    localStorage.setItem(THEME_KEY, theme);
   } catch {
     // storage can be unavailable in private mode
   }
+  notifyThemeChange();
 }
 
 function playTick() {
@@ -64,29 +104,25 @@ function playTick() {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light");
-  const themeRef = useRef<Theme>("light");
+  const theme = useSyncExternalStore(
+    subscribeToTheme,
+    getThemeSnapshot,
+    getServerThemeSnapshot
+  );
+  const themeRef = useRef<Theme>(theme);
 
   useEffect(() => {
-    let stored: string | null = null;
-    try {
-      stored = localStorage.getItem("theme");
-    } catch {
-      stored = null;
-    }
-    const initial: Theme = stored === "dark" ? "dark" : "light";
-    themeRef.current = initial;
-    setTheme(initial);
-    applyTheme(initial);
-  }, []);
+    themeRef.current = theme;
+    applyThemeClass(theme);
+  }, [theme]);
 
   const toggleTheme = useCallback((point?: TogglePoint) => {
     const next: Theme = themeRef.current === "light" ? "dark" : "light";
 
     const commit = () => {
       themeRef.current = next;
-      applyTheme(next);
-      setTheme(next);
+      applyThemeClass(next);
+      persistTheme(next);
     };
 
     playTick();

@@ -1,5 +1,4 @@
 import { Reveal } from "../Reveal";
-import { Check } from "../Check";
 
 export function AskSection() {
   return (
@@ -11,7 +10,7 @@ export function AskSection() {
           </h2>
           <p className="text-stone-600 dark:text-stone-300 leading-relaxed mb-10 max-w-xl">
             Open any processed meeting and type a question. Answers are
-            grounded in that meeting's transcript and cite the exact moments —
+            grounded in that meeting&apos;s transcript and cite the exact moments —
             click a citation and the audio jumps there.
           </p>
         </Reveal>

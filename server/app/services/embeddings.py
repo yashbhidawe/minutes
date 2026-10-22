@@ -1,8 +1,9 @@
 """Gemini embeddings wrapper (no new API key needed)."""
 
-from fastapi import HTTPException
 from os import getenv
+
 from dotenv import load_dotenv
+from fastapi import HTTPException
 
 load_dotenv()
 
@@ -61,4 +62,4 @@ def embed_texts(texts: list[str], batch_size: int = 100) -> list[list[float]]:
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Embedding failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Embedding failed: {e!s}") from e

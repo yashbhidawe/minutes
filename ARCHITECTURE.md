@@ -141,6 +141,19 @@ The natural alternative is pgvector, Pinecone, or similar. Rejected because the 
 
 ## Testing
 
-Pytest suite in `server/tests/` covers the audio chunker, the audio and storage/R2 services, Celery tasks, repositories, the meetings API, the user service, and the transcription/summarization services with mocked providers. CI runs the suite on every push to `dev` and `main` (`.github/workflows/tests.yml`).
+53 pytest tests in `server/tests/` cover the audio chunker, the audio and storage/R2 services, Celery dispatch, repositories, the meetings API, the chat/RAG API, the auth dependency, transcript chunking, the embedding wrapper, and the transcription/summarization services with mocked providers.
 
-Not yet covered by tests: the chat/RAG endpoints, the embedding and chunking services, and the auth dependency.
+`server/tests/conftest.py` redirects `DATABASE_URL` to a throwaway SQLite file and scrubs provider credentials **before** any application module is imported. This matters: `server/.env` points at the production database, and `app.main` runs `ensure_schema()` at import time, so without the guard a local test run would issue DDL against production. The suite is therefore hermetic — it never reaches a real database or a real provider API, and it runs identically in CI where no `.env` exists.
+
+CI (`.github/workflows/ci.yml`) runs four independent gates on every push and pull request:
+
+| Job | Tool | What it catches |
+|---|---|---|
+| `lint-server` | Ruff | Unused imports, undefined names, import order, modern-syntax drift |
+| `test-server` | pytest + coverage | Behaviour regressions; publishes a coverage artifact |
+| `lint-client` | ESLint (`--max-warnings=0`) | React hook misuse, unescaped entities, dead code |
+| `build-client` | `next build` | Type errors, broken imports, prerender failures |
+
+The Ruff rule set is pinned in `server/ruff.toml` rather than left to Ruff's defaults, so a dependency bump cannot fail the build by changing which rules are enabled.
+
+Not yet covered by tests: the meetings upload/reprocess endpoints, the audio and storage services against a real provider, and the Celery worker's retry path.
