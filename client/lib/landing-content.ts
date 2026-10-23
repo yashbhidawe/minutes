@@ -36,7 +36,7 @@ export interface Faq {
 export const FAQS: Faq[] = [
   {
     q: "What is Minutes?",
-    a: "Minutes is an automatic note-taker for Google Meet. It captures meetings you are authorized to record, creates a timestamped transcript, and produces decisions, highlights and action items.",
+    a: "Minutes is meeting notes for Indian sales teams. It captures Hindi, English, and Hinglish sales calls in the same sentence, then gives you timestamps, summaries, and action items. It is open source.",
   },
   {
     q: "Does a bot join my meeting?",
@@ -51,23 +51,24 @@ export const FAQS: Faq[] = [
     a: "Meetings are associated with your private account. Audio, transcripts and summaries are processed by our infrastructure and AI providers. Deleting a meeting removes its active transcript, notes, action items and stored audio; see our Privacy Policy for processing details.",
   },
   {
-    q: "What does it cost?",
-    a: "Free to start, no credit card required. Create an account, add the extension, and capture your next meeting.",
+    q: "Is it free?",
+    a: "Minutes is open source. Install the extension and use it at no cost.",
   },
 ];
 
 export const DEFINITION_ANSWER =
-  "Minutes is an automatic note-taker for Google Meet. It captures meetings you are authorized to record, creates a timestamped transcript, and produces decisions, blockers, next steps and action items. Ask anything, and every answer cites the transcript. No bot joins your call and no admin setup is required.";
+  "Minutes is meeting notes for Indian sales teams. It captures Hindi, English, and Hinglish sales calls in the same sentence, then gives you timestamps, summaries, and action items. Ask anything, and every answer cites the transcript. No bot joins your call and no admin setup is required. Open source.";
 
 export const TICKER = [
-  "Automatic capture",
-  "Post-call summaries",
+  "Hindi English Hinglish support",
+  "Sales call notes",
   "Action items",
   "Timestamped transcripts",
   "Decisions & next steps",
-  "Ask AI",
+  "Ask your meetings",
   "Cited answers",
   "Copy & export",
   "Private account",
   "No bots",
+  "Open source",
 ];

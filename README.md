@@ -1,16 +1,16 @@
 # Minutes
 
-Automatic meeting notes for Google Meet. Records tab audio upon call completion, transcribes via Groq Whisper (`whisper-large-v3`), and generates structured summaries and action items using Google Gemini (`gemini-3.8-flash`). Notes and timestamped transcripts are accessible via a Next.js web dashboard.
+Meeting notes for Indian sales teams. Captures Hindi, English, and Hinglish sales calls in the same sentence, then gives you timestamps, summaries, and action items. Records tab audio upon call completion, transcribes via Groq Whisper (`whisper-large-v3`), and generates structured summaries and action items using Google Gemini (`gemini-3.8-flash`). Notes and timestamped transcripts are accessible via a Next.js web dashboard. Open source.
 
 ---
 
 ## Problem
 
-Google Meet does not provide built-in transcription, meeting notes, or action item extraction. Users must take manual notes during calls or rely on separate recording and transcription tools that do not integrate with the meeting context.
+Google Meet does not provide built-in transcription, meeting notes, or action item extraction. Most meeting tools are English-first and handle Hindi, English, and Hinglish mixed in the same sentence poorly. Indian sales teams must take manual notes during calls or rely on separate recording and transcription tools that do not integrate with the meeting context.
 
 ## Solution
 
-Minutes captures tab audio directly from an active Google Meet call, uploads it to a FastAPI backend, runs it through Groq Whisper for speech-to-text and Gemini 3.8 Flash for structured summarization, and surfaces notes, decisions, action items, and timestamped transcripts in a Next.js dashboard.
+Minutes is meeting notes for Indian sales teams. It captures tab audio directly from an active Google Meet call, uploads it to a FastAPI backend, runs it through Groq Whisper for speech-to-text and Gemini 3.8 Flash for structured summarization, and surfaces notes, decisions, action items, and timestamped transcripts in a Next.js dashboard. Hindi, English, and Hinglish are captured together — no language selection required before the call. Open source.
 
 ---
 

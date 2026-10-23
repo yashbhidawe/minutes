@@ -8,7 +8,7 @@ export function SiteFooter() {
               Minutes
             </span>
             <p className="text-[12px] text-stone-500 dark:text-stone-400 max-w-xs leading-relaxed">
-              Meeting notes that write themselves. For meetings you are authorized to record.
+              Meeting notes for Hindi, English, and Hinglish sales calls. Open source.
             </p>
           </div>
           <div className="flex flex-col items-start gap-2.5 text-xs font-medium text-stone-500 dark:text-stone-400">

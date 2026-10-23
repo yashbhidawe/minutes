@@ -4,7 +4,7 @@ import { SITE_URL } from "@/lib/site";
 
 const title = "Create your free account";
 const description =
-  "Create a free Minutes account to turn your Google Meet calls into summaries, decisions and action items.";
+  "Create a free Minutes account to record and summarize your Hindi, English, and Hinglish sales calls.";
 
 export const metadata: Metadata = {
   title,
