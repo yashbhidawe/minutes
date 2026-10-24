@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo } from "@/components/landing/Logo";
 import { SiteFooter } from "@/components/landing/sections";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, LANGUAGE_URLS } from "@/lib/site";
 
 const title = "Privacy Policy";
 const description = "How Minutes handles meeting audio, transcripts, account data, and AI processing for sales call notes.";
@@ -10,7 +10,10 @@ const description = "How Minutes handles meeting audio, transcripts, account dat
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: "/privacy" },
+  alternates: {
+    canonical: "/privacy",
+    languages: LANGUAGE_URLS,
+  },
   openGraph: {
     type: "website",
     url: `${SITE_URL}/privacy`,

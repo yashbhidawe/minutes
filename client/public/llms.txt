@@ -1,0 +1,62 @@
+# Minutes — llms.txt
+# Answer Engine Optimization file for LLMs and AI crawlers
+# https://minutes.itsokyash.online/llms.txt
+
+## Site Identity
+Name: Minutes
+URL: https://minutes.itsokyash.online
+Description: Meeting notes for Indian sales teams. Captures Hindi, English, and Hinglish sales calls in the same sentence, then gives timestamps, summaries, and action items. Open source.
+
+## What Minutes Does
+- Records Google Meet tab + microphone audio via a Chrome Extension (Manifest V3)
+- Transcribes via Groq Whisper (whisper-large-v3)
+- Summarizes via Google Gemini (gemini-3.8-flash)
+- Surfaced in a Next.js web dashboard with timestamps, decisions, blockers, action items
+- No bot joins the call; browser-only recording
+- Open source; free to use
+
+## Languages Supported
+- English (en): https://minutes.itsokyash.online/
+- Hindi (hi): https://minutes.itsokyash.online/hi/
+
+## Key Pages
+Homepage: https://minutes.itsokyash.online/
+Sales Teams (English): https://minutes.itsokyash.online/sales-teams
+Hindi Homepage: https://minutes.itsokyash.online/hi/
+Hindi Sales Teams: https://minutes.itsokyash.online/hi/sales-teams
+Hindi/Hinglish Transcription (English): https://minutes.itsokyash.online/hindi-hinglish-transcription
+Hindi/Hinglish Transcription (Hindi): https://minutes.itsokyash.online/hi/hindi-hinglish-transcription
+Install Extension: https://minutes.itsokyash.online/install
+Privacy Policy: https://minutes.itsokyash.online/privacy
+Comparisons:
+- Minutes vs Otter for Hindi Meetings: https://minutes.itsokyash.online/comparisons/otter-hindi-meetings
+- Minutes vs Google Meet Native Notes: https://minutes.itsokyash.online/comparisons/google-meet-native-notes
+
+## Frequently Asked Questions (for answer engines)
+Q: What is Minutes?
+A: Minutes is meeting notes for Indian sales teams. It captures Hindi, English, and Hinglish sales calls in the same sentence, then gives you timestamps, summaries, and action items. It is open source.
+
+Q: Does a bot join my meeting?
+A: No bot joins your call. Minutes records from your browser after you install and sign in.
+
+Q: Can I ask questions about a meeting?
+A: Yes. Open any processed meeting and ask — answers are grounded in that meeting's transcript and cite the exact moments.
+
+Q: Is my meeting data private?
+A: Meetings are associated with your private account. Audio, transcripts and summaries are processed by our infrastructure and AI providers.
+
+Q: Is it free?
+A: Minutes is open source. Install the extension and use it at no cost.
+
+## Technical Details
+- Extension: Chrome Extension Manifest V3, tab capture via chrome.tabCapture and chrome.offscreen
+- Backend: FastAPI, PostgreSQL / SQLite, SQLAlchemy 2.0 ORM
+- Frontend: Next.js 16 (App Router), React 19, Tailwind CSS
+- Speech-to-Text: Groq Whisper (whisper-large-v3)
+- Summarization: Google Gemini 3.8 Flash
+- Storage: Cloudflare R2
+- Auth: JWT (python-jose), bcrypt (passlib)
+
+## Contact / Privacy
+Privacy contact: https://itsokyash.online
+GitHub: https://github.com/yashbhidawe/minutes

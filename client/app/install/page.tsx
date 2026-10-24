@@ -4,7 +4,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { Logo } from "@/components/landing/Logo";
 import { SiteFooter } from "@/components/landing/sections";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, LANGUAGE_URLS } from "@/lib/site";
 
 const title = "Install the Chrome Extension";
 const description =
@@ -13,7 +13,10 @@ const description =
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: "/install" },
+  alternates: {
+    canonical: "/install",
+    languages: LANGUAGE_URLS,
+  },
   openGraph: {
     type: "website",
     url: `${SITE_URL}/install`,

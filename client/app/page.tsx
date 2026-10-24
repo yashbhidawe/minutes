@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SITE_DESCRIPTION } from "@/lib/site";
+import { SITE_DESCRIPTION, LANGUAGE_URLS } from "@/lib/site";
 import { LandingNav } from "@/components/landing";
 import {
   ExtensionSection,
@@ -15,7 +15,10 @@ import {
 export const metadata: Metadata = {
   title: "Meeting Notes for Hindi, English, and Hinglish Sales Calls",
   description: SITE_DESCRIPTION,
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: "/",
+    languages: LANGUAGE_URLS,
+  },
 };
 
 export default function LandingPage() {
