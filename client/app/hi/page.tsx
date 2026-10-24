@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_DESCRIPTION } from "@/lib/site";
-import { HindiNav } from "@/components/landing/HindiNav";
 import { SiteFooter } from "@/components/landing/sections";
 
 export const metadata: Metadata = {
@@ -13,7 +12,6 @@ export const metadata: Metadata = {
 export default function HindiHomePage() {
   return (
     <div className="min-h-screen bg-[#fafaf9] dark:bg-[#0f0f0e] text-stone-900 dark:text-stone-50 antialiased overflow-x-clip">
-      <HindiNav />
       <main className="max-w-4xl mx-auto px-6 pt-14 pb-24">
         <section className="mb-16">
           <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-400 dark:text-stone-500 mb-3">

@@ -45,12 +45,9 @@ export default function HindiLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="hi" suppressHydrationWarning className="h-full antialiased">
-      <head />
-      <body className="min-h-full flex flex-col">
-        <HindiNav />
-        {children}
-      </body>
-    </html>
+    <>
+      <HindiNav />
+      {children}
+    </>
   );
 }
