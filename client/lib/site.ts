@@ -11,4 +11,4 @@ export const SITE_URL = (
 export const SITE_NAME = "Minutes";
 
 export const SITE_DESCRIPTION =
-  "Minutes turns meetings you are authorized to record into timestamped transcripts, summaries, decisions and action items. No bot joins your call, no admin setup, free to start.";
+  "Minutes is meeting notes for Indian sales teams. It captures Hindi, English, and Hinglish sales calls in the same sentence, then gives you timestamps, summaries, and action items. Open source.";

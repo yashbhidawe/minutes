@@ -1,12 +1,12 @@
 // Endpoints injected via config.js at package time (see extension/build.sh).
 const API_BASE =
-  (typeof MINUTE_AI_CONFIG !== "undefined" && MINUTE_AI_CONFIG.API_BASE) ||
+  (typeof MINUTES_CONFIG !== "undefined" && MINUTES_CONFIG.API_BASE) ||
   "http://localhost:8000";
 const DASHBOARD_URL =
-  (typeof MINUTE_AI_CONFIG !== "undefined" && MINUTE_AI_CONFIG.DASHBOARD_URL) ||
+  (typeof MINUTES_CONFIG !== "undefined" && MINUTES_CONFIG.DASHBOARD_URL) ||
   "http://localhost:3000";
 const DASHBOARD_URL_PATTERNS =
-  (typeof MINUTE_AI_CONFIG !== "undefined" && MINUTE_AI_CONFIG.DASHBOARD_HOSTS) || [
+  (typeof MINUTES_CONFIG !== "undefined" && MINUTES_CONFIG.DASHBOARD_HOSTS) || [
     "http://localhost:3000/*",
     "http://127.0.0.1:3000/*",
   ];

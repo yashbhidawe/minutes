@@ -32,13 +32,13 @@ export default function RegisterPage() {
       <div className="hidden lg:flex lg:w-1/2 bg-stone-900 items-center justify-center p-16">
         <div className="max-w-md">
           <h1 className="text-4xl font-light text-stone-100 tracking-tight leading-tight">
-            Start capturing
+            Start capturing sales calls.
             <br />
-            <span className="font-semibold">every word.</span>
+            <span className="font-semibold">Hindi, English, Hinglish.</span>
           </h1>
           <p className="mt-6 text-stone-400 text-lg leading-relaxed">
-            Create an account to start recording and summarizing
-            your meetings with AI.
+            Create an account to record and summarize your Hindi,
+            English, and Hinglish sales calls.
           </p>
         </div>
       </div>

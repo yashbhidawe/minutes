@@ -27,7 +27,6 @@ export function JsonLd() {
         operatingSystem: "Chrome",
         url: SITE_URL,
         description: SITE_DESCRIPTION,
-        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       },
       {
         "@type": "FAQPage",
@@ -39,7 +38,7 @@ export function JsonLd() {
       },
       {
         "@type": "HowTo",
-        name: "How to get automatic meeting notes for Google Meet",
+        name: "How to get meeting notes for Hindi, English, and Hinglish sales calls",
         description:
            "Record a meeting you are authorized to capture and review its transcript, summary and action items after processing.",
         step: STEPS.map((s, i) => ({

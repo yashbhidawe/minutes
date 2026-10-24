@@ -32,13 +32,13 @@ export default function LoginPage() {
       <div className="hidden lg:flex lg:w-1/2 bg-stone-900 items-center justify-center p-16">
         <div className="max-w-md">
           <h1 className="text-4xl font-light text-stone-100 tracking-tight leading-tight">
-            Meeting notes,
+            Meeting notes for sales calls.
             <br />
-            <span className="font-semibold">automatically.</span>
+            <span className="font-semibold">Hindi, English, Hinglish.</span>
           </h1>
           <p className="mt-6 text-stone-400 text-lg leading-relaxed">
-            Record, transcribe, and summarize your meetings with AI.
-            Never take manual notes again.
+            Minutes captures your client calls and gives you timestamps,
+            summaries, and action items. No bot joins your call.
           </p>
         </div>
       </div>

@@ -13,7 +13,7 @@ import {
 } from "@/components/landing/sections";
 
 export const metadata: Metadata = {
-  title: "Automatic Meeting Notes for Google Meet",
+  title: "Meeting Notes for Hindi, English, and Hinglish Sales Calls",
   description: SITE_DESCRIPTION,
   alternates: { canonical: "/" },
 };

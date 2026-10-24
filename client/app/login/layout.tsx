@@ -4,7 +4,7 @@ import { SITE_URL } from "@/lib/site";
 
 const title = "Sign in";
 const description =
-  "Sign in to Minutes to access your meeting notes, summaries and action items.";
+  "Sign in to Minutes to access your sales call notes, transcripts, and action items.";
 
 export const metadata: Metadata = {
   title,

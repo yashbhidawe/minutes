@@ -12,16 +12,15 @@ export function Hero() {
             id="hero-heading"
             className="animate-fade-up-2 text-[42px] leading-[1.02] sm:text-[60px] md:text-[72px] font-light tracking-[-0.03em] text-balance text-stone-950 dark:text-stone-50"
           >
-            Meeting notes
+            Meeting notes for Hindi, English,
             <br />
-            <span className="font-semibold text-stone-900 dark:text-stone-100">that write themselves.</span>
+            <span className="font-semibold text-stone-900 dark:text-stone-100">and Hinglish sales calls.</span>
           </h1>
 
           <p className="animate-fade-up-3 mt-6 text-[16px] md:text-lg leading-relaxed text-stone-500 dark:text-stone-400 max-w-xl">
-             Minutes captures your Google Meet audio, transcribes every
-             word, and summarizes the decisions, blockers, and action items
-             — then lets you ask anything about the call, with answers cited
-             back to the transcript.
+             Minutes captures your client calls in Hindi, English, and
+             Hinglish — mixed in the same sentence. You get timestamps,
+             summaries, and action items after the call. Open source.
           </p>
 
           <div className="animate-fade-up-4 mt-10">

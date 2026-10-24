@@ -12,6 +12,8 @@ export const NAV_LINKS = [
   ["Features", "#features"],
   ["Product", "#product"],
   ["Extension", "#extension"],
+  ["Sales teams", "/sales-teams"],
+  ["Hindi Hinglish", "/hindi-hinglish-transcription"],
   ["FAQ", "#faq"],
 ] as const;
 

@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/landing/sections";
 import { SITE_URL } from "@/lib/site";
 
 const title = "Privacy Policy";
-const description = "How Minutes handles meeting audio, transcripts, account data, and AI processing.";
+const description = "How Minutes handles meeting audio, transcripts, account data, and AI processing for sales call notes.";
 
 export const metadata: Metadata = {
   title,
