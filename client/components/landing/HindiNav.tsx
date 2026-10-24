@@ -10,9 +10,11 @@ import { Arrow } from "./AuthCta";
 export const HINDI_NAV_LINKS = [
   ["कैसे काम करता है", "#how"],
   ["विशेषताएं", "#features"],
+  ["उत्पाद", "#product"],
   ["सेल्स टीम", "/hi/sales-teams"],
   ["हिंदी हिंग्लिश ट्रांसक्रिप्शन", "/hi/hindi-hinglish-transcription"],
   ["एक्सटेंशन", "/install"],
+  ["अक्सर पूछे जाने वाले प्रश्न", "#faq"],
 ] as const;
 
 export function HindiNav() {
