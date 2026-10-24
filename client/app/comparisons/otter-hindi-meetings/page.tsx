@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, LANGUAGE_URLS } from "@/lib/site";
 import { SiteFooter } from "@/components/landing/sections";
 
 export const metadata: Metadata = {
   title: "Minutes vs Otter for Hindi Meetings — Minutes",
   description:
     "Comparing Minutes and Otter for Hindi meetings. Otter is English-first; Minutes captures Hindi, English, and Hinglish sales calls. Open source. Factual comparison only.",
-  alternates: { canonical: "/comparisons/otter-hindi-meetings" },
+  alternates: {
+    canonical: "/comparisons/otter-hindi-meetings",
+    languages: LANGUAGE_URLS,
+  },
   openGraph: {
     type: "website",
     url: `${SITE_URL}/comparisons/otter-hindi-meetings`,

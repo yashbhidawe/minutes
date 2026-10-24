@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, LANGUAGE_URLS } from "@/lib/site";
 
 const title = "Create your free account";
 const description =
@@ -9,7 +9,10 @@ const description =
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: "/register" },
+  alternates: {
+    canonical: "/register",
+    languages: LANGUAGE_URLS,
+  },
   openGraph: {
     type: "website",
     url: `${SITE_URL}/register`,

@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, LANGUAGE_URLS } from "@/lib/site";
 import { SiteFooter } from "@/components/landing/sections";
 
 export const metadata: Metadata = {
   title: "Minutes vs Google Meet Native Notes — Minutes",
   description:
     "Comparing Minutes and Google Meet native notes. Google Meet does not include built-in transcription and meeting notes on free plans; Minutes captures Hindi, English, and Hinglish sales calls. Open source. Factual comparison only.",
-  alternates: { canonical: "/comparisons/google-meet-native-notes" },
+  alternates: {
+    canonical: "/comparisons/google-meet-native-notes",
+    languages: LANGUAGE_URLS,
+  },
   openGraph: {
     type: "website",
     url: `${SITE_URL}/comparisons/google-meet-native-notes`,

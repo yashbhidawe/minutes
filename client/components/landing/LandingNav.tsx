@@ -86,6 +86,12 @@ export function LandingNav() {
         </div>
         <div className="hidden md:flex items-center gap-2.5">
           <ThemeToggle />
+          <Link
+            href="/hi/"
+            className="px-4 py-2 text-[13px] font-medium text-stone-600 dark:text-stone-400 hover:text-stone-950 dark:hover:text-stone-50 transition-colors"
+          >
+            हिन्दी
+          </Link>
           {token ? (
             <Link
               href="/dashboard"
@@ -150,6 +156,13 @@ export function LandingNav() {
               tabIndex={menuOpen ? 0 : -1}
               className="border-b border-stone-100 dark:border-stone-800 hover:text-stone-950 dark:hover:text-stone-50"
             />
+            <Link
+              href="/hi/"
+              tabIndex={menuOpen ? 0 : -1}
+              className="block py-2.5 border-b border-stone-100 dark:border-stone-800 hover:text-stone-950 dark:hover:text-stone-50"
+            >
+              हिन्दी
+            </Link>
             <div className="flex gap-2 pt-3">
               {token ? (
                 <Link
