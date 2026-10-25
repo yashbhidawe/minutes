@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "./Logo";
@@ -10,15 +11,18 @@ import { Arrow } from "./AuthCta";
 export const HINDI_NAV_LINKS = [
   ["कैसे काम करता है", "#how"],
   ["विशेषताएं", "#features"],
-  ["उत्पाद", "#product"],
-  ["सेल्स टीम", "/hi/sales-teams"],
-  ["हिंदी हिंग्लिश ट्रांसक्रिप्शन", "/hi/hindi-hinglish-transcription"],
-  ["एक्सटेंशन", "/install"],
+  ["एक्सटेंशन", "#extension"],
   ["अक्सर पूछे जाने वाले प्रश्न", "#faq"],
 ] as const;
 
 export function HindiNav() {
   const { token } = useAuth();
+  const pathname = usePathname() ?? "/hi";
+  const onHome = pathname.replace(/\/+$/, "") === "/hi";
+  // Section anchors only exist on the Hindi homepage; elsewhere link back to it.
+  const resolve = (href: string) => (href.startsWith("#") && !onHome ? `/hi/${href}` : href);
+  // Language switch lands on the English twin of the current page.
+  const englishHref = pathname.replace(/^\/hi\/?/, "/") || "/";
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -44,7 +48,7 @@ export function HindiNav() {
 
   /* Scrollspy — highlights the nav link for the section in view */
   useEffect(() => {
-    const ids = HINDI_NAV_LINKS.map(([, href]) => href.slice(1));
+    const ids = HINDI_NAV_LINKS.filter(([, href]) => href.startsWith("#")).map(([, href]) => href.slice(1));
     const sections = ids
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => !!el);
@@ -59,7 +63,7 @@ export function HindiNav() {
     );
     sections.forEach((s) => io.observe(s));
     return () => io.disconnect();
-  }, []);
+  }, [pathname]);
 
   return (
     <header
@@ -68,12 +72,12 @@ export function HindiNav() {
       }`}
     >
       <nav className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-4" aria-label="प्राथमिक">
-        <Logo />
+        <Logo href="/hi/" />
         <div className="hidden md:flex items-center gap-7 text-[13px] font-medium text-stone-500 dark:text-stone-400">
           {HINDI_NAV_LINKS.map(([label, href]) => (
             <Link
               key={href}
-              href={href}
+              href={resolve(href)}
               aria-current={active === href ? "true" : undefined}
               className={`nav-link hover:text-stone-950 dark:hover:text-stone-50 transition-colors ${active === href ? "nav-link-active" : ""}`}
             >
@@ -84,7 +88,7 @@ export function HindiNav() {
         <div className="hidden md:flex items-center gap-2.5">
           <ThemeToggle />
           <Link
-            href="/"
+            href={englishHref}
             className="px-4 py-2 text-[13px] font-medium text-stone-600 dark:text-stone-400 hover:text-stone-950 dark:hover:text-stone-50 transition-colors"
           >
             English
@@ -140,7 +144,7 @@ export function HindiNav() {
             {HINDI_NAV_LINKS.map(([label, href]) => (
               <a
                 key={href}
-                href={href}
+                href={resolve(href)}
                 onClick={() => setMenuOpen(false)}
                 tabIndex={menuOpen ? 0 : -1}
                 className="block py-2.5 border-b border-stone-100 dark:border-stone-800 last:border-0 hover:text-stone-950 dark:hover:text-stone-50"
@@ -154,7 +158,7 @@ export function HindiNav() {
               className="border-b border-stone-100 dark:border-stone-800 hover:text-stone-950 dark:hover:text-stone-50"
             />
             <Link
-              href="/"
+              href={englishHref}
               tabIndex={menuOpen ? 0 : -1}
               className="block py-2.5 border-b border-stone-100 dark:border-stone-800 hover:text-stone-950 dark:hover:text-stone-50"
             >

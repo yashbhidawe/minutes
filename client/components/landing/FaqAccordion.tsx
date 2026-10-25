@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { FAQS } from "@/lib/landing-content";
+import { COPY, type Locale } from "@/lib/landing-copy";
 
-export function FaqAccordion() {
+export function FaqAccordion({ locale = "en" }: { locale?: Locale }) {
+  const faqs = COPY[locale].faq.items;
   const [open, setOpen] = useState<number | null>(0);
 
   return (
     <div className="divide-y divide-stone-200 dark:divide-stone-800 border-y border-stone-200 dark:border-stone-800">
-      {FAQS.map((f, i) => {
+      {faqs.map((f, i) => {
         const isOpen = open === i;
         return (
           <div key={f.q}>

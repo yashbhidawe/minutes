@@ -1,6 +1,8 @@
 import { Reveal } from "../Reveal";
+import { COPY, type Locale } from "@/lib/landing-copy";
 
-export function ExtensionSection() {
+export function ExtensionSection({ locale = "en" }: { locale?: Locale }) {
+  const c = COPY[locale].extension;
   return (
     <section id="extension" className="max-w-6xl mx-auto px-6 pb-24 scroll-mt-24" aria-labelledby="extension-heading">
       <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -9,23 +11,21 @@ export function ExtensionSection() {
             <div className="flex items-center gap-2 mb-3">
               <span className="w-1 h-3 rounded bg-red-500" aria-hidden />
               <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500">
-                Chrome extension
+                {c.eyebrow}
               </span>
             </div>
             <h2 id="extension-heading" className="text-3xl md:text-5xl font-light tracking-tight text-stone-950 dark:text-stone-50 mb-4">
-              Installs in a minute.
+              {c.heading}
             </h2>
             <p className="text-lg text-stone-500 dark:text-stone-400 leading-relaxed mb-8">
-              Add Minutes once, sign in, and it captures your Google Meet
-              tab audio while you record. A floating widget shows you&apos;re live —
-              then the notes appear in your dashboard when the call ends.
+              {c.body}
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <a href="/install" className="btn-interactive px-5 py-2.5 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-[13px] font-semibold rounded-md hover:bg-stone-800 dark:hover:bg-stone-300 transition-colors">
-                Get the extension
+                {c.cta}
               </a>
               <a href="/privacy" className="px-5 py-2.5 border border-stone-300 dark:border-stone-700 dark:text-stone-300 text-[13px] font-medium rounded-md hover:border-stone-400 dark:hover:border-stone-500 transition-colors text-center">
-                Privacy policy
+                {c.privacy}
               </a>
             </div>
           </Reveal>
@@ -50,15 +50,15 @@ export function ExtensionSection() {
               <ul className="space-y-2 text-sm text-stone-600 dark:text-stone-400">
                 <li className="flex items-start gap-2">
                   <span className="w-5 h-5 rounded-full bg-stone-900 dark:bg-stone-800 flex items-center justify-center text-[10px] text-white shrink-0">1</span>
-                  <span className="leading-relaxed">Recording tab audio</span>
+                  <span className="leading-relaxed">{c.widget[0]}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-5 h-5 rounded-full bg-stone-900 dark:bg-stone-800 flex items-center justify-center text-[10px] text-white shrink-0">2</span>
-                  <span className="leading-relaxed">Capturing your microphone</span>
+                  <span className="leading-relaxed">{c.widget[1]}</span>
                 </li>
                 <li className="flex items-start gap-2 opacity-50">
                   <span className="w-5 h-5 rounded-full bg-stone-900 dark:bg-stone-800 flex items-center justify-center text-[10px] text-white shrink-0">3</span>
-                  <span className="leading-relaxed">Transcribing after the call</span>
+                  <span className="leading-relaxed">{c.widget[2]}</span>
                 </li>
               </ul>
             </div>

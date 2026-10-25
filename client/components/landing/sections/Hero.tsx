@@ -1,8 +1,10 @@
 import { AuthCta } from "../AuthCta";
 import { HeroDemo } from "../HeroDemo";
 import { Check } from "../Check";
+import { COPY, type Locale } from "@/lib/landing-copy";
 
-export function Hero() {
+export function Hero({ locale = "en" }: { locale?: Locale }) {
+  const c = COPY[locale].hero;
   return (
     <section className="relative" aria-labelledby="hero-heading">
       <div className="landing-grid absolute inset-0" aria-hidden />
@@ -12,36 +14,34 @@ export function Hero() {
             id="hero-heading"
             className="animate-fade-up-2 text-[42px] leading-[1.02] sm:text-[60px] md:text-[72px] font-light tracking-[-0.03em] text-balance text-stone-950 dark:text-stone-50"
           >
-            Meeting notes for Hindi, English,
+            {c.lead}
             <br />
-            <span className="font-semibold text-stone-900 dark:text-stone-100">and Hinglish sales calls.</span>
+            <span className="font-semibold text-stone-900 dark:text-stone-100">{c.emphasis}</span>
           </h1>
 
           <p className="animate-fade-up-3 mt-6 text-[16px] md:text-lg leading-relaxed text-stone-500 dark:text-stone-400 max-w-xl">
-             Minutes captures your client calls in Hindi, English, and
-             Hinglish — mixed in the same sentence. You get timestamps,
-             summaries, and action items after the call. Open source.
+            {c.body}
           </p>
 
           <div className="animate-fade-up-4 mt-10">
-            <AuthCta variant="hero" />
+            <AuthCta variant="hero" locale={locale} />
           </div>
 
           <ul className="animate-fade-up-5 mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-stone-400 dark:text-stone-500">
             <li className="flex items-center gap-1.5">
-              <Check className="text-stone-500 dark:text-stone-400" /> No bot joins your call
+              <Check className="text-stone-500 dark:text-stone-400" /> {c.bullets[0]}
             </li>
             <li className="flex items-center gap-1.5">
-              <Check className="text-stone-500 dark:text-stone-400" /> Browser only — no admin setup
+              <Check className="text-stone-500 dark:text-stone-400" /> {c.bullets[1]}
             </li>
             <li className="flex items-center gap-1.5">
-              <Check className="text-stone-500 dark:text-stone-400" /> Answers cite the transcript
+              <Check className="text-stone-500 dark:text-stone-400" /> {c.bullets[2]}
             </li>
           </ul>
         </div>
 
-        <div className="animate-fade-up-3">
-          <HeroDemo />
+        <div id="product" className="animate-fade-up-3 scroll-mt-24">
+          <HeroDemo locale={locale} />
         </div>
       </div>
     </section>

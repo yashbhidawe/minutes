@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
+import { COPY, type Locale } from "@/lib/landing-copy";
 
 export function Arrow() {
   return (
@@ -11,8 +12,9 @@ export function Arrow() {
   );
 }
 
-export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) {
+export function AuthCta({ variant, locale = "en" }: { variant: "hero" | "compact" | "final"; locale?: Locale }) {
   const { token } = useAuth();
+  const c = COPY[locale].authCta;
 
   if (variant === "final") {
     return (
@@ -22,7 +24,7 @@ export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) 
             href="/dashboard"
             className="btn-interactive btn-arrow px-7 py-3 bg-white text-stone-950 text-sm font-semibold rounded-md hover:bg-stone-200 transition-colors inline-flex items-center justify-center gap-1.5"
           >
-            Open dashboard <Arrow />
+            {c.openDashboard} <Arrow />
           </Link>
         ) : (
           <>
@@ -30,13 +32,13 @@ export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) 
               href="/register"
               className="btn-interactive px-7 py-3 bg-white text-stone-950 text-sm font-semibold rounded-md hover:bg-stone-200 transition-colors text-center"
             >
-              Create free account
+              {c.createFree}
             </Link>
             <Link
               href="/login"
               className="btn-interactive px-7 py-3 border border-stone-700 text-stone-200 text-sm font-medium rounded-md hover:border-stone-400 transition-colors text-center"
             >
-              Sign in
+              {c.signIn}
             </Link>
           </>
         )}
@@ -53,11 +55,11 @@ export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) 
         >
           {token ? (
             <>
-              Open dashboard <Arrow />
+              {c.openDashboard} <Arrow />
             </>
           ) : (
             <>
-              Try it free <Arrow />
+              {c.tryFree} <Arrow />
             </>
           )}
         </Link>
@@ -65,7 +67,7 @@ export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) 
           href="/install"
           className="btn-interactive px-5 py-2.5 border border-stone-300 dark:border-stone-700 dark:text-stone-300 text-[13px] font-medium rounded-md hover:border-stone-900 dark:hover:border-stone-400 transition-colors"
         >
-          Get the extension
+          {c.getExtension}
         </Link>
       </div>
     );
@@ -80,13 +82,13 @@ export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) 
             href="/install"
             className="btn-interactive btn-sheen px-6 py-3 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-sm font-medium rounded-md hover:bg-stone-700 dark:hover:bg-stone-300 transition-colors text-center shadow-xs"
           >
-            Get the extension
+            {c.getExtension}
           </Link>
           <a
             href="#how"
             className="btn-interactive px-6 py-3 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-stone-800 dark:text-stone-200 text-sm font-medium rounded-md hover:border-stone-900 dark:hover:border-stone-400 transition-colors text-center"
           >
-            How it works
+            {c.howItWorks}
           </a>
         </>
       ) : (
@@ -95,13 +97,13 @@ export function AuthCta({ variant }: { variant: "hero" | "compact" | "final" }) 
             href="/register"
             className="btn-interactive btn-sheen px-6 py-3 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-sm font-medium rounded-md hover:bg-stone-700 dark:hover:bg-stone-300 transition-colors text-center shadow-xs"
           >
-            Start capturing — it&apos;s free
+            {c.startCapturing}
           </Link>
           <Link
             href="/login"
             className="btn-interactive px-6 py-3 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-stone-800 dark:text-stone-200 text-sm font-medium rounded-md hover:border-stone-900 dark:hover:border-stone-400 transition-colors text-center"
           >
-            Sign in
+            {c.signIn}
           </Link>
         </>
       )}

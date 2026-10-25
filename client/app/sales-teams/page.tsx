@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SITE_URL, LANGUAGE_URLS } from "@/lib/site";
+import { SITE_URL } from "@/lib/site";
 import { SiteFooter } from "@/components/landing/sections";
 
 export const metadata: Metadata = {
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "Minutes is meeting notes for Indian sales teams. It captures Hindi, English, and Hinglish sales calls in the same sentence, then gives you timestamps, summaries, and action items. Open source.",
   alternates: {
     canonical: "/sales-teams",
-    languages: LANGUAGE_URLS,
+    languages: { en: "/sales-teams", hi: "/hi/sales-teams" },
   },
   openGraph: {
     type: "website",

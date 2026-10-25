@@ -1,9 +1,11 @@
-import { FAQS, STEPS } from "@/lib/landing-content";
+import { COPY, type Locale } from "@/lib/landing-copy";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 /* Structured data: one @graph so crawlers + answer engines get
    Organization, WebSite, SoftwareApplication, FAQPage, HowTo, Breadcrumb. */
-export function JsonLd() {
+export function JsonLd({ locale = "en" }: { locale?: Locale }) {
+  const c = COPY[locale];
+  const url = locale === "hi" ? `${SITE_URL}/hi/` : SITE_URL;
   const graph = {
     "@context": "https://schema.org",
     "@graph": [
@@ -30,7 +32,7 @@ export function JsonLd() {
       },
       {
         "@type": "FAQPage",
-        mainEntity: FAQS.map((f) => ({
+        mainEntity: c.faq.items.map((f) => ({
           "@type": "Question",
           name: f.q,
           acceptedAnswer: { "@type": "Answer", text: f.a },
@@ -38,10 +40,9 @@ export function JsonLd() {
       },
       {
         "@type": "HowTo",
-        name: "How to get meeting notes for Hindi, English, and Hinglish sales calls",
-        description:
-           "Record a meeting you are authorized to capture and review its transcript, summary and action items after processing.",
-        step: STEPS.map((s, i) => ({
+        name: c.jsonLd.howToName,
+        description: c.jsonLd.howToDescription,
+        step: c.how.steps.map((s, i) => ({
           "@type": "HowToStep",
           position: i + 1,
           name: s.title,
@@ -51,7 +52,7 @@ export function JsonLd() {
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+          { "@type": "ListItem", position: 1, name: c.jsonLd.home, item: url },
         ],
       },
     ],

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SITE_URL, LANGUAGE_URLS } from "@/lib/site";
+import { SITE_URL } from "@/lib/site";
 import { SiteFooter } from "@/components/landing/sections";
 
 export const metadata: Metadata = {
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "Meeting transcription that works in Hindi, English, and Hinglish. Captures mixed-language sales calls in the same sentence, with timestamps and summaries. Open source.",
   alternates: {
     canonical: "/hindi-hinglish-transcription",
-    languages: LANGUAGE_URLS,
+    languages: { en: "/hindi-hinglish-transcription", hi: "/hi/hindi-hinglish-transcription" },
   },
   openGraph: {
     type: "website",

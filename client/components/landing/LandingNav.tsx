@@ -10,10 +10,7 @@ import { Arrow } from "./AuthCta";
 export const NAV_LINKS = [
   ["How it works", "#how"],
   ["Features", "#features"],
-  ["Product", "#product"],
   ["Extension", "#extension"],
-  ["Sales teams", "/sales-teams"],
-  ["Hindi Hinglish", "/hindi-hinglish-transcription"],
   ["FAQ", "#faq"],
 ] as const;
 
