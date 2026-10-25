@@ -15,6 +15,9 @@ GENERATION_MODEL = getenv("GEMINI_MODEL", "gemini-3.8-flash")
 FALLBACK_MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"]
 MAX_RETRIES = 3
 BASE_BACKOFF_SECONDS = 2.0
+# Per-request deadline. Without it the SDK waits for Google's own (very long)
+# deadline, so one hung model stalls the whole request for minutes.
+REQUEST_TIMEOUT_SECONDS = float(getenv("GEMINI_TIMEOUT_SECONDS", "60"))
 
 _client = None
 
@@ -31,6 +34,17 @@ def get_client():
     return _client
 
 
+def _is_timeout_error(exc: Exception) -> bool:
+    text = str(exc).lower()
+    type_name = type(exc).__name__.lower()
+    return (
+        "504" in text
+        or "deadline" in text
+        or "timeout" in type_name
+        or "timed out" in text
+    )
+
+
 def _is_overload_error(exc: Exception) -> bool:
     text = str(exc).lower()
     type_name = type(exc).__name__.lower()
@@ -44,14 +58,25 @@ def _is_overload_error(exc: Exception) -> bool:
     )
 
 
-def generate_with_retry(prompt: str, response_mime_type: str = "application/json") -> str:
+def generate_with_retry(
+    prompt: str,
+    response_mime_type: str = "application/json",
+    models: list[str] | None = None,
+    timeout_seconds: float | None = None,
+) -> str:
     """Call Gemini with exponential-backoff retries and model fallbacks.
+
+    `models` overrides the model order; `timeout_seconds` caps each request.
+    A timed-out model is skipped immediately (no backoff, no repeat attempts):
+    a model that hung once will almost always hang again.
 
     Returns the raw response text. Raises HTTPException(503) if every model
     and retry attempt is exhausted.
     """
     client = get_client()
-    models = [GENERATION_MODEL] + [m for m in FALLBACK_MODELS if m != GENERATION_MODEL]
+    timeout_ms = int((timeout_seconds or REQUEST_TIMEOUT_SECONDS) * 1000)
+    primary = models or [GENERATION_MODEL]
+    models = primary + [m for m in [GENERATION_MODEL, *FALLBACK_MODELS] if m not in primary]
 
     last_error = None
     for model in models:
@@ -62,6 +87,7 @@ def generate_with_retry(prompt: str, response_mime_type: str = "application/json
                     contents=prompt,
                     config=types.GenerateContentConfig(
                         response_mime_type=response_mime_type,
+                        http_options=types.HttpOptions(timeout=timeout_ms),
                     ),
                 )
                 return response.text.strip()
@@ -69,6 +95,8 @@ def generate_with_retry(prompt: str, response_mime_type: str = "application/json
                 raise
             except Exception as exc:
                 last_error = exc
+                if _is_timeout_error(exc):
+                    break  # try next model right away
                 if not _is_overload_error(exc):
                     raise
                 if attempt < MAX_RETRIES:
