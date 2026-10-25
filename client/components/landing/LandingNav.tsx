@@ -10,10 +10,7 @@ import { Arrow } from "./AuthCta";
 export const NAV_LINKS = [
   ["How it works", "#how"],
   ["Features", "#features"],
-  ["Product", "#product"],
   ["Extension", "#extension"],
-  ["Sales teams", "/sales-teams"],
-  ["Hindi Hinglish", "/hindi-hinglish-transcription"],
   ["FAQ", "#faq"],
 ] as const;
 
@@ -63,7 +60,7 @@ export function LandingNav() {
 
   return (
     <header
-      className={`sticky top-0 z-40 border-b bg-[#fafaf9]/85 dark:bg-stone-950/85 backdrop-blur-md transition-shadow duration-300 ${
+      className={`sticky top-0 z-40 border-b bg-[#fafafa]/85 dark:bg-stone-950/85 backdrop-blur-md transition-shadow duration-300 ${
         scrolled ? "border-stone-200 dark:border-stone-800 shadow-[0_8px_30px_-18px_rgb(0_0_0/0.35)]" : "border-stone-200/80 dark:border-stone-800/80"
       }`}
     >
@@ -116,30 +113,42 @@ export function LandingNav() {
             </>
           )}
         </div>
-        <button
-          onClick={() => setMenuOpen((v) => !v)}
-          className="md:hidden p-2 -mr-2 text-stone-700 dark:text-stone-300 rounded-md"
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={menuOpen}
-        >
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
+        {/* mobile: keep the essentials (theme + dashboard) outside the menu */}
+        <div className="md:hidden flex items-center gap-1">
+          <ThemeToggle />
+          {token && (
+            <Link
+              href="/dashboard"
+              className="px-3 py-1.5 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-[13px] font-medium rounded-md"
+            >
+              Dashboard
+            </Link>
+          )}
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            className="p-2 -mr-2 text-stone-700 dark:text-stone-300 rounded-md"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
           >
-            {menuOpen ? <path d="M18 6 6 18M6 6l12 12" /> : <path d="M3 6h18M3 12h18M3 18h18" />}
-          </svg>
-        </button>
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            >
+              {menuOpen ? <path d="M18 6 6 18M6 6l12 12" /> : <path d="M3 6h18M3 12h18M3 18h18" />}
+            </svg>
+          </button>
+        </div>
       </nav>
 
       {/* mobile menu — animated, always in DOM for a11y */}
       <div className="menu-panel md:hidden" data-open={menuOpen}>
         <div>
-          <div className="border-t border-stone-200 dark:border-stone-800 bg-[#fafaf9] dark:bg-stone-950 px-6 py-4 space-y-1 text-sm font-medium text-stone-600 dark:text-stone-400">
+          <div className="border-t border-stone-200 dark:border-stone-800 bg-[#fafafa] dark:bg-[#0a0a0a] px-6 py-4 space-y-1 text-sm font-medium text-stone-600 dark:text-stone-400">
             {NAV_LINKS.map(([label, href]) => (
               <a
                 key={href}
@@ -151,11 +160,6 @@ export function LandingNav() {
                 {label}
               </a>
             ))}
-            <ThemeToggle
-              showLabel
-              tabIndex={menuOpen ? 0 : -1}
-              className="border-b border-stone-100 dark:border-stone-800 hover:text-stone-950 dark:hover:text-stone-50"
-            />
             <Link
               href="/hi/"
               tabIndex={menuOpen ? 0 : -1}
@@ -163,34 +167,24 @@ export function LandingNav() {
             >
               हिन्दी
             </Link>
-            <div className="flex gap-2 pt-3">
-              {token ? (
+            {!token && (
+              <div className="flex gap-2 pt-3">
                 <Link
-                  href="/dashboard"
+                  href="/login"
                   tabIndex={menuOpen ? 0 : -1}
-                  className="flex-1 text-center px-4 py-2.5 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-sm rounded-md"
+                  className="flex-1 text-center px-4 py-2.5 border border-stone-300 dark:border-stone-700 rounded-md"
                 >
-                  Open dashboard →
+                  Sign in
                 </Link>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    tabIndex={menuOpen ? 0 : -1}
-                    className="flex-1 text-center px-4 py-2.5 border border-stone-300 dark:border-stone-700 rounded-md"
-                  >
-                    Sign in
-                  </Link>
-                  <Link
-                    href="/register"
-                    tabIndex={menuOpen ? 0 : -1}
-                    className="flex-1 text-center px-4 py-2.5 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 rounded-md"
-                  >
-                    Get started
-                  </Link>
-                </>
-              )}
-            </div>
+                <Link
+                  href="/register"
+                  tabIndex={menuOpen ? 0 : -1}
+                  className="flex-1 text-center px-4 py-2.5 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 rounded-md"
+                >
+                  Get started
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

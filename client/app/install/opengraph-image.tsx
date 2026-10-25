@@ -16,8 +16,8 @@ export default function OgImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "96px",
-          backgroundColor: "#1c1917",
-          color: "#fafaf9",
+          backgroundColor: "#171717",
+          color: "#fafafa",
           fontFamily: "system-ui, sans-serif",
         }}
       >
@@ -27,8 +27,8 @@ export default function OgImage() {
               width: "72px",
               height: "72px",
               borderRadius: "16px",
-              backgroundColor: "#fafaf9",
-              color: "#1c1917",
+              backgroundColor: "#fafafa",
+              color: "#171717",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -38,14 +38,14 @@ export default function OgImage() {
           >
             M
           </div>
-          <div style={{ fontSize: "28px", letterSpacing: "8px", color: "#a8a29e" }}>
+          <div style={{ fontSize: "28px", letterSpacing: "8px", color: "#a3a3a3" }}>
             minutes
           </div>
         </div>
         <div style={{ fontSize: "80px", lineHeight: 1.05, fontWeight: 300 }}>
           Install in <span style={{ fontWeight: 700 }}>2 minutes.</span>
         </div>
-        <div style={{ marginTop: "32px", fontSize: "30px", color: "#a8a29e" }}>
+        <div style={{ marginTop: "32px", fontSize: "30px", color: "#a3a3a3" }}>
           Free manual setup for Chrome, Edge and Brave.
         </div>
       </div>

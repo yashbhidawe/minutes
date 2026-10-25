@@ -7,6 +7,7 @@ per-meeting scope (tens to low-hundreds of chunks).
 
 import json
 import math
+from os import getenv
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
@@ -17,12 +18,16 @@ from app.repositories.chunks import ChunkRepository
 from app.repositories.meeting import MeetingRepository
 from app.services.chunking import build_chunks
 from app.services.embeddings import embed_texts
-from app.services.summarization import generate_with_retry
+from app.services.summarization import GENERATION_MODEL, generate_with_retry
 
 DEFAULT_TOP_K = 5
 MAX_TOP_K = 12
 GLOBAL_DEFAULT_TOP_K = 8
 GLOBAL_PER_MEETING_CAP = 3
+# Answering over a handful of excerpts doesn't need the biggest model, and the
+# lite model is several times faster. Override with RAG_MODEL.
+RAG_MODEL = getenv("RAG_MODEL", "gemini-3.5-flash-lite")
+RAG_TIMEOUT_SECONDS = 20.0
 
 RAG_PROMPT = """You answer questions about a meeting using ONLY the provided transcript excerpts.
 
@@ -151,6 +156,8 @@ def answer_question(meeting_id: int, question: str, session: Session, top_k: int
         raw = generate_with_retry(
             RAG_PROMPT.format(question=question.strip(), excerpts=excerpts),
             response_mime_type="application/json",
+            models=[RAG_MODEL, GENERATION_MODEL],
+            timeout_seconds=RAG_TIMEOUT_SECONDS,
         )
         raw = _strip_markdown_fence(raw)
         result = json.loads(raw)
@@ -294,6 +301,8 @@ def answer_global(
         raw = generate_with_retry(
             GLOBAL_RAG_PROMPT.format(question=question.strip(), excerpts=excerpts),
             response_mime_type="application/json",
+            models=[RAG_MODEL, GENERATION_MODEL],
+            timeout_seconds=RAG_TIMEOUT_SECONDS,
         )
         raw = _strip_markdown_fence(raw)
         result = json.loads(raw)

@@ -1,9 +1,9 @@
 import Link from "next/link";
 
-export function Logo({ dark = false }: { dark?: boolean }) {
+export function Logo({ dark = false, href = "/" }: { dark?: boolean; href?: string }) {
   return (
     <Link
-      href="/"
+      href={href}
       className="flex items-center gap-2.5 shrink-0 rounded-md"
       aria-label="Minutes — home"
     >

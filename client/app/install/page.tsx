@@ -107,8 +107,8 @@ export default async function InstallPage() {
   const version = await getExtensionVersion();
 
   return (
-    <div className="min-h-screen bg-[#fafaf9] dark:bg-[#0f0f0e] text-stone-900 dark:text-stone-50 antialiased flex flex-col">
-      <header className="sticky top-0 z-40 border-b border-stone-200/80 dark:border-stone-800/80 bg-[#fafaf9]/85 dark:bg-stone-950/85 backdrop-blur-md">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] text-stone-900 dark:text-stone-50 antialiased flex flex-col">
+      <header className="sticky top-0 z-40 border-b border-stone-200/80 dark:border-stone-800/80 bg-[#fafafa]/85 dark:bg-stone-950/85 backdrop-blur-md">
         <nav
           className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-4"
           aria-label="Primary"

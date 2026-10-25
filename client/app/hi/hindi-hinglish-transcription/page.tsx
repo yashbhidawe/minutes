@@ -7,7 +7,10 @@ export const metadata: Metadata = {
   title: "हिंदी, अंग्रेजी और हिंग्लिश मीटिंग ट्रांसक्रिप्शन — Minutes",
   description:
     "मीटिंग ट्रांसक्रिप्शन जो हिंदी, अंग्रेजी और हिंग्लिश में काम करता है। मिश्रित भाषा वाली सेल्स कॉल को एक ही वाक्य में कैप्चर करता है, टाइमस्टैम्प और सारांश के साथ। ओपन सोर्स।",
-  alternates: { canonical: "/hi/hindi-hinglish-transcription" },
+  alternates: {
+    canonical: "/hi/hindi-hinglish-transcription",
+    languages: { en: "/hindi-hinglish-transcription", hi: "/hi/hindi-hinglish-transcription" },
+  },
   openGraph: {
     type: "website",
     url: `${SITE_URL}/hi/hindi-hinglish-transcription`,
@@ -26,7 +29,7 @@ export const metadata: Metadata = {
 
 export default function HindiTranscriptionPage() {
   return (
-    <div className="min-h-screen bg-[#fafaf9] dark:bg-[#0f0f0e] text-stone-900 dark:text-stone-50 antialiased flex flex-col">
+    <div lang="hi" className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] text-stone-900 dark:text-stone-50 antialiased flex flex-col">
       <main className="flex-1">
         <section className="max-w-3xl mx-auto px-6 pt-14 pb-24">
           <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-400 dark:text-stone-500 mb-3">
@@ -91,7 +94,7 @@ export default function HindiTranscriptionPage() {
           </div>
         </section>
       </main>
-      <SiteFooter />
+      <SiteFooter locale="hi" />
     </div>
   );
 }

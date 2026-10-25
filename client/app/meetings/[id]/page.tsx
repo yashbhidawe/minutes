@@ -38,7 +38,7 @@ const PROCESSING_STATUSES = ["uploaded", "queued", "transcribing", "transcribed"
 function PriorityDot({ priority }: { priority: string }) {
   const colors: Record<string, string> = {
     high: "bg-red-500",
-    medium: "bg-amber-400",
+    medium: "bg-stone-400",
     low: "bg-emerald-500",
   };
   return <span className={`inline-block w-2 h-2 rounded-full ${colors[priority] || colors.medium}`} />;
@@ -439,9 +439,9 @@ export default function MeetingDetailPage() {
         {/* Header Action Controls */}
         <div className="flex items-center gap-2">
           {meeting.status === "pending" && (
-            <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900 p-2 rounded">
-              <span className="text-xs font-mono font-medium text-amber-800 dark:text-amber-300 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+            <div className="flex items-center gap-2 bg-stone-100 dark:bg-stone-800 border border-stone-300 dark:border-stone-700 p-2 rounded">
+              <span className="text-xs font-mono font-medium text-stone-700 dark:text-stone-200 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-stone-500 dark:bg-stone-300 animate-ping" />
                 Awaiting Audio...
               </span>
               <input
@@ -454,7 +454,7 @@ export default function MeetingDetailPage() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="px-3 py-1 bg-amber-900 text-white text-xs font-medium rounded hover:bg-amber-800 transition-colors"
+                className="px-3 py-1 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-xs font-medium rounded hover:bg-stone-700 dark:hover:bg-stone-300 transition-colors"
               >
                 {uploading ? "Uploading..." : "Upload File"}
               </button>

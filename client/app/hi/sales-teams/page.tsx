@@ -7,7 +7,10 @@ export const metadata: Metadata = {
   title: "भारतीय सेल्स टीम के लिए मीटिंग नोट्स — Minutes",
   description:
     "मिनट्स भारतीय सेल्स टीम के लिए मीटिंग नोट्स है। यह हिंदी, अंग्रेजी और हिंग्लिश सेल्स कॉल को एक ही वाक्य में कैप्चर करता है, फिर टाइमस्टैम्प, सारांश और एक्शन आइटम देता है। ओपन सोर्स।",
-  alternates: { canonical: "/hi/sales-teams" },
+  alternates: {
+    canonical: "/hi/sales-teams",
+    languages: { en: "/sales-teams", hi: "/hi/sales-teams" },
+  },
   openGraph: {
     type: "website",
     url: `${SITE_URL}/hi/sales-teams`,
@@ -26,7 +29,7 @@ export const metadata: Metadata = {
 
 export default function HindiSalesTeamsPage() {
   return (
-    <div className="min-h-screen bg-[#fafaf9] dark:bg-[#0f0f0e] text-stone-900 dark:text-stone-50 antialiased flex flex-col">
+    <div lang="hi" className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] text-stone-900 dark:text-stone-50 antialiased flex flex-col">
       <main className="flex-1">
         <section className="max-w-3xl mx-auto px-6 pt-14 pb-24">
           <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-400 dark:text-stone-500 mb-3">
@@ -92,7 +95,7 @@ export default function HindiSalesTeamsPage() {
           </div>
         </section>
       </main>
-      <SiteFooter />
+      <SiteFooter locale="hi" />
     </div>
   );
 }

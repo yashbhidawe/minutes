@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "./Logo";
@@ -10,15 +11,18 @@ import { Arrow } from "./AuthCta";
 export const HINDI_NAV_LINKS = [
   ["कैसे काम करता है", "#how"],
   ["विशेषताएं", "#features"],
-  ["उत्पाद", "#product"],
-  ["सेल्स टीम", "/hi/sales-teams"],
-  ["हिंदी हिंग्लिश ट्रांसक्रिप्शन", "/hi/hindi-hinglish-transcription"],
-  ["एक्सटेंशन", "/install"],
+  ["एक्सटेंशन", "#extension"],
   ["अक्सर पूछे जाने वाले प्रश्न", "#faq"],
 ] as const;
 
 export function HindiNav() {
   const { token } = useAuth();
+  const pathname = usePathname() ?? "/hi";
+  const onHome = pathname.replace(/\/+$/, "") === "/hi";
+  // Section anchors only exist on the Hindi homepage; elsewhere link back to it.
+  const resolve = (href: string) => (href.startsWith("#") && !onHome ? `/hi/${href}` : href);
+  // Language switch lands on the English twin of the current page.
+  const englishHref = pathname.replace(/^\/hi\/?/, "/") || "/";
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -44,7 +48,7 @@ export function HindiNav() {
 
   /* Scrollspy — highlights the nav link for the section in view */
   useEffect(() => {
-    const ids = HINDI_NAV_LINKS.map(([, href]) => href.slice(1));
+    const ids = HINDI_NAV_LINKS.filter(([, href]) => href.startsWith("#")).map(([, href]) => href.slice(1));
     const sections = ids
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => !!el);
@@ -59,21 +63,21 @@ export function HindiNav() {
     );
     sections.forEach((s) => io.observe(s));
     return () => io.disconnect();
-  }, []);
+  }, [pathname]);
 
   return (
     <header
-      className={`sticky top-0 z-40 border-b bg-[#fafaf9]/85 dark:bg-stone-950/85 backdrop-blur-md transition-shadow duration-300 ${
+      className={`sticky top-0 z-40 border-b bg-[#fafafa]/85 dark:bg-stone-950/85 backdrop-blur-md transition-shadow duration-300 ${
         scrolled ? "border-stone-200 dark:border-stone-800 shadow-[0_8px_30px_-18px_rgb(0_0_0/0.35)]" : "border-stone-200/80 dark:border-stone-800/80"
       }`}
     >
       <nav className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-4" aria-label="प्राथमिक">
-        <Logo />
+        <Logo href="/hi/" />
         <div className="hidden md:flex items-center gap-7 text-[13px] font-medium text-stone-500 dark:text-stone-400">
           {HINDI_NAV_LINKS.map(([label, href]) => (
             <Link
               key={href}
-              href={href}
+              href={resolve(href)}
               aria-current={active === href ? "true" : undefined}
               className={`nav-link hover:text-stone-950 dark:hover:text-stone-50 transition-colors ${active === href ? "nav-link-active" : ""}`}
             >
@@ -84,7 +88,7 @@ export function HindiNav() {
         <div className="hidden md:flex items-center gap-2.5">
           <ThemeToggle />
           <Link
-            href="/"
+            href={englishHref}
             className="px-4 py-2 text-[13px] font-medium text-stone-600 dark:text-stone-400 hover:text-stone-950 dark:hover:text-stone-50 transition-colors"
           >
             English
@@ -113,34 +117,46 @@ export function HindiNav() {
             </>
           )}
         </div>
-        <button
-          onClick={() => setMenuOpen((v) => !v)}
-          className="md:hidden p-2 -mr-2 text-stone-700 dark:text-stone-300 rounded-md"
-          aria-label={menuOpen ? "मेनू बंद करें" : "मेनू खोलें"}
-          aria-expanded={menuOpen}
-        >
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
+        {/* mobile: keep the essentials (theme + dashboard) outside the menu */}
+        <div className="md:hidden flex items-center gap-1">
+          <ThemeToggle />
+          {token && (
+            <Link
+              href="/dashboard"
+              className="px-3 py-1.5 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-[13px] font-medium rounded-md"
+            >
+              डैशबोर्ड
+            </Link>
+          )}
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            className="p-2 -mr-2 text-stone-700 dark:text-stone-300 rounded-md"
+            aria-label={menuOpen ? "मेनू बंद करें" : "मेनू खोलें"}
+            aria-expanded={menuOpen}
           >
-            {menuOpen ? <path d="M18 6 6 18M6 6l12 12" /> : <path d="M3 6h18M3 12h18M3 18h18" />}
-          </svg>
-        </button>
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            >
+              {menuOpen ? <path d="M18 6 6 18M6 6l12 12" /> : <path d="M3 6h18M3 12h18M3 18h18" />}
+            </svg>
+          </button>
+        </div>
       </nav>
 
       {/* mobile menu — animated, always in DOM for a11y */}
       <div className="menu-panel md:hidden" data-open={menuOpen}>
         <div>
-          <div className="border-t border-stone-200 dark:border-stone-800 bg-[#fafaf9] dark:bg-stone-950 px-6 py-4 space-y-1 text-sm font-medium text-stone-600 dark:text-stone-400">
+          <div className="border-t border-stone-200 dark:border-stone-800 bg-[#fafafa] dark:bg-[#0a0a0a] px-6 py-4 space-y-1 text-sm font-medium text-stone-600 dark:text-stone-400">
             {HINDI_NAV_LINKS.map(([label, href]) => (
               <a
                 key={href}
-                href={href}
+                href={resolve(href)}
                 onClick={() => setMenuOpen(false)}
                 tabIndex={menuOpen ? 0 : -1}
                 className="block py-2.5 border-b border-stone-100 dark:border-stone-800 last:border-0 hover:text-stone-950 dark:hover:text-stone-50"
@@ -148,46 +164,31 @@ export function HindiNav() {
                 {label}
               </a>
             ))}
-            <ThemeToggle
-              showLabel
-              tabIndex={menuOpen ? 0 : -1}
-              className="border-b border-stone-100 dark:border-stone-800 hover:text-stone-950 dark:hover:text-stone-50"
-            />
             <Link
-              href="/"
+              href={englishHref}
               tabIndex={menuOpen ? 0 : -1}
               className="block py-2.5 border-b border-stone-100 dark:border-stone-800 hover:text-stone-950 dark:hover:text-stone-50"
             >
               English
             </Link>
-            <div className="flex gap-2 pt-3">
-              {token ? (
+            {!token && (
+              <div className="flex gap-2 pt-3">
                 <Link
-                  href="/dashboard"
+                  href="/login"
                   tabIndex={menuOpen ? 0 : -1}
-                  className="flex-1 text-center px-4 py-2.5 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-sm rounded-md"
+                  className="flex-1 text-center px-4 py-2.5 border border-stone-300 dark:border-stone-700 rounded-md"
                 >
-                  डैशबोर्ड खोलें →
+                  साइन इन करें
                 </Link>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    tabIndex={menuOpen ? 0 : -1}
-                    className="flex-1 text-center px-4 py-2.5 border border-stone-300 dark:border-stone-700 rounded-md"
-                  >
-                    साइन इन करें
-                  </Link>
-                  <Link
-                    href="/register"
-                    tabIndex={menuOpen ? 0 : -1}
-                    className="flex-1 text-center px-4 py-2.5 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 rounded-md"
-                  >
-                    शुरू करें
-                  </Link>
-                </>
-              )}
-            </div>
+                <Link
+                  href="/register"
+                  tabIndex={menuOpen ? 0 : -1}
+                  className="flex-1 text-center px-4 py-2.5 bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 rounded-md"
+                >
+                  शुरू करें
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
