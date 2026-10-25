@@ -67,10 +67,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   // Offscreen doc successfully uploaded audio
   if (message.type === "UPLOAD_COMPLETE") {
+    const finishedTabId = recordingState.tabId;
     chrome.action.setBadgeText({ text: "" });
     recordingState = { isRecording: false, meetingId: null, tabId: null, startTime: null, error: null };
     chrome.storage.local.set({ recordingState });
     closeOffscreenDocument().catch(() => {});
+
+    // Tell content script pill to go away
+    if (finishedTabId) {
+      chrome.tabs.sendMessage(finishedTabId, { type: "RECORDING_STOPPED" }).catch(() => {});
+    }
 
     if (chrome.notifications && message.meetingId) {
       chrome.notifications.create(`meeting_${message.meetingId}`, {
@@ -216,6 +222,13 @@ async function handleMeetingStarted(message, sender, sendResponse) {
       chrome.storage.local.set({ recordingState });
       chrome.action.setBadgeText({ text: "REC" });
       chrome.action.setBadgeBackgroundColor({ color: "#dc2626" });
+
+      // Push instant update to the Meet tab so the pill appears without waiting for next poll
+      chrome.tabs.sendMessage(tabId, {
+        type: "RECORDING_STARTED",
+        meetingId: meeting.id,
+        startTime: recordingState.startTime,
+      }).catch(() => {}); // tab may not have content script yet — polling will catch it
 
       sendResponse({ meetingId: meeting.id });
     } catch (err) {
