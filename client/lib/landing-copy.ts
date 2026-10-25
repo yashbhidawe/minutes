@@ -129,7 +129,7 @@ const en: LandingCopy = {
   extension: {
     eyebrow: "Chrome extension",
     heading: "Installs in a minute.",
-    body: "Add Minutes once, sign in, and it captures your Google Meet tab audio while you record. A floating widget shows you're live — then the notes appear in your dashboard when the call ends.",
+    body: "Add Minutes once, sign in, and it captures your Google Meet, Zoom or Teams tab audio while you record. A floating widget shows you're live — then the notes appear in your dashboard when the call ends.",
     cta: "Get the extension",
     privacy: "Privacy policy",
     widget: ["Recording tab audio", "Capturing your microphone", "Transcribing after the call"],
@@ -218,7 +218,7 @@ const hi: LandingCopy = {
   extension: {
     eyebrow: "Chrome एक्सटेंशन",
     heading: "एक मिनट में इंस्टॉल।",
-    body: "मिनट्स को एक बार जोड़ें, साइन इन करें, और रिकॉर्डिंग के दौरान यह आपके Google Meet टैब का ऑडियो कैप्चर करता है। एक फ्लोटिंग विजेट दिखाता है कि रिकॉर्डिंग चालू है — कॉल खत्म होते ही नोट्स आपके डैशबोर्ड में आ जाते हैं।",
+    body: "मिनट्स को एक बार जोड़ें, साइन इन करें, और रिकॉर्डिंग के दौरान यह आपके Google Meet, Zoom या Teams टैब का ऑडियो कैप्चर करता है। एक फ्लोटिंग विजेट दिखाता है कि रिकॉर्डिंग चालू है — कॉल खत्म होते ही नोट्स आपके डैशबोर्ड में आ जाते हैं।",
     cta: "एक्सटेंशन इंस्टॉल करें",
     privacy: "गोपनीयता नीति",
     widget: ["टैब का ऑडियो रिकॉर्ड हो रहा है", "आपका माइक्रोफ़ोन कैप्चर हो रहा है", "कॉल के बाद ट्रांसक्रिप्शन होगा"],

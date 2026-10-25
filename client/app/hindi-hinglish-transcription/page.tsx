@@ -89,7 +89,7 @@ export default function HindiHinglishTranscriptionPage() {
               <p className="text-stone-600 dark:text-stone-400 leading-relaxed">
                 The extension records tab and microphone audio from your
                 browser. Nothing appears as a participant in your Google
-                Meet.
+                Meet, Zoom or Teams call.
               </p>
             </div>
           </div>

@@ -8,26 +8,54 @@
   let widgetPosition = null; // { left, top }
   let currentRecordingStatus = null;
 
-  function checkIsGoogleMeetCall() {
-    if (window.location.host !== "meet.google.com") return false;
+  // One detector per supported platform. `inCall` must only be true once the
+  // user is actually in the call (not on a landing/pre-join page).
+  const PLATFORMS = [
+    {
+      name: "Google Meet",
+      matchHost: (host) => host === "meet.google.com",
+      titleSuffix: / - Google Meet$/,
+      inCall: () => {
+        const path = window.location.pathname;
+        if (!/^\/[a-z]{3}-[a-z]{4}-[a-z]{3}/i.test(path)) return false;
+        const leaveButton = document.querySelector(
+          '[aria-label*="Leave"], [aria-label*="End call"], [jsname="CQylEf"], [data-tooltip*="Leave"]'
+        );
+        const micCamControls = document.querySelector(
+          '[aria-label*="microphone"], [aria-label*="camera"], [aria-label*="Microphone"], [aria-label*="Camera"]'
+        );
+        const toolbar = document.querySelector('[jsname="A137Wd"], [jscontroller="kAP0id"]');
+        return !!(leaveButton || (micCamControls && toolbar));
+      },
+    },
+    {
+      name: "Zoom",
+      matchHost: (host) => host === "zoom.us" || host.endsWith(".zoom.us") || host.endsWith(".zoom.com"),
+      titleSuffix: /\s*[-|]\s*Zoom.*$/,
+      inCall: () => {
+        // Browser client only: /wc/<id>/start or /wc/<id>/join
+        if (!/^\/wc\/[^/]+\/(start|join)/.test(window.location.pathname)) return false;
+        return !!document.querySelector(
+          '#foot-bar, #wc-footer, .footer__leave-btn, button[aria-label="Leave"], button[aria-label="End"]'
+        );
+      },
+    },
+    {
+      name: "Microsoft Teams",
+      matchHost: (host) =>
+        host === "teams.microsoft.com" || host === "teams.live.com" || host === "teams.cloud.microsoft",
+      titleSuffix: /\s*\|\s*Microsoft Teams$/,
+      inCall: () =>
+        !!document.querySelector(
+          '#hangup-button, [data-tid="hangup-main-btn"], [data-tid="call-hangup"], button[aria-label^="Leave"]'
+        ),
+    },
+  ];
 
-    const path = window.location.pathname;
-    if (!path || path === "/" || path.startsWith("/landing") || path.startsWith("/about")) {
-      return false;
-    }
+  const platform = PLATFORMS.find((p) => p.matchHost(window.location.host));
 
-    const isMeetingUrl = /^\/[a-z]{3}-[a-z]{4}-[a-z]{3}/i.test(path);
-    if (!isMeetingUrl) return false;
-
-    const leaveButton = document.querySelector(
-      '[aria-label*="Leave"], [aria-label*="End call"], [jsname="CQylEf"], [data-tooltip*="Leave"]'
-    );
-    const micCamControls = document.querySelector(
-      '[aria-label*="microphone"], [aria-label*="camera"], [aria-label*="Microphone"], [aria-label*="Camera"]'
-    );
-    const toolbar = document.querySelector('[jsname="A137Wd"], [jscontroller="kAP0id"]');
-
-    return !!(leaveButton || (micCamControls && toolbar));
+  function checkIsMeetingCall() {
+    return !!platform && platform.inCall();
   }
 
   function formatTimer(ms) {
@@ -462,17 +490,17 @@
   }
 
   function monitorMeetingState() {
-    const currentlyInMeeting = checkIsGoogleMeetCall();
+    const currentlyInMeeting = checkIsMeetingCall();
 
     if (currentlyInMeeting && !isInMeeting && !pendingMeetingTimer) {
       // Show "detecting" banner immediately so user knows extension is active
       renderStartBanner("detecting");
       pendingMeetingTimer = setTimeout(() => {
         pendingMeetingTimer = null;
-        if (checkIsGoogleMeetCall() && !isInMeeting) {
+        if (checkIsMeetingCall() && !isInMeeting) {
           isInMeeting = true;
           renderStartBanner("starting");
-          const title = document.title.replace(" - Google Meet", "").trim() || "Google Meet";
+          const title = document.title.replace(platform.titleSuffix, "").trim() || platform.name;
           chrome.runtime.sendMessage(
             { type: "MEETING_STARTED", title: title, duration: 0 },
             (res) => {
@@ -519,7 +547,7 @@
     });
   }
 
-  setInterval(monitorMeetingState, 1500);
+  if (platform) setInterval(monitorMeetingState, 1500);
 
   // Listen for push messages from background (instant pill update without waiting for next poll)
   chrome.runtime.onMessage.addListener((message) => {

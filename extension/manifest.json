@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Minutes",
   "version": "1.1.0",
-  "description": "Meeting notes for Hindi, English, and Hinglish sales calls",
+  "description": "Meeting notes for Hindi, English, and Hinglish sales calls on Google Meet, Zoom, and Teams",
   "permissions": [
     "activeTab",
     "tabCapture",
@@ -13,7 +13,6 @@
   ],
   "host_permissions": [
     "http://localhost:8000/*",
-    "*://meet.google.com/*",
     "<all_urls>"
   ],
   "background": {
@@ -21,7 +20,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://meet.google.com/*"],
+      "matches": [
+        "https://meet.google.com/*",
+        "https://*.zoom.us/wc/*",
+        "https://teams.microsoft.com/*",
+        "https://teams.live.com/*",
+        "https://teams.cloud.microsoft/*"
+      ],
       "js": ["content.js"]
     },
     {

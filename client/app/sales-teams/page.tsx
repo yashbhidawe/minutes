@@ -89,7 +89,7 @@ export default function SalesTeamsPage() {
               <h2 className="text-lg font-semibold text-stone-950 dark:text-stone-50 mb-3">No bot, no admin setup</h2>
               <p className="text-stone-600 dark:text-stone-400 leading-relaxed">
                 The extension records from your browser. Nothing joins your
-                Google Meet as a participant. Install and start recording.
+                Google Meet, Zoom or Teams call as a participant. Install and start recording.
               </p>
             </div>
           </div>

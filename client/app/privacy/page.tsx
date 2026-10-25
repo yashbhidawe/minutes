@@ -48,7 +48,7 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-lg font-semibold text-stone-950 dark:text-stone-50">Overview</h2>
               <p className="mt-3">
-                Minutes records Google Meet audio from a browser extension, creates a timestamped transcript, and generates a summary with decisions and action items. This policy explains what is collected, why it is used, and how to delete meeting data.
+                Minutes records meeting audio (Google Meet, Zoom and Microsoft Teams in the browser) from a browser extension, creates a timestamped transcript, and generates a summary with decisions and action items. This policy explains what is collected, why it is used, and how to delete meeting data.
               </p>
             </section>
 
