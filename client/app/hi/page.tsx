@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function HindiHomePage() {
   return (
-    <div lang="hi" className="min-h-screen bg-[#fafaf9] dark:bg-[#0f0f0e] text-stone-900 dark:text-stone-50 antialiased overflow-x-clip">
+    <div lang="hi" className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] text-stone-900 dark:text-stone-50 antialiased overflow-x-clip">
       <JsonLd locale="hi" />
       <main>
         <Hero locale="hi" />

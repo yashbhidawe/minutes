@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 
 export default function HindiSalesTeamsPage() {
   return (
-    <div lang="hi" className="min-h-screen bg-[#fafaf9] dark:bg-[#0f0f0e] text-stone-900 dark:text-stone-50 antialiased flex flex-col">
+    <div lang="hi" className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] text-stone-900 dark:text-stone-50 antialiased flex flex-col">
       <main className="flex-1">
         <section className="max-w-3xl mx-auto px-6 pt-14 pb-24">
           <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-stone-400 dark:text-stone-500 mb-3">

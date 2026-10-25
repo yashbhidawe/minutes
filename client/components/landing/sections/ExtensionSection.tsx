@@ -33,8 +33,8 @@ export function ExtensionSection({ locale = "en" }: { locale?: Locale }) {
 
           <div className="relative hidden lg:block">
           <div className="absolute inset-0 bg-gradient-to-b from-stone-200/40 via-transparent to-transparent blur-3xl rounded-2xl dark:from-stone-900/20" aria-hidden />
-          <div className="relative bg-white dark:bg-[#1a1817] border border-stone-200 dark:border-stone-800 rounded-2xl shadow-xl overflow-hidden">
-            <div className="px-4 py-3 border-b border-stone-100 dark:border-stone-800 bg-stone-50 dark:bg-[#272727] flex items-center gap-2">
+          <div className="relative bg-white dark:bg-[#141414] border border-stone-200 dark:border-stone-800 rounded-2xl shadow-xl overflow-hidden">
+            <div className="px-4 py-3 border-b border-stone-100 dark:border-stone-800 bg-stone-50 dark:bg-[#1f1f1f] flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-stone-300 dark:bg-stone-700" aria-hidden />
               <span className="w-2 h-2 rounded-full bg-stone-300 dark:bg-stone-700" aria-hidden />
               <span className="w-2 h-2 rounded-full bg-stone-800 dark:bg-stone-900" aria-hidden />
@@ -44,7 +44,7 @@ export function ExtensionSection({ locale = "en" }: { locale?: Locale }) {
                 <span className="text-[10px] font-mono font-bold text-stone-900 dark:text-white uppercase tracking-wider">Minutes</span>
                 <span className="text-[10px] uppercase font-mono tracking-wider px-1.5 py-0.5 rounded border font-semibold bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900/50">REC</span>
               </div>
-              <div className="h-2 bg-stone-100 dark:bg-[#373737] rounded-full overflow-hidden mb-4">
+              <div className="h-2 bg-stone-100 dark:bg-[#2e2e2e] rounded-full overflow-hidden mb-4">
                 <div className="h-full bg-red-500 w-[65%] animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]" aria-hidden />
               </div>
               <ul className="space-y-2 text-sm text-stone-600 dark:text-stone-400">

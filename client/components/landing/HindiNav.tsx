@@ -67,7 +67,7 @@ export function HindiNav() {
 
   return (
     <header
-      className={`sticky top-0 z-40 border-b bg-[#fafaf9]/85 dark:bg-stone-950/85 backdrop-blur-md transition-shadow duration-300 ${
+      className={`sticky top-0 z-40 border-b bg-[#fafafa]/85 dark:bg-stone-950/85 backdrop-blur-md transition-shadow duration-300 ${
         scrolled ? "border-stone-200 dark:border-stone-800 shadow-[0_8px_30px_-18px_rgb(0_0_0/0.35)]" : "border-stone-200/80 dark:border-stone-800/80"
       }`}
     >
@@ -140,7 +140,7 @@ export function HindiNav() {
       {/* mobile menu — animated, always in DOM for a11y */}
       <div className="menu-panel md:hidden" data-open={menuOpen}>
         <div>
-          <div className="border-t border-stone-200 dark:border-stone-800 bg-[#fafaf9] dark:bg-stone-950 px-6 py-4 space-y-1 text-sm font-medium text-stone-600 dark:text-stone-400">
+          <div className="border-t border-stone-200 dark:border-stone-800 bg-[#fafafa] dark:bg-[#0a0a0a] px-6 py-4 space-y-1 text-sm font-medium text-stone-600 dark:text-stone-400">
             {HINDI_NAV_LINKS.map(([label, href]) => (
               <a
                 key={href}

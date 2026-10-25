@@ -18,8 +18,8 @@ export function HowItWorks({ locale = "en" }: { locale?: Locale }) {
             {c.steps.map((s, i) => (
               <li key={s.n}>
                 <Reveal delay={i * 80}>
-                  <div className="flex flex-col gap-3 bg-white dark:bg-[#1a1817] border border-stone-200 dark:border-stone-800 rounded-xl p-6">
-                    <div className="w-10 h-10 rounded-lg border border-stone-200 dark:border-stone-800 flex items-center justify-center bg-stone-50 dark:bg-[#272727] text-stone-600 dark:text-stone-400">
+                  <div className="flex flex-col gap-3 bg-white dark:bg-[#141414] border border-stone-200 dark:border-stone-800 rounded-xl p-6">
+                    <div className="w-10 h-10 rounded-lg border border-stone-200 dark:border-stone-800 flex items-center justify-center bg-stone-50 dark:bg-[#1f1f1f] text-stone-600 dark:text-stone-400">
                       <span className="text-sm font-mono font-bold">{s.n}</span>
                     </div>
                     <h3 className="text-base font-semibold tracking-tight text-stone-900 dark:text-white">{s.title}</h3>

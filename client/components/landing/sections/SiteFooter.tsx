@@ -5,7 +5,7 @@ export function SiteFooter({ locale = "en" }: { locale?: Locale }) {
   const home = COPY[locale].homeHref;
   const pagePrefix = locale === "hi" ? "/hi" : "";
   return (
-    <footer className="border-t border-stone-200 dark:border-stone-800 bg-white dark:bg-[#0f0f0e]">
+    <footer className="border-t border-stone-200 dark:border-stone-800 bg-white dark:bg-[#0a0a0a]">
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="grid sm:grid-cols-4 gap-12 mb-12">
           <div className="flex flex-col gap-2">

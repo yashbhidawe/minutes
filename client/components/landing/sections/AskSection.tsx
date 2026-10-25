@@ -4,7 +4,7 @@ import { COPY, type Locale } from "@/lib/landing-copy";
 export function AskSection({ locale = "en" }: { locale?: Locale }) {
   const c = COPY[locale].ask;
   return (
-    <section id="ask" className="bg-white dark:bg-stone-950 border-t border-stone-200 dark:border-stone-900 px-6 pt-16 pb-24 scroll-mt-24" aria-labelledby="ask-heading">
+    <section id="ask" className="bg-white dark:bg-[#101010] border-t border-stone-200 dark:border-stone-900 px-6 pt-16 pb-24 scroll-mt-24" aria-labelledby="ask-heading">
       <div className="max-w-4xl mx-auto">
         <Reveal>
           <h2 id="ask-heading" className="text-3xl md:text-4xl font-light tracking-tight text-stone-950 dark:text-stone-50 mb-6">
@@ -39,7 +39,7 @@ export function AskSection({ locale = "en" }: { locale?: Locale }) {
               </div>
             </div>
             <div className="mt-8 pt-6 border-t border-stone-100 dark:border-stone-800 flex items-center gap-3">
-              <input type="text" placeholder={c.placeholder} className="flex-1 text-sm px-3 py-2 border border-stone-200 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-100 dark:placeholder:text-stone-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              <input type="text" placeholder={c.placeholder} className="flex-1 text-sm px-3 py-2 border border-stone-200 dark:border-stone-700 dark:bg-[#101010] dark:text-stone-100 dark:placeholder:text-stone-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               <button className="px-4 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-medium rounded-lg hover:bg-stone-800 dark:hover:bg-stone-300 transition-colors">{c.button}</button>
             </div>
           </div>

@@ -7,7 +7,7 @@ export function HeroDemo({ locale = "en" }: { locale?: Locale }) {
   return (
     <div className="relative">
       <div className="absolute -inset-6 bg-gradient-to-b from-stone-200/40 via-transparent to-transparent blur-3xl rounded-full dark:from-stone-900/20" aria-hidden />
-      <div className="demo-card relative bg-white dark:bg-[#1a1817] border border-stone-200 dark:border-stone-800 rounded-2xl shadow-[0_30px_60px_-20px_rgb(0_0_0/0.15)] overflow-hidden">
+      <div className="demo-card relative bg-white dark:bg-[#141414] border border-stone-200 dark:border-stone-800 rounded-2xl shadow-[0_30px_60px_-20px_rgb(0_0_0/0.15)] overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80')] bg-cover bg-center opacity-10 pointer-events-none dark:opacity-5" aria-hidden />
         <div className="relative z-10">
           {/* window bar */}
@@ -32,7 +32,7 @@ export function HeroDemo({ locale = "en" }: { locale?: Locale }) {
               </div>
             </div>
 
-            <div className="bg-stone-50 dark:bg-[#272727] border border-stone-200 dark:border-stone-800 rounded-xl p-4 mb-4">
+            <div className="bg-stone-50 dark:bg-[#1f1f1f] border border-stone-200 dark:border-stone-800 rounded-xl p-4 mb-4">
               <p className="text-[10px] font-bold tracking-wider uppercase text-stone-400 dark:text-stone-500 mb-2.5">{c.decisionsLabel}</p>
               <ul className="space-y-2 text-[13px] leading-relaxed text-stone-800 dark:text-stone-200">
                 <li className="flex gap-2">
@@ -46,7 +46,7 @@ export function HeroDemo({ locale = "en" }: { locale?: Locale }) {
               </ul>
             </div>
 
-            <div className="bg-stone-950 dark:bg-[#121212] text-stone-200 dark:text-stone-300 rounded-xl p-4 font-mono text-xs">
+            <div className="bg-stone-950 dark:bg-[#050505] text-stone-200 dark:text-stone-300 rounded-xl p-4 font-mono text-xs">
               <p className="text-[10px] uppercase tracking-[0.16em] text-stone-500 dark:text-stone-400 font-sans font-semibold mb-2">{c.highlightLabel}</p>
               <div className="flex items-start gap-3">
                 <span className="text-stone-600 dark:text-stone-400 font-bold shrink-0 mt-0.5">[04:12]</span>
@@ -55,7 +55,7 @@ export function HeroDemo({ locale = "en" }: { locale?: Locale }) {
             </div>
           </div>
 
-          <div className="px-4 sm:px-6 py-4 border-t border-stone-100 dark:border-stone-800 bg-stone-50 dark:bg-[#1f1f1e]">
+          <div className="px-4 sm:px-6 py-4 border-t border-stone-100 dark:border-stone-800 bg-stone-50 dark:bg-[#171717]">
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center text-[10px] font-bold text-white shrink-0">A</div>
               <div className="flex-1">
@@ -65,7 +65,7 @@ export function HeroDemo({ locale = "en" }: { locale?: Locale }) {
               </div>
             </div>
             <div className="mt-2 flex items-end gap-2">
-              <div className="max-w-[80%] bg-white dark:bg-[#1a1817] border border-stone-200 dark:border-stone-800 text-xs text-stone-800 dark:text-stone-200 leading-relaxed rounded-lg rounded-bl-sm px-3 py-2">
+              <div className="max-w-[80%] bg-white dark:bg-[#141414] border border-stone-200 dark:border-stone-800 text-xs text-stone-800 dark:text-stone-200 leading-relaxed rounded-lg rounded-bl-sm px-3 py-2">
                 <p>{c.answer}</p>
                 <div className="flex gap-1.5 mt-1.5 pt-1 border-t border-stone-100 dark:border-stone-800/50">
                   <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400">▶ 04:12</span>
