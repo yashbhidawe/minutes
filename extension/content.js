@@ -536,7 +536,7 @@
 
     // Query status to update floating widget
     chrome.runtime.sendMessage({ type: "GET_STATUS" }, (response) => {
-      if (response && response.isRecording) {
+      if (response && response.isRecording && response.isThisTab) {
         isInMeeting = true;
         removeStartBanner(); // pill takes over
         renderFloatingWidget(response);
@@ -568,7 +568,7 @@
 
   // Sync state on load
   chrome.runtime.sendMessage({ type: "GET_STATUS" }, (response) => {
-    if (response && response.isRecording) {
+    if (response && response.isRecording && response.isThisTab) {
       isInMeeting = true;
       renderFloatingWidget(response);
     }

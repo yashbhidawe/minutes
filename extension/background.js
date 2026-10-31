@@ -121,6 +121,7 @@ function routeMessage(message, sender, sendResponse) {
       meetingId: recordingState.meetingId,
       startTime: recordingState.startTime,
       error: recordingState.error,
+      isThisTab: !!sender.tab && sender.tab.id === recordingState.tabId,
     });
     return true;
   }
@@ -265,6 +266,12 @@ async function handleMeetingStarted(message, sender, sendResponse) {
 // ─── Meeting ended ───────────────────────────────────────────────────────────
 
 async function handleMeetingEnded(message, sender, sendResponse) {
+  // Another Meet/Zoom/Teams tab leaving a call must not stop this recording.
+  if (message.type === "MEETING_ENDED" && sender.tab && sender.tab.id !== recordingState.tabId) {
+    sendResponse({ ignored: true });
+    return;
+  }
+
   if (!recordingState.isRecording || !recordingState.meetingId) {
     sendResponse({ error: "No active recording" });
     return;
