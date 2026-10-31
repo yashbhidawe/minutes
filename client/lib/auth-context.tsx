@@ -31,7 +31,8 @@ type StoredAuth = {
 
 function isTokenExpired(token: string): boolean {
   try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
+    // JWTs are base64url; atob() only understands the standard alphabet.
+    const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
     return payload.exp * 1000 < Date.now();
   } catch {
     return true;

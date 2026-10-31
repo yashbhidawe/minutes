@@ -57,7 +57,7 @@ export function ActivationChecklist({ hasRecording, hasSummary }: ActivationChec
         extensionStatus === "checking"
           ? "Checking this browser..."
           : extensionStatus === "not-installed"
-            ? "Install Minutes to record Google Meet calls."
+            ? "Install Minutes to record Google Meet, Zoom and Teams calls."
             : "Minutes is installed in this browser.",
       complete: extensionInstalled,
       href: extensionInstalled ? undefined : "/install",
@@ -76,10 +76,10 @@ export function ActivationChecklist({ hasRecording, hasSummary }: ActivationChec
     },
     {
       key: "recording",
-      title: "Record your first Google Meet",
+      title: "Record your first call",
       body: hasRecording
         ? "Your first recording has been uploaded."
-        : "Join a Google Meet call and let the extension finish uploading it.",
+        : "Join a Meet, Zoom or Teams call in your browser and let the extension finish uploading it.",
       complete: hasRecording,
     },
     {

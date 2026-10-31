@@ -18,11 +18,13 @@ class UserService:
         return self.user_repository.get_by_id(user_id)
     
     def create_user(self, user_data: UserCreate):
+        # Login lowercases the email, so store it lowercased too.
+        user_data = user_data.model_copy(update={"email": user_data.email.lower()})
         existing_user = self.user_repository.get_by_email(user_data.email)
         if existing_user:
             raise HTTPException(status_code=400, detail="Email already registered")
         
-        verify_email_format(user_data.email.lower())
+        verify_email_format(user_data.email)
         verify_password_format(user_data.password)
         password_hash = hash_password(user_data.password)
         return self.user_repository.create(user_data, password_hash)

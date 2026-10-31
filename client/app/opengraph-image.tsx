@@ -48,7 +48,7 @@ export default function OgImage() {
           <span style={{ fontWeight: 700 }}>automatically.</span>
         </div>
         <div style={{ marginTop: "32px", fontSize: "30px", color: "#a3a3a3" }}>
-          Summaries, decisions &amp; action items for Google Meet.
+          Summaries, decisions &amp; action items for Meet, Zoom &amp; Teams.
         </div>
       </div>
     ),

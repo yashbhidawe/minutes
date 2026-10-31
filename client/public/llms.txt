@@ -5,14 +5,15 @@
 ## Site Identity
 Name: Minutes
 URL: https://minutes.itsokyash.online
-Description: Meeting notes for Indian sales teams. Captures Hindi, English, and Hinglish sales calls in the same sentence, then gives timestamps, summaries, and action items. Open source.
+Description: Meeting notes for Indian sales teams on Google Meet, Zoom and Microsoft Teams. Captures Hindi, English, and Hinglish sales calls in the same sentence, then gives timestamps, summaries, and action items. Open source.
 
 ## What Minutes Does
-- Records Google Meet tab + microphone audio via a Chrome Extension (Manifest V3)
+- Records tab + microphone audio from Google Meet, Zoom (web client) and Microsoft Teams (web) calls via a Chrome Extension (Manifest V3)
 - Transcribes via Groq Whisper (whisper-large-v3)
 - Summarizes via Google Gemini (gemini-3.8-flash)
 - Surfaced in a Next.js web dashboard with timestamps, decisions, blockers, action items
 - No bot joins the call; browser-only recording
+- Platform-agnostic: works with any call joined in a Chrome tab. Zoom and Teams desktop apps are not supported yet (join from the browser instead)
 - Open source; free to use
 
 ## Languages Supported
@@ -26,6 +27,7 @@ Hindi Homepage: https://minutes.itsokyash.online/hi/
 Hindi Sales Teams: https://minutes.itsokyash.online/hi/sales-teams
 Hindi/Hinglish Transcription (English): https://minutes.itsokyash.online/hindi-hinglish-transcription
 Hindi/Hinglish Transcription (Hindi): https://minutes.itsokyash.online/hi/hindi-hinglish-transcription
+Works with Meet, Zoom & Teams: https://minutes.itsokyash.online/meeting-notes-google-meet-zoom-teams
 Install Extension: https://minutes.itsokyash.online/install
 Privacy Policy: https://minutes.itsokyash.online/privacy
 Comparisons:
@@ -36,11 +38,17 @@ Comparisons:
 Q: What is Minutes?
 A: Minutes is meeting notes for Indian sales teams. It captures Hindi, English, and Hinglish sales calls in the same sentence, then gives you timestamps, summaries, and action items. It is open source.
 
+Q: Does Minutes work with Zoom and Microsoft Teams, or only Google Meet?
+A: Minutes works with Google Meet, Zoom and Microsoft Teams when the call is joined in a Chrome browser tab. The Zoom and Teams desktop apps are not supported yet; use "Join from your browser" (Zoom) or "Continue on this browser" (Teams).
+
 Q: Does a bot join my meeting?
 A: No bot joins your call. Minutes records from your browser after you install and sign in.
 
 Q: Can I ask questions about a meeting?
 A: Yes. Open any processed meeting and ask — answers are grounded in that meeting's transcript and cite the exact moments.
+
+Q: Can I search across all my meetings?
+A: Yes. The Ask AI page (/search, after sign-in) answers questions across every meeting a user has recorded and cites the meetings and timestamps it used.
 
 Q: Is my meeting data private?
 A: Meetings are associated with your private account. Audio, transcripts and summaries are processed by our infrastructure and AI providers.

@@ -1,4 +1,5 @@
 import json
+from datetime import UTC, datetime, timedelta
 
 from fastapi import BackgroundTasks
 
@@ -14,6 +15,34 @@ from app.services.summarization import summarize_transcript
 # Statuses that mean a background job is already running for a meeting.
 # The API layer uses this to reject duplicate reprocess requests with 409.
 BUSY_STATUSES = frozenset({"queued", "transcribing", "transcribed", "summarizing"})
+
+# Statuses a worker sets while it is actively processing (not merely queued).
+RUNNING_STATUSES = frozenset({"transcribing", "transcribed", "summarizing"})
+
+# Every pipeline phase bumps updated_at, so a running job older than the lease
+# lost its worker (the Celery hard limit is 30 min). A redelivered task may
+# then take the meeting over. Meetings stuck in a busy status for STUCK_AFTER
+# (queued job lost with Redis, worker killed and never redelivered) are failed
+# so the user can hit Reprocess.
+PROCESSING_LEASE = timedelta(minutes=35)
+STUCK_AFTER = timedelta(minutes=90)
+STUCK_MESSAGE = "Processing timed out. Click Reprocess to try again."
+
+
+def _cutoff_iso(age: timedelta) -> str:
+    return (datetime.now(UTC) - age).isoformat()
+
+
+def stale_lease_cutoff() -> str:
+    return _cutoff_iso(PROCESSING_LEASE)
+
+
+def stuck_cutoff() -> str:
+    return _cutoff_iso(STUCK_AFTER)
+
+
+def is_actively_processing(meeting) -> bool:
+    return meeting.status in RUNNING_STATUSES and meeting.updated_at >= stale_lease_cutoff()
 
 
 def execute_meeting_pipeline(meeting_id: int, is_final_attempt: bool = True):
@@ -42,7 +71,11 @@ def execute_meeting_pipeline(meeting_id: int, is_final_attempt: bool = True):
                 print(f"[Pipeline Warning] Meeting ID {meeting_id} not found or missing audio.")
                 return False
 
-            repo.update_status(meeting_id, "transcribing")
+            # Atomic claim: a duplicate delivery or a concurrent reprocess must
+            # not run the pipeline twice (double cost, interleaved writes).
+            if not repo.claim_for_processing(meeting_id, RUNNING_STATUSES, stale_lease_cutoff()):
+                print(f"[Pipeline] Meeting ID {meeting_id} is already being processed; skipping duplicate run.")
+                return False
             print(f"[Pipeline] Processing audio for meeting ID: {meeting_id}")
             audio_bytes = download_file(meeting.audio_key)
 

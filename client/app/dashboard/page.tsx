@@ -136,7 +136,7 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-100">Dashboard</h1>
           <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 font-medium">
-            Google Meet notes & AI-extracted action items
+            Google Meet, Zoom & Teams notes & AI-extracted action items
           </p>
         </div>
         <button
@@ -240,7 +240,7 @@ export default function DashboardPage() {
             {searchQuery ? "No matching meetings found" : "No meetings recorded yet"}
           </p>
           <p className="text-stone-400 dark:text-stone-500 text-xs">
-            {searchQuery ? "Try searching with a different term." : "Join a Google Meet call or create a manual meeting record."}
+            {searchQuery ? "Try searching with a different term." : "Join a Meet, Zoom or Teams call in your browser, or create a manual meeting record."}
           </p>
         </div>
       ) : (

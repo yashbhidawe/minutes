@@ -11,7 +11,7 @@ export const SITE_URL = (
 export const SITE_NAME = "Minutes";
 
 export const SITE_DESCRIPTION =
-  "Minutes is meeting notes for Indian sales teams. It captures Hindi, English, and Hinglish sales calls in the same sentence, then gives you timestamps, summaries, and action items. Open source.";
+  "Minutes is meeting notes for Indian sales teams on Google Meet, Zoom, and Microsoft Teams. It captures Hindi, English, and Hinglish sales calls in the same sentence, then gives you timestamps, summaries, and action items. Open source.";
 
 /**
  * Language alternate URLs for hreflang.

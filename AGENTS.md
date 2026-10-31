@@ -63,7 +63,8 @@ Minutes consists of three interconnected subsystems:
     const source = audioContext.createMediaStreamSource(stream);
     source.connect(audioContext.destination);
     ```
-- **State Persistence**: Store authentication tokens and `recordingState` in `chrome.storage.local`.
+- **State Persistence**: Store authentication tokens and `recordingState` in `chrome.storage.local`. Handlers must `await stateReady` (background.js) before reading `recordingState`: a freshly woken service worker has default state until the storage read resolves.
+- **Recording durability**: `offscreen.js` writes every recorder chunk to IndexedDB via `recording-store.js` and deletes the local copy only after the backend accepts the upload. Failed or orphaned recordings are re-uploaded on browser start, by the `retry-uploads` alarm, and after any successful upload. New extension files must also be added to the copy list in `extension/build.sh`.
 
 ### C. Next.js Web Dashboard (`client/`)
 

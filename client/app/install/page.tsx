@@ -76,7 +76,7 @@ const STEPS = [
   {
     n: "6",
     title: "Sign in",
-    body: "Click the Minutes icon and sign in with your Minutes account (or sign in on the web dashboard first — the session syncs automatically). Then join a Google Meet and you're set.",
+    body: "Click the Minutes icon and sign in with your Minutes account (or sign in on the web dashboard first — the session syncs automatically). Then join a Google Meet, or a Zoom or Teams call in your browser, and you're set.",
   },
 ];
 
@@ -95,7 +95,11 @@ const TROUBLESHOOTING = [
   },
   {
     q: "Recording starts but notes never appear",
-    a: "Make sure you stayed on the Meet tab until recording started, allowed microphone access, and that the backend is reachable. Open the dashboard — if the meeting row shows an error, that message tells you what failed.",
+    a: "Make sure you stayed on the meeting tab until recording started, allowed microphone access, and that the backend is reachable. Open the dashboard — if the meeting row shows an error, that message tells you what failed.",
+  },
+  {
+    q: "Does it work with the Zoom or Teams desktop app?",
+    a: "Not yet. Minutes records browser tab audio, so Zoom and Teams calls must be joined in the browser (Zoom: “Join from your browser”; Teams: “Continue on this browser”). Google Meet runs in the browser already.",
   },
   {
     q: "How do I update to a new version?",

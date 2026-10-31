@@ -1,3 +1,6 @@
+from datetime import UTC, datetime
+
+from sqlalchemy import or_, update
 from sqlalchemy.orm import Session
 
 from app.models.actionItem import ActionItem
@@ -5,6 +8,10 @@ from app.models.meeting import Meeting
 from app.models.meeting_chunk import MeetingChunk
 from app.models.note import Note
 from app.models.transcript import Transcript
+
+
+def _now_iso() -> str:
+    return datetime.now(UTC).isoformat()
 
 
 class MeetingRepository:
@@ -38,11 +45,46 @@ class MeetingRepository:
         if not meeting:
             return None
         meeting.status = status
+        meeting.updated_at = _now_iso()  # doubles as the processing heartbeat
         if audio_key:
             meeting.audio_key = audio_key
         self.session.commit()
         self.session.refresh(meeting)
         return meeting
+
+    def claim_for_processing(
+        self, meeting_id: int, running_statuses: frozenset[str], stale_before: str
+    ) -> bool:
+        """Atomically move a meeting to "transcribing" unless a live job owns it.
+
+        A job is live when the meeting is in a running status and its
+        updated_at heartbeat is newer than `stale_before`. The single UPDATE
+        means two workers racing on the same meeting cannot both win.
+        """
+        result = self.session.execute(
+            update(Meeting)
+            .where(
+                Meeting.id == meeting_id,
+                or_(Meeting.status.not_in(running_statuses), Meeting.updated_at < stale_before),
+            )
+            .values(status="transcribing", updated_at=_now_iso())
+        )
+        self.session.commit()
+        return result.rowcount == 1
+
+    def fail_stale(self, user_id: int, busy_statuses: frozenset[str], stale_before: str, message: str) -> int:
+        """Marks a user's meetings stuck in a busy status as failed so they can be reprocessed."""
+        result = self.session.execute(
+            update(Meeting)
+            .where(
+                Meeting.user_id == user_id,
+                Meeting.status.in_(busy_statuses),
+                Meeting.updated_at < stale_before,
+            )
+            .values(status="failed", error_message=message, updated_at=_now_iso())
+        )
+        self.session.commit()
+        return result.rowcount
 
     def update_title(self, meeting_id: int, title: str) -> Meeting | None:
         meeting = self.get_by_id(meeting_id)

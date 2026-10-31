@@ -19,7 +19,7 @@ export const STEPS: Step[] = [
   {
     n: "02",
     title: "Meet like normal",
-    body: "Join your Google Meet. The extension captures tab audio while you record.",
+    body: "Join your Google Meet, Zoom or Teams call in the browser. The extension captures tab audio while you record.",
   },
   {
     n: "03",
@@ -37,7 +37,7 @@ export const STEPS_HI: Step[] = [
   {
     n: "02",
     title: "हमेशा की तरह मीटिंग करें",
-    body: "अपनी Google Meet में जुड़ें। रिकॉर्डिंग के दौरान एक्सटेंशन टैब का ऑडियो कैप्चर करता है।",
+    body: "ब्राउज़र में अपनी Google Meet, Zoom या Teams कॉल में जुड़ें। रिकॉर्डिंग के दौरान एक्सटेंशन टैब का ऑडियो कैप्चर करता है।",
   },
   {
     n: "03",
@@ -55,6 +55,14 @@ export const FAQS: Faq[] = [
   {
     q: "What is Minutes?",
     a: "Minutes is meeting notes for Indian sales teams. It captures Hindi, English, and Hinglish sales calls in the same sentence, then gives you timestamps, summaries, and action items. It is open source.",
+  },
+  {
+    q: "Can I search across all my meetings?",
+    a: "Yes. The Ask AI page answers questions across every meeting you have recorded, such as “what blockers came up this week?”, and each answer cites the meetings and moments it came from.",
+  },
+  {
+    q: "Does it work with Zoom and Microsoft Teams, or only Google Meet?",
+    a: "It works with Google Meet, Zoom and Microsoft Teams when you join the call in a Chrome tab. The Zoom and Teams desktop apps are not supported yet — use “Join from your browser” on Zoom or “Continue on this browser” on Teams.",
   },
   {
     q: "Does a bot join my meeting?",
@@ -78,6 +86,14 @@ export const FAQS_HI: Faq[] = [
   {
     q: "मिनट्स क्या है?",
     a: "मिनट्स भारतीय सेल्स टीम के लिए मीटिंग नोट्स है। यह हिंदी, अंग्रेजी और हिंग्लिश सेल्स कॉल को एक ही वाक्य में कैप्चर करता है, फिर टाइमस्टैम्प, सारांश और एक्शन आइटम देता है। यह ओपन सोर्स है।",
+  },
+  {
+    q: "क्या मैं अपनी सभी मीटिंग्स में खोज सकता हूँ?",
+    a: "हाँ। Ask AI पेज आपकी रिकॉर्ड की गई सभी मीटिंग्स में सवालों के जवाब देता है, जैसे “इस हफ्ते कौन से ब्लॉकर आए?”, और हर जवाब उन मीटिंग्स और पलों का हवाला देता है जहाँ से वह आया।",
+  },
+  {
+    q: "क्या यह Zoom और Microsoft Teams पर भी काम करता है, या सिर्फ Google Meet पर?",
+    a: "हाँ, जब आप कॉल को Chrome टैब में जॉइन करते हैं तो यह Google Meet, Zoom और Microsoft Teams तीनों पर काम करता है। Zoom और Teams के डेस्कटॉप ऐप अभी सपोर्टेड नहीं हैं — Zoom में “Join from your browser” और Teams में “Continue on this browser” चुनें।",
   },
   {
     q: "क्या मेरी मीटिंग में कोई बॉट जुड़ता है?",

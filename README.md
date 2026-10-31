@@ -6,18 +6,18 @@ Meeting notes for Indian sales teams. Captures Hindi, English, and Hinglish sale
 
 ## Problem
 
-Google Meet does not provide built-in transcription, meeting notes, or action item extraction. Most meeting tools are English-first and handle Hindi, English, and Hinglish mixed in the same sentence poorly. Indian sales teams must take manual notes during calls or rely on separate recording and transcription tools that do not integrate with the meeting context.
+Google Meet, Zoom and Teams do not provide free built-in Hindi/Hinglish transcription, meeting notes, or action item extraction. Most meeting tools are English-first and handle Hindi, English, and Hinglish mixed in the same sentence poorly. Indian sales teams must take manual notes during calls or rely on separate recording and transcription tools that do not integrate with the meeting context.
 
 ## Solution
 
-Minutes is meeting notes for Indian sales teams. It captures tab audio directly from an active Google Meet call, uploads it to a FastAPI backend, runs it through Groq Whisper for speech-to-text and Gemini 3.8 Flash for structured summarization, and surfaces notes, decisions, action items, and timestamped transcripts in a Next.js dashboard. Hindi, English, and Hinglish are captured together — no language selection required before the call. Open source.
+Minutes is meeting notes for Indian sales teams. It captures tab audio directly from an active Google Meet, Zoom (web client) or Microsoft Teams (web) call, uploads it to a FastAPI backend, runs it through Groq Whisper for speech-to-text and Gemini 3.8 Flash for structured summarization, and surfaces notes, decisions, action items, and timestamped transcripts in a Next.js dashboard. Hindi, English, and Hinglish are captured together — no language selection required before the call. Open source.
 
 ---
 
 ## Architecture
 
 ```
-[ Google Meet Call ]
+[ Meet / Zoom / Teams Call ]
         │
         ▼ (DOM Detection)
 [ Chrome Extension ] ──(tab capture via offscreen.html)──► [ WebM Audio Blob ]
@@ -46,6 +46,8 @@ Minutes is meeting notes for Indian sales teams. It captures tab audio directly 
 | Extension | Chrome Extension Manifest V3 | Tab audio capture via `chrome.tabCapture` and `chrome.offscreen` |
 | Speech-to-Text | Groq Whisper (`whisper-large-v3`) | Transcription with timestamped segments |
 | Summarization | Google Gemini 3.8 Flash | Structured JSON meeting notes and action items; falls back to `gemini-3.5-flash-lite` / `gemini-3.1-flash-lite` |
+| Embeddings | Gemini `gemini-embedding-001` | Transcript chunk embeddings for Ask AI; stored as JSON on `meeting_chunks` rows (no vector DB) |
+| Q&A | Gemini `gemini-3.5-flash-lite` (override with `RAG_MODEL`) | Cited answers over one meeting or all of a user's meetings |
 | Storage | Cloudflare R2 | Audio file persistence |
 | Auth | JWT (`python-jose`), bcrypt (`passlib`) | User authentication |
 
@@ -75,7 +77,7 @@ minutes/
 │   ├── background.js     # Service worker: meeting state & upload coordination
 │   ├── offscreen.html    # Offscreen document host
 │   ├── offscreen.js      # MediaRecorder tab audio capture & AudioContext passthrough
-│   ├── content.js        # Google Meet DOM detection
+│   ├── content.js        # Meet / Zoom / Teams DOM detection
 │   ├── popup.html        # Extension popup UI
 │   └── popup.js          # Authentication & status controller
 ├── AGENTS.md             # Contributor & AI assistant guidelines
@@ -88,14 +90,30 @@ minutes/
 
 ## How It Works
 
-1. **Meeting detection** — `content.js` monitors the Google Meet DOM and signals `background.js` when a call starts or ends.
+1. **Meeting detection** — `content.js` monitors the Meet, Zoom or Teams DOM and signals `background.js` when a call starts or ends.
 2. **Tab audio capture** — `background.js` obtains a tab stream ID through `chrome.tabCapture.getMediaStreamId` and spawns `offscreen.html`. Because Manifest V3 service workers cannot access `MediaRecorder` or Web Audio APIs directly, recording happens in the offscreen document.
 3. **Audio passthrough** — `offscreen.js` pipes captured audio through `AudioContext.destination` so meeting participants remain audible to the user during recording.
 4. **Upload** — `background.js` uploads the WebM audio blob to `/meetings/{id}/upload-audio`.
 5. **Storage** — The backend streams audio to Cloudflare R2.
 6. **Transcription** — Groq Whisper transcribes audio into raw text and timestamped segments. Long recordings are sliced into 10-minute chunks with offset re-stitching to bypass the 25 MB file limit.
 7. **Summarization** — Gemini 3.8 Flash analyzes the transcript and returns structured JSON with key decisions, discussion points, blockers, next steps, and action items. Falls back to `gemini-3.5-flash-lite` or `gemini-3.1-flash-lite` if the primary model is rate-limited.
-8. **Dashboard** — Notes, action items, and timestamped transcripts are displayed in the Next.js web dashboard.
+8. **Indexing** — After summarization, the transcript is split into timestamped chunks and embedded so it can be searched.
+9. **Dashboard** — Notes, action items, and timestamped transcripts are displayed in the Next.js web dashboard.
+
+### Extracted notes
+
+Each summary is a single structured Gemini JSON response containing:
+
+- **Title** — a 3–7 word meeting title
+- **Key decisions**, **discussion points**, **blockers**, and **next steps** — bullet lists
+- **Action items** — each with a description, assignee, due date, and priority (high / medium / low), and a status you can toggle in the dashboard
+
+### Ask AI (cited Q&A)
+
+- **Per meeting** — ask a question on any processed meeting; the answer is grounded only in that meeting's transcript.
+- **Across all meetings** — the `/search` page answers questions over every indexed meeting you own, capping how many excerpts come from any single meeting so one long call can't dominate.
+- **Citations** — every answer cites the transcript excerpts it used. In a meeting, clicking a citation seeks the audio player to that timestamp, starts playback, and opens the transcript, so you can hear the source.
+- **Retrieval** — cosine similarity over chunk embeddings stored in the database; meetings are indexed automatically after summarization, or on demand via `/meetings/{id}/index`.
 
 ---
 
@@ -133,6 +151,14 @@ minutes/
 | GET | `/meetings/{id}/notes` | Get generated meeting notes |
 | GET | `/meetings/{id}/action-items` | Get extracted action items |
 | PATCH | `/meetings/{id}/action-items/{item_id}` | Update action item status |
+
+### Ask AI
+
+| Method | Endpoint | Description |
+|:-------|:---------|:------------|
+| POST | `/meetings/{id}/index` | Chunk and embed a meeting transcript for search |
+| POST | `/meetings/{id}/ask` | Ask a question about one meeting; returns answer and timestamped citations |
+| POST | `/chat/ask` | Ask a question across all of the user's meetings |
 
 ---
 
@@ -216,6 +242,8 @@ Never commit real secrets to version control.
 - Groq Whisper speech-to-text with timestamped segments
 - Gemini 3.8 Flash structured JSON summarization
 - Next.js dashboard with meeting list, detail view, action item status toggles, and transcript viewer
+- Ask AI: cited Q&A per meeting and across all meetings, with citation-to-audio seek
+- Google Meet, Zoom (web client) and Microsoft Teams (web) call detection
 
 ---
 

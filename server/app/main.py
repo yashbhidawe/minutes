@@ -6,7 +6,9 @@ from app.api.chat import router as chat_router
 from app.api.meetings import router as meetings_router
 from app.api.users import router as users_router
 from app.core.db_connection import ensure_schema
+from app.core.observability import init_observability
 
+init_observability()
 app = FastAPI()
 ensure_schema()
 app.include_router(users_router)
