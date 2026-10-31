@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi import HTTPException
 
-from app.schemas.user import LoginRequest
+from app.schemas.user import LoginRequest, UserCreate
 from app.services.user import UserService
 from app.utils.verifyPassword import hash_password, verify_password
 
@@ -50,3 +50,15 @@ def test_login_rejects_invalid_password():
 
     assert error.value.status_code == 400
     assert error.value.detail == "Invalid email or password"
+
+
+def test_create_user_stores_lowercased_email():
+    repository = MagicMock()
+    repository.get_by_email.return_value = None
+    service = UserService(repository)
+
+    service.create_user(UserCreate(email="Person@Example.com", password="StrongPassword1!"))
+
+    repository.get_by_email.assert_called_once_with("person@example.com")
+    stored = repository.create.call_args.args[0]
+    assert stored.email == "person@example.com"

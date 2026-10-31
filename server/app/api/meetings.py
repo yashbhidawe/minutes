@@ -122,10 +122,11 @@ def update_action_item_status(
         raise HTTPException(status_code=404, detail="Meeting not found")
 
     action_item_repo = ActionItemRepository(session)
-    item = action_item_repo.update_status(item_id, body.status)
-    if not item:
+    existing = action_item_repo.get_by_id(item_id)
+    # The item must belong to the meeting we just authorized, not just exist.
+    if not existing or existing.meeting_id != meeting_id:
         raise HTTPException(status_code=404, detail="Action item not found")
-    return item
+    return action_item_repo.update_status(item_id, body.status)
 
 
 class CreateMeetingRequest(BaseModel):
