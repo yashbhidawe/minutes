@@ -21,8 +21,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === "STOP_RECORDING") {
+    // Ack as soon as the recorder has stopped; the upload can take a while and
+    // reports back through UPLOAD_COMPLETE / UPLOAD_FAILED.
     stopRecording()
-      .then(() => sendResponse({ ok: true }))
+      .then((job) => {
+        sendResponse({ ok: true });
+        if (job) finishUpload(job);
+      })
       .catch((err) => sendResponse({ error: err.message }));
     return true;
   }
@@ -132,62 +137,57 @@ async function startRecording(streamId, meetingId, token) {
 
 async function stopRecording() {
   if (!mediaRecorder || mediaRecorder.state === "inactive") {
+    // Recorder already ended (e.g. its tracks died with the tab). Report it so
+    // the background clears its recording state instead of waiting forever.
+    const meetingId = currentMeetingId;
     cleanup();
-    return;
+    chrome.runtime.sendMessage({
+      type: "UPLOAD_FAILED",
+      meetingId,
+      error: "Recording had already stopped — no audio was uploaded.",
+    });
+    return null;
   }
 
-  return new Promise((resolve, reject) => {
-    mediaRecorder.onstop = async () => {
-      try {
-        const durationSec = recordingStartTime
-          ? Math.floor((Date.now() - recordingStartTime) / 1000)
-          : null;
-
-        const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
-        console.log(`[Offscreen] Final audio blob created: ${audioBlob.size} bytes`);
-        cleanup();
-
-        // Upload directly from offscreen document
-        await uploadAudioToBackend(audioBlob, currentMeetingId, durationSec);
-        resolve();
-      } catch (err) {
-        cleanup();
-        chrome.runtime.sendMessage({
-          type: "UPLOAD_FAILED",
-          meetingId: currentMeetingId,
-          error: err.message,
-        });
-        reject(err);
-      }
+  return new Promise((resolve) => {
+    mediaRecorder.onstop = () => {
+      const durationSec = recordingStartTime
+        ? Math.floor((Date.now() - recordingStartTime) / 1000)
+        : null;
+      const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+      console.log(`[Offscreen] Final audio blob created: ${audioBlob.size} bytes`);
+      const job = { audioBlob, meetingId: currentMeetingId, durationSec, token: authToken };
+      cleanup();
+      resolve(job);
     };
 
     mediaRecorder.stop();
   });
 }
 
-async function uploadAudioToBackend(audioBlob, meetingId, durationSec) {
-  if (!authToken) {
-    chrome.runtime.sendMessage({
-      type: "UPLOAD_FAILED",
-      meetingId,
-      error: "Not logged in — auth token was not passed to recorder.",
-    });
-    return;
+async function finishUpload({ audioBlob, meetingId, durationSec, token }) {
+  try {
+    await uploadAudioToBackend(audioBlob, meetingId, durationSec, token);
+    chrome.runtime.sendMessage({ type: "UPLOAD_COMPLETE", meetingId });
+  } catch (err) {
+    console.error("[Offscreen] Upload failed:", err);
+    chrome.runtime.sendMessage({ type: "UPLOAD_FAILED", meetingId, error: err.message });
+  }
+}
+
+async function uploadAudioToBackend(audioBlob, meetingId, durationSec, token) {
+  if (!token) {
+    throw new Error("Not logged in — auth token was not passed to recorder.");
   }
 
   if (audioBlob.size < 1000) {
-    chrome.runtime.sendMessage({
-      type: "UPLOAD_FAILED",
-      meetingId,
-      error: "Recording too short or empty — no audio was captured.",
-    });
-    return;
+    throw new Error("Recording too short or empty — no audio was captured.");
   }
 
   const formData = new FormData();
   formData.append("file", audioBlob, `meeting_${meetingId}.webm`);
 
-  const headers = { Authorization: `Bearer ${authToken}` };
+  const headers = { Authorization: `Bearer ${token}` };
   if (durationSec && durationSec > 0) {
     headers["X-Recording-Duration"] = String(durationSec);
   }
@@ -200,20 +200,8 @@ async function uploadAudioToBackend(audioBlob, meetingId, durationSec) {
 
   if (!res.ok) {
     const errData = await res.json().catch(() => ({ detail: "Upload failed" }));
-    const errMsg = errData.detail || "Upload failed";
-    chrome.runtime.sendMessage({
-      type: "UPLOAD_FAILED",
-      meetingId,
-      error: errMsg,
-    });
-    throw new Error(errMsg);
+    throw new Error(errData.detail || "Upload failed");
   }
-
-  // Notify background to clear badge and state
-  chrome.runtime.sendMessage({
-    type: "UPLOAD_COMPLETE",
-    meetingId,
-  });
 }
 
 function cleanup() {

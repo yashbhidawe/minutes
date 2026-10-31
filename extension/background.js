@@ -21,19 +21,22 @@ let recordingState = {
   error: null,
 };
 
-// Restore state across service worker restarts
-// Guard in case storage API isn't fully bound yet (MV3 cold start race)
-if (chrome.storage && chrome.storage.local) {
+// Restore state across service worker restarts. Handlers must await
+// `stateReady`: a worker woken by a tab close or message starts with default
+// state until this storage read resolves, and would otherwise ignore the event.
+const stateReady = new Promise((resolve) => {
+  if (!(chrome.storage && chrome.storage.local)) return resolve();
   chrome.storage.local.get(["recordingState"], (result) => {
-    if (result.recordingState) {
+    if (result && result.recordingState) {
       recordingState = result.recordingState;
       if (recordingState.isRecording) {
         chrome.action.setBadgeText({ text: "REC" });
         chrome.action.setBadgeBackgroundColor({ color: "#dc2626" });
       }
     }
+    resolve();
   });
-}
+});
 
 // ─── Offscreen document helpers ─────────────────────────────────────────────
 
@@ -54,7 +57,18 @@ async function closeOffscreenDocument() {
 
 // ─── Message router ──────────────────────────────────────────────────────────
 
+const HANDLED_MESSAGES = new Set([
+  "MEETING_STARTED", "MANUAL_START_RECORDING", "MEETING_ENDED", "MANUAL_STOP_RECORDING",
+  "UPLOAD_COMPLETE", "UPLOAD_FAILED", "GET_STATUS", "SET_TOKEN", "GET_TOKEN", "LOGOUT",
+]);
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (!HANDLED_MESSAGES.has(message.type)) return false;
+  stateReady.then(() => routeMessage(message, sender, sendResponse));
+  return true;
+});
+
+function routeMessage(message, sender, sendResponse) {
   if (message.type === "MEETING_STARTED" || message.type === "MANUAL_START_RECORDING") {
     handleMeetingStarted(message, sender, sendResponse);
     return true;
@@ -135,7 +149,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse({ ok: true });
     return true;
   }
-});
+}
 
 // ─── Tab helpers ─────────────────────────────────────────────────────────────
 
@@ -262,6 +276,11 @@ async function handleMeetingEnded(message, sender, sendResponse) {
     sendResponse({ status: "uploading", meetingId: recordingState.meetingId });
   } catch (err) {
     console.error("Error stopping recording:", err);
+    // Upload already finished and state was cleared — nothing to recover.
+    if (!recordingState.isRecording) {
+      sendResponse({ status: "uploading" });
+      return;
+    }
     // Offscreen doc is gone — just clean up state
     chrome.action.setBadgeText({ text: "" });
     recordingState = { isRecording: false, meetingId: null, tabId: null, startTime: null, error: err.message };
@@ -274,12 +293,14 @@ async function handleMeetingEnded(message, sender, sendResponse) {
 // ─── Tab closed while recording ──────────────────────────────────────────────
 
 chrome.tabs.onRemoved.addListener(async (tabId) => {
+  await stateReady;
   if (recordingState.tabId === tabId && recordingState.isRecording) {
     console.log("Recorded tab closed — stopping recording and uploading...");
     try {
       await chrome.runtime.sendMessage({ type: "STOP_RECORDING" });
     } catch (err) {
       console.error("Failed to stop on tab close:", err);
+      if (!recordingState.isRecording) return;
       chrome.action.setBadgeText({ text: "" });
       recordingState = { isRecording: false, meetingId: null, tabId: null, startTime: null, error: null };
       chrome.storage.local.set({ recordingState });
