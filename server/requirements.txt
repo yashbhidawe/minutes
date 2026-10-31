@@ -32,3 +32,6 @@ pydub==0.25.1
 # audioop was removed from stdlib in Python 3.13 — backport only needed there.
 # Python 3.12 (Dockerfile) still has stdlib audioop, and audioop-lts publishes no 3.12 wheels.
 audioop-lts==0.2.2; python_version >= "3.13"
+
+# error tracking (optional: only active when SENTRY_DSN is set)
+sentry-sdk==2.19.2

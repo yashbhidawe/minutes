@@ -12,7 +12,14 @@ from app.schemas.action_item import ActionItemResponse
 from app.schemas.meeting import MeetingResponse, MeetingUploadResponse, TranscriptResponse
 from app.schemas.note import NoteResponse
 from app.services.audio import upload_audio
-from app.services.celery_tasks import BUSY_STATUSES, dispatch_meeting_task, execute_meeting_pipeline
+from app.services.celery_tasks import (
+    BUSY_STATUSES,
+    STUCK_MESSAGE,
+    dispatch_meeting_task,
+    execute_meeting_pipeline,
+    is_actively_processing,
+    stuck_cutoff,
+)
 from app.services.storage import delete_file, download_file
 from app.services.summarization import summarize_transcript
 from app.services.transcription import transcribe_audio
@@ -39,6 +46,7 @@ def list_meetings(
     session: Session = Depends(get_session),
 ):
     repo = MeetingRepository(session)
+    repo.fail_stale(user.id, BUSY_STATUSES, stuck_cutoff(), STUCK_MESSAGE)
     return repo.get_by_user(user.id)
 
 
@@ -49,6 +57,7 @@ def get_meeting(
     session: Session = Depends(get_session),
 ):
     repo = MeetingRepository(session)
+    repo.fail_stale(user.id, BUSY_STATUSES, stuck_cutoff(), STUCK_MESSAGE)
     meeting = repo.get_by_id(meeting_id)
     if not meeting or meeting.user_id != user.id:
         raise HTTPException(status_code=404, detail="Meeting not found")
@@ -174,6 +183,9 @@ async def upload_meeting_audio(
     meeting = repo.get_by_id(meeting_id)
     if not meeting or meeting.user_id != user.id:
         raise HTTPException(status_code=404, detail="Meeting not found")
+
+    if is_actively_processing(meeting):
+        raise HTTPException(status_code=409, detail="Meeting is already being processed. Please wait for it to finish.")
 
     meeting = await upload_audio(meeting_id, file, repo)
 

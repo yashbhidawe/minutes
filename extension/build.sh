@@ -42,7 +42,7 @@ mkdir -p "$DIST/icons"
 
 # Copy packaged files (config.js is generated below with prod URLs).
 cp "$EXT_DIR/manifest.json" "$EXT_DIR/background.js" "$EXT_DIR/content.js" \
-   "$EXT_DIR/dashboard-sync.js" "$EXT_DIR/offscreen.html" "$EXT_DIR/offscreen.js" \
+   "$EXT_DIR/dashboard-sync.js" "$EXT_DIR/offscreen.html" "$EXT_DIR/offscreen.js" "$EXT_DIR/recording-store.js" \
    "$EXT_DIR/permissions.html" "$EXT_DIR/permissions.js" \
    "$EXT_DIR/popup.html" "$EXT_DIR/popup.js" "$DIST/"
 cp "$EXT_DIR/icons/"*.png "$DIST/icons/"
